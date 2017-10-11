@@ -13,7 +13,7 @@
 	<description>Aviation weather message conversions - GeoWeb module</description>
 	<groupId>nl.knmi.geoweb.iwxxm</groupId>
 	<artifactId>geoweb-aviation-messageconverter</artifactId>
-	<version>1.0.2</version>
+	<version>1.0.3</version>
 
 	<scm>
 		<connection>scm:git:https://github.com/ernstdevreede/geoweb-aviation-messageconverter.git</connection>

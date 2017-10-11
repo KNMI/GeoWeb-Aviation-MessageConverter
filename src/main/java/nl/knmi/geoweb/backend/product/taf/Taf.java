@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -23,6 +24,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
 import nl.knmi.geoweb.backend.product.taf.serializers.CloudsSerializer;
 import nl.knmi.geoweb.backend.product.taf.serializers.WeathersSerializer;
 
@@ -305,6 +307,7 @@ public class Taf {
 
 		return sb.toString();
 	}
+	
 
 	// TODO use BEAN in proper way (Ask WvM)
 	@Bean(name = "objectMapper")
