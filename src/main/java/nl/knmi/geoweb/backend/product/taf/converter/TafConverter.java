@@ -1,10 +1,6 @@
 package nl.knmi.geoweb.backend.product.taf.converter;
 
-import java.io.File;
-import java.io.IOException;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -49,29 +45,26 @@ public class TafConverter {
 		if (ConversionResult.Status.SUCCESS == result.getStatus()) {
 			TAF pojo = result.getConvertedMessage();
 			//			pojo.amendTimeReferences(ZonedDateTime.of(2017, 9, 4, 6, 0, 0, 0, ZoneId.of("Z")));
-			System.out.println(pojo.getAerodrome().isResolved());
 			Aerodrome ad=pojo.getAerodrome();
 			ad.setReferencePoint(new GeoPosition("EPSG:4326", 52.0, 5.2));
 			ad.setFieldElevation(-4.);
 			ad.setLocationIndicatorICAO("EHAM");
 			ad.setName("AMSTERDAM");
-			System.out.println(pojo.getAerodrome().isResolved());
 
 			ConversionResult<String>iwxxmResult=tafIWXXMStringSerializer.convertMessage(pojo, ConversionHints.TAF);
 			if (ConversionResult.Status.SUCCESS == iwxxmResult.getStatus()) {
-				System.out.println("Result: "+iwxxmResult.getConvertedMessage());
 				return iwxxmResult.getConvertedMessage();
 			} else {
-				System.out.println("ERR: "+iwxxmResult.getStatus());
+				System.err.println("ERR: "+iwxxmResult.getStatus());
 				for (ConversionIssue iss:iwxxmResult.getConversionIssues()) {
-					System.out.println("iss: "+iss.getMessage());
+					System.err.println("iss: "+iss.getMessage());
 				}
 			}
 		}else {
-			System.out.println("Taf2IWXXM failed");
-			System.out.println("ERR: "+result.getStatus());
+			System.err.println("Taf2IWXXM failed");
+			System.err.println("ERR: "+result.getStatus());
 			for (ConversionIssue iss:result.getConversionIssues()) {
-				System.out.println("iss: "+iss.getMessage());
+				System.err.println("iss: "+iss.getMessage());
 			}
 		}
 		return "FAIL";
