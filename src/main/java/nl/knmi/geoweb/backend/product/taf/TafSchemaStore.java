@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.NotDirectoryException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -115,9 +116,9 @@ public class TafSchemaStore {
 			return new String(bytes, "utf-8");
 		} else {
 			Debug.errprintln("No taf schemas found, copying one from resources dir");
-			Debug.println("A taf_schema_1505310219.json missing: writing to store from resource");
-			String s = Tools.readResource("taf_schema_1505310219.json");
-			Tools.writeFile(this.directory + "/taf_schema_1505310219.json", s);
+			String s = Tools.readResource("TafValidatorSchema.json");
+			String fn=String.format("%s/taf_schema_%d.json",  this.directory, new Date().getTime()/1000);
+			Tools.writeFile(fn, s);
 			return getLatestTafSchema();
 		}
 
