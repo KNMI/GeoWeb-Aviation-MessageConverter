@@ -18,16 +18,16 @@ public class CloudsSerializer extends StdSerializer<List<Forecast.TAFCloudType>>
 	public CloudsSerializer () {
 		this(null);
 	}
-	
+
 	public CloudsSerializer(Class<List<Forecast.TAFCloudType>> t) {
 		super(t);
 	}
-	
+
 	@Override
 	public void serialize(
 			List<Forecast.TAFCloudType> value, JsonGenerator jgen, SerializerProvider provider)
-	throws IOException, JsonProcessingException {
-		if (value.size() == 1 && value.get(0).getIsNSC()) {
+					throws IOException, JsonProcessingException {
+		if (value.size() == 1 && value.get(0).getIsNSC() != null && value.get(0).getIsNSC()) {
 			jgen.writeString("NSC");
 		} else {
 			jgen.writeObject(value);
@@ -37,5 +37,5 @@ public class CloudsSerializer extends StdSerializer<List<Forecast.TAFCloudType>>
 	public boolean isEmpty(SerializerProvider provider, List<Forecast.TAFCloudType> value) {
 		return value == null || value.size() == 0;
 	}
-			
+
 }
