@@ -203,7 +203,7 @@
             {
                 "additionalProperties": false,
                 "properties": {
-                    "qualifier": { "type": "string", "enum": ["moderate", "heavy"]},
+                    "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
                     "descriptor": { "type": "string", "enum": ["freezing"] },
                     "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, 
                         "items": { 
@@ -219,7 +219,7 @@
             {
                 "additionalProperties": false,
                 "properties": {
-                    "qualifier": { "type": "string", "enum": ["moderate", "heavy"]},
+                    "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
                     "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["duststorm", "funnel cloud", "squall"] } }
                 },
                 "required": ["phenomena"]
@@ -227,7 +227,7 @@
             {
                 "additionalProperties": false,
                 "properties": {
-                    "qualifier": { "type": "string", "enum": ["moderate", "heavy"]},
+                    "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
                     "descriptor": { "type": "string", "enum": ["blowing", "low drifting"] },
                     "phenomena": { 
                         "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { 
@@ -243,7 +243,7 @@
             {
                 "additionalProperties": false,
                 "properties": {
-                    "qualifier": { "type": "string", "enum": ["moderate", "heavy"]},
+                    "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
                     "descriptor": { "type": "string", "enum": ["thunderstorm"] },
                     "phenomena": { 
                         "type": "array", "uniqueItems": true, "items": { 
@@ -259,7 +259,7 @@
             {
                 "additionalProperties": false,
                 "properties": {
-                    "qualifier": { "type": "string", "enum": ["moderate", "heavy"]},
+                    "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
                     "descriptor": { 
                         "type": "string", "enum": ["showers"],
                         "$geoweb::messages": {
