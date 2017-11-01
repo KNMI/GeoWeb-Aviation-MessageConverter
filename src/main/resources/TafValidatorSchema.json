@@ -24,9 +24,9 @@
             "maximum": 999,
             "multipleOf": 30, 
             "$geoweb::messages": {
-                "minimum": "Vertical visibility must be greater than 0 meters",
-                "maximum": "Vertical visibility must be less than 1000 meters",
-                "multipleOf": "Vertical visibility must a multiple of 30 meters"
+                "minimum": "Vertical visibility must be greater than FL000",
+                "maximum": "Vertical visibility must be less than FL1000",
+                "multipleOf": "Vertical visibility must a multiple of FL030"
             }
         },
         "first_cloud": {
@@ -42,9 +42,9 @@
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30, 
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than 0 meters",
-                        "maximum": "Clouds cannot be higher than 1000 meters",
-                        "multipleOf": "Cloud height must a multiple of 30 meters"
+                        "minimum": "Clouds cannot be lower than FL000",
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "multipleOf": "Cloud height must a multiple of FL030"
                     }
                 }
             }, "additionalProperties": false
@@ -62,9 +62,9 @@
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than 0 meters",
-                        "maximum": "Clouds cannot be higher than 1000 meters",
-                        "multipleOf": "Cloud height must a multiple of 30 meters"
+                        "minimum": "Clouds cannot be lower than FL000",
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "multipleOf": "Cloud height must a multiple of FL030"
                     }
                 },
                 "mod": { "type": "string", "enum": ["CB", "TCU"]}
@@ -84,9 +84,9 @@
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than 0 meters",
-                        "maximum": "Clouds cannot be higher than 1000 meters",
-                        "multipleOf": "Cloud height must a multiple of 30 meters"
+                        "minimum": "Clouds cannot be lower than FL000",
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "multipleOf": "Cloud height must a multiple of FL030"
                     }
                 }
             }, "additionalProperties": false
@@ -104,9 +104,9 @@
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than 0 meters",
-                        "maximum": "Clouds cannot be higher than 1000 meters",
-                        "multipleOf": "Cloud height must a multiple of 30 meters"
+                        "minimum": "Clouds cannot be lower than FL000",
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "multipleOf": "Cloud height must a multiple of FL030"
                     }
                 },
                 "mod": { "type": "string", "enum": ["CB", "TCU"]}
@@ -125,9 +125,9 @@
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than 0 meters",
-                        "maximum": "Clouds cannot be higher than 1000 meters",
-                        "multipleOf": "Cloud height must a multiple of 30 meters"
+                        "minimum": "Clouds cannot be lower than FL000",
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "multipleOf": "Cloud height must a multiple of FL030"
                     }
                 }
             }, "additionalProperties": false
@@ -145,9 +145,9 @@
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than 0 meters",
-                        "maximum": "Clouds cannot be higher than 1000 meters",
-                        "multipleOf": "Cloud height must a multiple of 30 meters"
+                        "minimum": "Clouds cannot be lower than FL000",
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "multipleOf": "Cloud height must a multiple of FL030"
                     }
                 },
                 "mod": { "type": "string", "enum": ["CB", "TCU"]}
@@ -161,9 +161,9 @@
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than 0 meters",
-                        "maximum": "Clouds cannot be higher than 1000 meters",
-                        "multipleOf": "Cloud height must a multiple of 30 meters"
+                        "minimum": "Clouds cannot be lower than FL000",
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "multipleOf": "Cloud height must a multiple of FL030"
                     }
                 }
             }, "additionalProperties": false
@@ -209,12 +209,12 @@
                         "items": { 
                             "type": "string", "enum": ["fog", "drizzle", "rain", "unknown precipitation"],
                             "$geoweb::messages": {
-                                "enum": "Only freezing fob, drizzle, rain, or unknown precipitation is allowed"
+                                "enum": "Only freezing fog, drizzle, rain, or unknown precipitation is allowed"
                             } 
                         } 
                     }
                 },
-                "required": ["phenomena", "descriptor"]
+                "required": ["phenomena"]
             },
             {
                 "additionalProperties": false,
@@ -334,19 +334,6 @@
                     "value": { "type": "integer", "enum": [9999] }
                 },
                 "additionalProperties": false
-            }, {
-                "properties": {
-                    "value": { 
-                        "type": "integer", "minimum": 0, "maximum": 99,
-                        "$geoweb::messages": {
-                            "minimum": "Visibility cannot be fewer than 0 kilometers",
-                            "maximum": "Visibility cannot be greater than 100 kilometers"
-                        }
-                     },
-                    "unit": { "type": "string", "enum": ["KM"] }
-                },
-                "additionalProperties": false,
-                "required": ["value", "unit"]
             }]
         },
         "wind": { 

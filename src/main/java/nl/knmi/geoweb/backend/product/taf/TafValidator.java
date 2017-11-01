@@ -259,7 +259,6 @@ public class TafValidator {
 		Debug.println("Succesfully read schema from resource");
 		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);
 		JsonNode schemaNode = ValidationUtils.getJsonNode(schemaFile);
-		System.out.println(schemaFile);
 		// This extracts the custom error messages in the JSONSchema and removes them
 		// This is necessary because otherwise the schema is invalid and thus always needs to happen.
 		// The messages map is a mapping from a pointer in the JSONSchema to another map
