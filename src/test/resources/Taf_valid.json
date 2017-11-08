@@ -42,8 +42,7 @@
 					"height": 720
 				}],
 				"visibility": {
-					"value": 9,
-					"unit" : "KM"
+					"value": 9000
 				},
 				"wind": {
 					"direction": 220,
