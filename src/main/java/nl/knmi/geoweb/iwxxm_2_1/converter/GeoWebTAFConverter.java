@@ -122,7 +122,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		} 
 
 		String windSpeedUnit=input.getForecast().getWind().getUnit();
-		if ("KT".equals(windSpeedUnit)) {
+		if ("KT".equalsIgnoreCase(windSpeedUnit)) {
 			windSpeedUnit="[kn_i]";
 		}
 
@@ -157,7 +157,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		} 
 
 		String windSpeedUnit=input.getForecast().getWind().getUnit();
-		if ("KT".equals(windSpeedUnit)) {
+		if ("KT".equalsIgnoreCase(windSpeedUnit)) {
 			windSpeedUnit="[kn_i]";
 		}
 
