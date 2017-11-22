@@ -108,7 +108,9 @@ public class Taf {
 			List<String> phenomena;
 
 			TAFWeather(String ww) {
-				isNSW = true;
+				if ("NSW".equalsIgnoreCase(ww)) {
+				    isNSW = true;
+				}
 			}
 			
 			public TAFWeather() { isNSW = null; }
