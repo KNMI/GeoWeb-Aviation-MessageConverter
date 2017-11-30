@@ -1,14 +1,21 @@
 package nl.knmi.geoweb.backend.product.taf;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -21,7 +28,9 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
@@ -29,6 +38,8 @@ import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 import nl.knmi.adaguc.tools.Debug;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Component
@@ -40,7 +51,7 @@ public class TafValidator {
 		this.tafSchemaStore = tafSchemaStore;
 	}
 	
-	public JsonNode validate(Taf taf) throws IOException, ProcessingException, JSONException {
+	public JsonNode validate(Taf taf) throws IOException, ProcessingException, JSONException, ParseException {
 		return validate(taf.toJSON());
 	}
 
@@ -181,19 +192,30 @@ public class TafValidator {
 		}
 		return pathSet;
 	}
+	
+	public static int LCSLength(String a, String b) {
+	    int[][] lengths = new int[a.length()+1][b.length()+1];
+	    
+	    // row 0 and column 0 are initialized to 0 already
+	 
+	    for (int i = 0; i < a.length(); i++)
+	        for (int j = 0; j < b.length(); j++)
+	            if (a.charAt(i) == b.charAt(j))
+	                lengths[i+1][j+1] = lengths[i][j] + 1;
+	            else
+	                lengths[i+1][j+1] =
+	                    Math.max(lengths[i+1][j], lengths[i][j+1]);
+	    return lengths[a.length()][b.length()];
+	}
 
 	private static Map<String, Set<String>> convertReportInHumanReadableErrors(ProcessingReport validationReport, Map<String, Map<String, String>> messagesMap) {
 		Map<String, Set<String>> errorMessages = new HashMap<>();
-		List<String> needles = Arrays.asList("visibility", "clouds", "wind", "weather");
 		validationReport.forEach(report -> {
 			Map<String, Set<String>> errors = pointersOfSchemaErrors(report.asJson());
 
 			// TODO: this is not ideal but filters only relevant errors
 			// Removes forecast errors iff there exists an error which contains needle
-			errors.entrySet().stream().filter(error -> 
-			!(error.getKey().contains("forecast") && 
-					existsHashmapKeyContainingString(errors, needles))
-					)
+			errors.entrySet().stream()
 			.collect(Collectors.toMap(Entry::getKey, Entry::getValue)).forEach((pointer, keywords) -> {
 				if(!messagesMap.containsKey(pointer)) {
 					return;
@@ -215,7 +237,25 @@ public class TafValidator {
 				});
 			});
 		});
-		return errorMessages;
+		List<String> keys = errorMessages.keySet().stream().collect(Collectors.toList());
+		Map<String, Set<String>> finalErrors = new HashMap<>();
+		if(keys.size() == 0) {
+			return finalErrors;
+		}
+		Collections.sort(keys);
+		final double SAME_RATIO = 1.0;
+		for(int i = 0; i < keys.size(); ++i) {
+			for (int j = i + 1; j < keys.size(); ++j) {
+				int lcs = LCSLength(keys.get(i), keys.get(j));
+				if (((double)lcs / (double)keys.get(i).length()) < SAME_RATIO) {
+					finalErrors.put(keys.get(i), errorMessages.get(keys.get(i)));
+					break;
+				}
+			}
+		}
+		String lastKey = keys.get(keys.size() - 1);
+		finalErrors.put(lastKey, errorMessages.get(lastKey));
+		return finalErrors;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -237,7 +277,7 @@ public class TafValidator {
 
 		// Remove custom fields
 		removeGeowebPrefixedFields(schemaNode);
-
+		
 		return messagesMap;
 	}
 	
@@ -252,12 +292,134 @@ public class TafValidator {
 		
 		return validReport.isSuccess();
 	}
+	
+	public static void enrich(JsonNode input) throws ParseException {
+		augmentChangegroupsIncreasingInTime(input);
+		augmentOverlappingBecomingChangegroups(input);
+		augmentChangegroupDuration(input);
+		augmentWindGust(input);
+		augmentAscendingClouds(input);
+	}
+	
+	private static void augmentAscendingClouds(JsonNode input) throws ParseException {
+		List<JsonNode> forecasts = input.findParents("clouds");
+		for (JsonNode forecast : forecasts) {
+			ObjectNode editableForecast = (ObjectNode) forecast;
+			int prevHeight = 0;
+			JsonNode node = forecast.findValue("clouds");
+			if(node.getClass().equals(String.class) || node.getClass().equals(TextNode.class)) {
+				editableForecast.put("cloudsAscending", true);
+				continue;
+			};
+			boolean ascending = true;
+			for (JsonNode cloud : node) {
+				ObjectNode cloudNode = (ObjectNode) cloud;
+				JsonNode cloudHeight = cloudNode.findValue("height");
+				if (cloudHeight == null) continue;
+				int height = Integer.parseInt(cloudHeight.asText());
+				
+				// If ascending hadn't been previously set to false and the height is greater than the previously seen height
+				// we keep it at true, otherwise we set it at false
+				if (ascending) {
+					if (height < prevHeight) {
+						ascending = false;
+					}
+				}
+				prevHeight = height;
+			}
+			editableForecast.put("cloudsAscending", ascending);
+		}
+	}
+	
+	private static void augmentWindGust(JsonNode input) throws ParseException {
+		List<JsonNode> windGroups = input.findValues("wind");
+		for(JsonNode node : windGroups) {
+			ObjectNode windNode = (ObjectNode) node;
+			JsonNode gustField = node.findValue("gusts");
+			if(gustField == null) continue;
+			int gust = Integer.parseInt(gustField.asText());
+			int windspeed = Integer.parseInt(node.findValue("speed").asText());
+			windNode.put("gustFastEnough", gust >= (windspeed + 10));
+		}
+	}
+	
+	private static void augmentChangegroupDuration(JsonNode input) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+		JsonNode changeGroups = input.get("changegroups");
+		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
+			ObjectNode changegroup = (ObjectNode) change.next();
+			Date changeStart = formatter.parse(changegroup.findValue("changeStart").asText());
+			Date changeEnd = null; 
+			JsonNode end = changegroup.findValue("changeEnd");
+			if (end != null) {
+				changeEnd = formatter.parse(end.asText());
+			} else {
+				changeEnd = formatter.parse(input.findValue("validityEnd").asText());
+			}
+			long diffInMillies = Math.abs(changeEnd.getTime() - changeStart.getTime());
+			long diffInHours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+			changegroup.put("changeDurationInHours", diffInHours);
+		}
+	}
+	
+	private static void augmentOverlappingBecomingChangegroups(JsonNode input) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-	public JsonNode validate(String tafStr) throws  ProcessingException, JSONException, IOException {
-		// Locate the schema file
-		String schemaFile = tafSchemaStore.getLatestTafSchema();
-		Debug.println("Succesfully read schema from resource");
-		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);
+		List<Date> becmgEndTimes = new ArrayList<Date>();
+		JsonNode changeGroups = input.get("changegroups");
+		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
+			ObjectNode changegroup = (ObjectNode) change.next();
+			String type = changegroup.findValue("changeType").asText();
+			if (!"BECMG".equals(type)) continue;
+			Date becmgStart = formatter.parse(changegroup.findValue("changeStart").asText());
+			boolean overlap = false;
+			for (Date otherEnd : becmgEndTimes) {
+				if (becmgStart.before(otherEnd)) {
+					overlap = true;
+				}
+			}
+			becmgEndTimes.add(formatter.parse(changegroup.findValue("changeEnd").asText()));
+			changegroup.put("changegroupBecomingOverlaps", overlap);
+		}
+	}
+	
+	private static void augmentChangegroupsIncreasingInTime(JsonNode input) throws ParseException {
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+		java.util.Date prevChangeStart = formatter.parse(input.findValue("validityStart").asText());
+		JsonNode changeGroups = input.get("changegroups");
+		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
+			ObjectNode changegroup = (ObjectNode) change.next();
+			String changeStart = changegroup.findValue("changeStart").asText();
+			java.util.Date parsedDate = formatter.parse(changeStart);
+			boolean comesAfter = parsedDate.after(prevChangeStart);
+			changegroup.put("changegroupsAscending", comesAfter);
+		}
+	}
+	
+	public DualReturn performValidation(String schemaFile, String tafStr) throws IOException, ProcessingException {
+		return performValidation(schemaFile, ValidationUtils.getJsonNode(tafStr));
+	}
+	
+	private class DualReturn {
+		@Getter
+		@Setter
+		private ProcessingReport report = null;
+		
+		@Getter
+		@Setter
+		private Map<String, Map<String, String>> messages = null;
+		
+		public DualReturn(ProcessingReport report, Map<String, Map<String, String>> messages) {
+			this.report = report;
+			this.messages = messages;
+		}
+	}
+
+	public DualReturn performValidation(String schemaFile, JsonNode jsonNode) throws IOException, ProcessingException {
 		JsonNode schemaNode = ValidationUtils.getJsonNode(schemaFile);
 		// This extracts the custom error messages in the JSONSchema and removes them
 		// This is necessary because otherwise the schema is invalid and thus always needs to happen.
@@ -271,21 +433,58 @@ public class TafValidator {
 		// Construct the final schema based on the filtered schema
 		final JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
 		final JsonSchema schema = factory.getJsonSchema(schemaNode);
-
 		// Try and validate the TAF
 		ProcessingReport validationReport = schema.validate(jsonNode);
+		return new DualReturn(validationReport, messagesMap);
+	}
+	
+	public JsonNode validate(String tafStr) throws  ProcessingException, JSONException, IOException, ParseException {
+		String schemaFile = tafSchemaStore.getLatestTafSchema();
+		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);
+
+		DualReturn ret = performValidation(schemaFile, jsonNode);
+		ProcessingReport validationReport = ret.getReport();
+		Map<String, Map<String, String>> messagesMap = ret.getMessages();
+
 		// If the validation is not successful we try to find all relevant errors
 		// They are relevant if the error path in the schema exist in the possibleMessages set
-		if(validationReport != null && !validationReport.isSuccess()) {
-			// Try to find all possible errors and map them to the human-readable variants using the messages map
-			Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);
-			String json = new ObjectMapper().writeValueAsString(errorMessages);
-			JsonNode finalJson = ValidationUtils.getJsonNode(json);
-			((ObjectNode)finalJson).put("succeeded", "false");
-			return finalJson;
+		if (validationReport == null) {
+			ObjectMapper om = new ObjectMapper();
+			JsonNode errorNode = om.readTree("{\"succeeded\": false, \"message\": \"Validation report was null\"");
+			return errorNode;
 		}
-		JSONObject succeededObject = new JSONObject();
-		succeededObject.put("succeeded", "true");
-		return ValidationUtils.getJsonNode(succeededObject.toString());
+		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
+		JsonNode errorJson = new ObjectMapper().readTree("{\"succeeded\": false}");
+		if(!validationReport.isSuccess()) {
+			String errorsAsJson = new ObjectMapper().writeValueAsString(errorMessages);
+			// Try to find all possible errors and map them to the human-readable variants using the messages map
+			((ObjectNode)errorJson).setAll((ObjectNode)(ValidationUtils.getJsonNode(errorsAsJson)));
+		} 
+		
+		// Enrich the JSON with custom data validation, this is validated using a second schema
+		enrich(jsonNode);
+		String enrichedSchemaFile = tafSchemaStore.getLatestEnrichedTafSchema();
+		ret = performValidation(enrichedSchemaFile, jsonNode);
+		ProcessingReport enrichedValidationReport = ret.getReport();
+		Map<String, Map<String, String>> enrichedMessagesMap = ret.getMessages();
+		if (enrichedValidationReport == null) {
+			ObjectMapper om = new ObjectMapper();
+			JsonNode errorNode = om.readTree("{\"succeeded\": false, \"message\": \"Validation report was null\"");
+			return errorNode;
+		}
+		if(!enrichedValidationReport.isSuccess()) {
+			// Try to find all possible errors and map them to the human-readable variants using the messages map
+			// Append them to any previous errors, if any
+			Map<String, Set<String>> enrichedErrorMessages = convertReportInHumanReadableErrors(enrichedValidationReport, enrichedMessagesMap);
+			String errorsAsJson = new ObjectMapper().writeValueAsString(enrichedErrorMessages);
+			((ObjectNode)errorJson).setAll((ObjectNode)ValidationUtils.getJsonNode(errorsAsJson));
+		}
+		
+		if (enrichedValidationReport.isSuccess() && validationReport.isSuccess()) {
+			JSONObject succeededObject = new JSONObject();
+			succeededObject.put("succeeded", "true");
+			return ValidationUtils.getJsonNode(succeededObject.toString());
+		}
+		return errorJson;
 	}
 }

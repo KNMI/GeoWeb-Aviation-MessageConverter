@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +41,7 @@ public class TafValidatorTest {
 	}
 	
 	@Test
-	public void testValidateFails () throws IOException, JSONException, ProcessingException  {
+	public void testValidateFails () throws IOException, JSONException, ProcessingException, ParseException  {
 		TafSchemaStore tafSchemaStore =  new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore);
 

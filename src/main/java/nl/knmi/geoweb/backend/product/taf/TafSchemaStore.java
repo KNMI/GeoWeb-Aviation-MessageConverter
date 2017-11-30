@@ -1,5 +1,7 @@
 package nl.knmi.geoweb.backend.product.taf;
 
+import static org.mockito.Matchers.contains;
+
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -96,14 +98,39 @@ public class TafSchemaStore {
 		}
 		return null;
 	}
-	
+	public String getLatestEnrichedTafSchema() throws IOException {
+		File dir=new File(directory);
+		File[] files=dir.listFiles(new FilenameFilter() {
+
+			@Override
+			public boolean accept(File dir, String name) {
+				return !name.contains("..") && name.contains("enriched_taf_schema")&&name.endsWith(".json");
+			}
+		});
+		
+		// Timestamp is in the file so sort files according to this timestamp
+		// Oldest are first so pick the final element in the array
+		if (files!=null && files.length > 0) {
+			Arrays.sort(files, (a, b) -> getTimestamp(a.getName()).compareTo(getTimestamp(b.getName())));
+			File latest = files[files.length - 1];
+			byte[] bytes = Files.readAllBytes(latest.toPath());
+			return new String(bytes, "utf-8");
+		} else {
+			Debug.errprintln("No taf schemas found, copying one from resources dir");
+			String s = Tools.readResource("EnrichedTafValidatorSchema.json");
+			String fn=String.format("%s/enriched_taf_schema_%d.json",  this.directory, new Date().getTime()/1000);
+			Tools.writeFile(fn, s);
+			return getLatestTafSchema();
+		}
+
+	}
 	public String getLatestTafSchema() throws IOException {
 		File dir=new File(directory);
 		File[] files=dir.listFiles(new FilenameFilter() {
 
 			@Override
 			public boolean accept(File dir, String name) {
-				return !name.contains("..") && name.contains("taf_schema")&&name.endsWith(".json");
+				return !name.contains("..") && name.contains("taf_schema") && !name.contains("enriched") && name.endsWith(".json");
 			}
 		});
 		
