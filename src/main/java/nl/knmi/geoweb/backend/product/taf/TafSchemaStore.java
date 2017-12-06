@@ -1,7 +1,5 @@
 package nl.knmi.geoweb.backend.product.taf;
 
-import static org.mockito.Matchers.contains;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
