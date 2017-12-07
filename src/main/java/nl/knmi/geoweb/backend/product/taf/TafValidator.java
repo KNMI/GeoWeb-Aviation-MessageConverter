@@ -397,6 +397,7 @@ public class TafValidator {
 			java.util.Date parsedDate = formatter.parse(changeStart);
 			boolean comesAfter = parsedDate.after(prevChangeStart);
 			changegroup.put("changegroupsAscending", comesAfter);
+			prevChangeStart = parsedDate;
 		}
 	}
 	
