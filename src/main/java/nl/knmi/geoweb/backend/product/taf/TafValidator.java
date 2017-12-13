@@ -584,7 +584,6 @@ public class TafValidator {
 		
 		// Enrich the JSON with custom data validation, this is validated using a second schema
 		enrich(jsonNode);
-		System.out.println(jsonNode);
 		String enrichedSchemaFile = tafSchemaStore.getLatestEnrichedTafSchema();
 		ret = performValidation(enrichedSchemaFile, jsonNode);
 		ProcessingReport enrichedValidationReport = ret.getReport();
