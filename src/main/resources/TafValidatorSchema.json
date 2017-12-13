@@ -26,7 +26,7 @@
             "$geoweb::messages": {
                 "minimum": "Vertical visibility must be greater than FL000",
                 "maximum": "Vertical visibility must be less than FL1000",
-                "multipleOf": "Vertical visibility must a multiple of FL030"
+                "multipleOf": "Vertical visibility must a multiple of 100ft"
             }
         },
         "first_cloud": {
@@ -44,7 +44,7 @@
                     "$geoweb::messages": {
                         "minimum": "Clouds cannot be lower than FL000",
                         "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of FL030"
+                        "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 }
             }, "additionalProperties": false
@@ -64,7 +64,7 @@
                     "$geoweb::messages": {
                         "minimum": "Clouds cannot be lower than FL000",
                         "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of FL030"
+                        "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 },
                 "mod": { "type": "string", "enum": ["CB", "TCU"]}
@@ -86,7 +86,7 @@
                     "$geoweb::messages": {
                         "minimum": "Clouds cannot be lower than FL000",
                         "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of FL030"
+                        "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 }
             }, "additionalProperties": false
@@ -106,7 +106,7 @@
                     "$geoweb::messages": {
                         "minimum": "Clouds cannot be lower than FL000",
                         "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of FL030"
+                        "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 },
                 "mod": { "type": "string", "enum": ["CB", "TCU"]}
@@ -127,7 +127,7 @@
                     "$geoweb::messages": {
                         "minimum": "Clouds cannot be lower than FL000",
                         "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of FL030"
+                        "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 }
             }, "additionalProperties": false
@@ -147,7 +147,7 @@
                     "$geoweb::messages": {
                         "minimum": "Clouds cannot be lower than FL000",
                         "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of FL030"
+                        "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 },
                 "mod": { "type": "string", "enum": ["CB", "TCU"]}
@@ -163,7 +163,7 @@
                     "$geoweb::messages": {
                         "minimum": "Clouds cannot be lower than FL000",
                         "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of FL030"
+                        "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 }
             }, "additionalProperties": false
@@ -207,20 +207,36 @@
                     "descriptor": { "type": "string", "enum": ["freezing"] },
                     "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, 
                         "items": { 
-                            "type": "string", "enum": ["fog", "drizzle", "rain", "unknown precipitation"],
+                            "type": "string", "enum": ["fog", "drizzle", "rain"],
                             "$geoweb::messages": {
-                                "enum": "Only freezing fog, drizzle, rain, or unknown precipitation is allowed"
+                                "enum": "Only freezing fog, drizzle or rain is allowed"
                             } 
                         } 
                     }
                 },
-                "required": ["phenomena"]
+                "required": ["phenomena", "descriptor"]
             },
             {
                 "additionalProperties": false,
                 "properties": {
                     "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
-                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["duststorm", "funnel cloud", "squall"] } }
+                    "descriptor": { "type": "string", "enum": ["shallow", "patches", "partial", "low drifting"] },
+                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, 
+                        "items": { 
+                            "type": "string", "enum": ["fog"],
+                            "$geoweb::messages": {
+                                "enum": "Only fog can be shallow, patchy or partial"
+                            } 
+                        } 
+                    }
+                },
+                "required": ["phenomena", "descriptor"]
+            },
+            {
+                "additionalProperties": false,
+                "properties": {
+                    "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
+                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["duststorm", "funnel cloud", "squall", "snow", "snow grains", "ice pellets", "mist", "smoke", "volcanic ash", "widespread dust", "sand", "haze", "dust", "funnel clouds", "sandstorm"] } }
                 },
                 "required": ["phenomena"]
             },
@@ -247,9 +263,9 @@
                     "descriptor": { "type": "string", "enum": ["thunderstorm"] },
                     "phenomena": { 
                         "type": "array", "uniqueItems": true, "items": { 
-                            "type": "string", "enum": ["rain", "snow", "small hail", "hail", "unkown precipitation"],
+                            "type": "string", "enum": ["rain", "snow", "small hail", "hail", "squalls"],
                             "$geoweb::messages": {
-                                "enum": "Thunderstorm only allowed with no additional phenomena, rain, snow, small hail or unknown precipitation"
+                                "enum": "Thunderstorm only allowed with no additional phenomena, rain, snow or small hail"
                             } 
                         } 
                     }
@@ -268,9 +284,9 @@
                     },
                     "phenomena": { 
                         "type": "array", "uniqueItems": true, "minItems": 1, "items": { 
-                            "type": "string", "enum": ["rain", "snow", "small hail", "hail", "unkown precipitation"],
+                            "type": "string", "enum": ["rain", "snow", "small hail", "hail", "snow grains"],
                             "$geoweb::messages": {
-                                "enum": "Showers only allowed with rain, snow, small hail or unknown precipitation"
+                                "enum": "Showers only allowed with rain, snow, snow grains or small hail"
                             } 
                         }
                     }
@@ -344,7 +360,7 @@
                 "properties": {
                     "direction": { "type": "string", "enum": ["VRB"],
                     "$geoweb::messages": {
-                        "enum": "Direction must be variable or between 0 and 360 degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
+                        "oneOf": "Direction must be variable or one of (0, 10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
                     } },
                     "speed": { "type": "integer", "maximum": 2, "minimum": 0 },
                     "unit": { "type": "string", "enum": ["KT"],
@@ -365,10 +381,10 @@
                 "properties": {
                     "direction": {"oneOf": [
                         { "type": "string", "enum": ["VRB"] },
-                        { "type": "integer", "minimum": 0, "maximum": 360 }
+                        { "type": "integer", "minimum": 0, "maximum": 360, "multipleOf": 10 }
                       ],
                 "$geoweb::messages": {
-                    "oneOf": "Direction must be variable or between 0 and 360 degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
+                   "oneOf": "Direction must be variable or one of (0, 10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
                 } },
                     "speed": { "type": "integer", "minimum": 3, "maximum": 99, 
                     "$geoweb::messages": {
@@ -386,10 +402,10 @@
                 "properties": {
                     "direction": {"oneOf": [
                         { "type": "string", "enum": ["VRB"] },
-                        { "type": "integer", "minimum": 0, "maximum": 360 }
+                        { "type": "integer", "minimum": 0, "maximum": 360, "multipleOf": 10 }
                       ],
                 "$geoweb::messages": {
-                    "oneOf": "Direction must be variable or between 0 and 360 degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
+                   "oneOf": "Direction must be variable or one of (0, 10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
                 } },
                     "speed": { "type": "string", "enum": ["P99"] },
                     "unit": { "type": "string", "enum": ["KT"] },
@@ -400,10 +416,10 @@
                 "properties": {
                     "direction": {"oneOf": [
                         { "type": "string", "enum": ["VRB"] },
-                        { "type": "integer", "minimum": 0, "maximum": 360 }
+                        { "type": "integer", "minimum": 0, "maximum": 360, "multipleOf": 10 }
                       ],
                 "$geoweb::messages": {
-                    "oneOf": "Direction must be variable or between 0 and 360 degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
+                    "oneOf": "Direction must be variable or one of (0, 10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
                 } },
                     "speed": { "type": "string", "enum": ["P49"] },
                     "unit": { "type": "string", "enum": ["MPS"] },
@@ -415,10 +431,10 @@
                 "properties": {
                     "direction": {"oneOf": [
                         { "type": "string", "enum": ["VRB"] },
-                        { "type": "integer", "minimum": 0, "maximum": 360 }
+                        { "type": "integer", "minimum": 0, "maximum": 360, "multipleOf": 10 }
                       ],
                     "$geoweb::messages": {
-                        "oneOf": "Direction must be variable or between 0 and 360 degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
+                        "oneOf": "Direction must be variable or one of (0, 10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
                     } },
                     "speed": { "type": "integer", "minimum": 2, "maximum": 49 },
                     "unit": { "type": "string", "enum": ["MPS"] },
@@ -441,8 +457,7 @@
                         "visibility": {"$ref": "#/definitions/visibility"},
                         "weather": {"$ref": "#/definitions/weather"},
                         "clouds": {"$ref": "#/definitions/clouds"}
-                    },
-                    "required": ["wind", "visibility", "weather", "clouds"]
+                    }
                 },
                 {
                     "additionalProperties": false,

@@ -27,6 +27,34 @@
                             "minimum": "Changegroup must last at least one hour",
                             "maximum": "Changegroup can't last all day"
                      	}
+                    },
+                    "cloudsNeededAndPresent":{
+                    	"type": "boolean",
+                    	"enum": [false],
+                        "$geoweb::messages": {
+                    		"enum": "Clouds are necessary for rain"
+                        }
+                    },
+                    "endAfterStart": {
+                    	"type": "boolean",
+                    	"enum": [true],
+                    	"$geoweb::messages": {
+                    		"enum": "The end of the change must be after the start"
+                    	}
+                    },
+                    "visibilityWeatherRequiredAndPresent": {
+                    	"type": "boolean",
+                    	"enum": [true],
+                    	"$geoweb::messages": {
+                    		"enum": "If the visibility is less than 5000 meters weather groups are required"
+                    	}
+                    },
+                    "windEnoughDifference": {
+                    	"type": "boolean",
+                    	"enum": [true],
+                    	"$geoweb::messages": {
+                    		"enum": "Change in wind must be at least 30 degrees or 5 knots"
+                    	}
                     }
                 }  
             }, {
@@ -43,6 +71,13 @@
                      	}
                     },
 
+                    "cloudsNeededAndPresent":{
+                    	"type": "boolean",
+                    	"enum": [true],
+                        "$geoweb::messages": {
+                    		"enum": "Clouds are necessary for rain"
+                        }
+                    },
                     "changegroupBecomingOverlaps": {
                         "type": "boolean",
                         "enum": [false],
@@ -62,6 +97,27 @@
                             "minimum": "Changegroups must be at least one hour",
                             "maximum": "BECMG changegroups should be shorter than 2 hours, but strictly shorter than 4 hours"
                      	}
+                    },
+                    "endAfterStart": {
+                    	"type": "boolean",
+                    	"enum": [true],
+                    	"$geoweb::messages": {
+                    		"enum": "The end of the change must be after the start"
+                    	}
+                    },
+                    "visibilityWeatherRequiredAndPresent": {
+                    	"type": "boolean",
+                    	"enum": [true],
+                    	"$geoweb::messages": {
+                    		"enum": "If the visibility is less than 5000 meters weather groups are required"
+                    	}
+                    },
+                    "windEnoughDifference": {
+                    	"type": "boolean",
+                    	"enum": [true],
+                    	"$geoweb::messages": {
+                    		"enum": "Change in wind must be at least 30 degrees or 5 knots"
+                    	}
                     }
                 }
 			}
@@ -71,6 +127,13 @@
     		"type": "object",
     		"properties": {
     		
+                "cloudsNeededAndPresent":{
+                	"type": "boolean",
+                	"enum": [true],
+                    "$geoweb::messages": {
+                		"enum": "Clouds are necessary for rain"
+                    }
+                },
                 "cloudsAscending": {
                     "type": "boolean",
                     "enum": [true],

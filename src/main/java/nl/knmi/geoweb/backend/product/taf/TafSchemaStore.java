@@ -114,7 +114,7 @@ public class TafSchemaStore {
 			byte[] bytes = Files.readAllBytes(latest.toPath());
 			return new String(bytes, "utf-8");
 		} else {
-			Debug.errprintln("No taf schemas found, copying one from resources dir");
+			Debug.errprintln("No enriched taf schemas found, copying one from resources dir");
 			String s = Tools.readResource("EnrichedTafValidatorSchema.json");
 			String fn=String.format("%s/enriched_taf_schema_%d.json",  this.directory, new Date().getTime()/1000);
 			Tools.writeFile(fn, s);
@@ -138,7 +138,8 @@ public class TafSchemaStore {
 			Arrays.sort(files, (a, b) -> getTimestamp(a.getName()).compareTo(getTimestamp(b.getName())));
 			File latest = files[files.length - 1];
 			byte[] bytes = Files.readAllBytes(latest.toPath());
-			return new String(bytes, "utf-8");
+			String result = new String(bytes, "utf-8");
+			return result;
 		} else {
 			Debug.errprintln("No taf schemas found, copying one from resources dir");
 			String s = Tools.readResource("TafValidatorSchema.json");
