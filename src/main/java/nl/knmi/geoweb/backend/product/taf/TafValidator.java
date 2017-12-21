@@ -295,15 +295,22 @@ public class TafValidator {
 	
 	private static void augmentCloudNeededRain(JsonNode input) {
 		ObjectNode forecast = (ObjectNode) input.get("forecast");
+		if (forecast == null || forecast.isNull() || forecast.isMissingNode()) return;
+
 		JsonNode forecastWeather = input.get("forecast").get("weather");
 		JsonNode forecastClouds = input.get("forecast").get("clouds");
-		
+		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode()) return;
+		if (forecastClouds == null || forecastClouds.isNull() || forecastClouds.isMissingNode()) return;
+
 		processWeatherAndCloudGroup(forecast, forecastWeather, forecastClouds);
 		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			JsonNode changegroup = (ObjectNode) change.next();
-			ObjectNode changeForecast = (ObjectNode)changegroup.get("forecast");
+			JsonNode changeForecastNode = changegroup.get("forecast");
+			if (changeForecastNode == null || changeForecastNode.isMissingNode() || changeForecastNode.isNull()) continue;
+			ObjectNode changeForecast = (ObjectNode) changeForecastNode;
 			JsonNode changeWeather = changeForecast.get("weather");
 			JsonNode changeClouds = changeForecast.get("clouds");
 			processWeatherAndCloudGroup(changeForecast, changeWeather, changeClouds);
@@ -335,11 +342,17 @@ public class TafValidator {
 	}
 	
 	private static void augmentEnoughWindChange(JsonNode input) {
-		JsonNode forecastWind = input.get("forecast").get("wind");
+		JsonNode forecastNode = input.get("forecast");
+		if (forecastNode == null || forecastNode.isNull() || forecastNode.isMissingNode()) return;
+
+		JsonNode forecastWind = forecastNode.get("wind");
+		if (forecastWind == null || forecastWind.isNull() || forecastWind.isMissingNode()) return;
+
 		if (forecastWind == null || !forecastWind.has("direction") || !forecastWind.has("speed")) return;
 		int forecastWindDirection = forecastWind.get("direction").asInt();
 		int forecastWindSpeed = forecastWind.get("speed").asInt();
 		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			if (!changegroup.has("forecast")) continue;
@@ -359,13 +372,15 @@ public class TafValidator {
 	
 	private static void augmentVisibilityWeatherRequired(JsonNode input) {
 		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			JsonNode visibilityNode = changegroup.findValue("visibility");
 			if (visibilityNode == null || !visibilityNode.has("value")) continue;
 			int visibility = visibilityNode.get("value").asInt();
 			if (visibility <= 5000) {
-				changegroup.put("visibilityWeatherRequiredAndPresent", changegroup.findValue("weather").isArray());
+				JsonNode weather = changegroup.findValue("weather");
+				changegroup.put("visibilityWeatherRequiredAndPresent", weather != null && weather.isArray());
 			}
 		}
 	}
@@ -375,6 +390,7 @@ public class TafValidator {
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			JsonNode changeStartNode = changegroup.findValue("changeStart");
@@ -420,6 +436,7 @@ public class TafValidator {
 	
 	private static void augmentWindGust(JsonNode input) throws ParseException {
 		List<JsonNode> windGroups = input.findValues("wind");
+		if (windGroups == null) return;
 		for(JsonNode node : windGroups) {
 			ObjectNode windNode = (ObjectNode) node;
 			JsonNode gustField = node.findValue("gusts");
@@ -434,6 +451,7 @@ public class TafValidator {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			JsonNode changeStartNode = changegroup.findValue("changeStart");
@@ -458,6 +476,7 @@ public class TafValidator {
 
 		List<Date> becmgEndTimes = new ArrayList<Date>();
 		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			String type = changegroup.findValue("changeType").asText();
@@ -478,14 +497,15 @@ public class TafValidator {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-		java.util.Date prevChangeStart = formatter.parse(input.findValue("validityStart").asText());
+		Date prevChangeStart = formatter.parse(input.findValue("validityStart").asText());
 		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			JsonNode changeStartNode = changegroup.findValue("changeStart");
 			if (changeStartNode == null) continue;
 			String changeStart = changeStartNode.asText();
-			java.util.Date parsedDate = formatter.parse(changeStart);
+			Date parsedDate = formatter.parse(changeStart);
 			boolean comesAfter = parsedDate.after(prevChangeStart);
 			changegroup.put("changegroupsAscending", comesAfter);
 			prevChangeStart = parsedDate;
@@ -530,10 +550,19 @@ public class TafValidator {
 	}
 	
 	private static void removeLastEmptyChangegroup(JsonNode jsonNode) {
-		ArrayNode changegroups = (ArrayNode)jsonNode.at("/changegroups");
+		if (jsonNode == null) return;
+		JsonNode changegroupsNode = jsonNode.at("/changegroups");
+		if (changegroupsNode == null || changegroupsNode.isMissingNode() || changegroupsNode.isNull()) return;
+		ArrayNode changegroups = (ArrayNode)changegroupsNode;
 		// If there are no changegroups we are done
 		if (changegroups == null || changegroups.size() == 0) return;
-		ObjectNode lastChangegroup = (ObjectNode) changegroups.get(changegroups.size() - 1);
+		for (int i = 0; i < changegroups.size(); i++) {
+			JsonNode elem = changegroups.get(i);
+			if (elem == null || elem.isMissingNode() || elem.isNull() || elem.size() == 0) {
+				changegroups.remove(i);
+			}
+		}
+		JsonNode lastChangegroup = changegroups.get(changegroups.size() - 1);
 
 		// If the last changegroup is null or {} we can throw it away
 		if (lastChangegroup == null || lastChangegroup.size() == 0) {

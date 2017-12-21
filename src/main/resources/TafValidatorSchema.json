@@ -314,6 +314,7 @@
             "type": "object",
             "oneOf": [{
                 "properties": {
+                	"unit": { "type": "string", "enum": ["M", "KM"] },
                     "value": { 
                         "type": "integer", "minimum": 0, "maximum": 799, "multipleOf": 50 ,
                         "$geoweb::messages": {
@@ -325,6 +326,7 @@
                 "additionalProperties": false
             },{
                 "properties": {
+                    "unit": { "type": "string", "enum": ["M", "KM"] },
                     "value": { 
                         "type": "integer", "minimum": 800, "maximum": 4999, "multipleOf": 100,
                         "$geoweb::messages": {
@@ -336,6 +338,7 @@
                 "additionalProperties": false
             }, {
                 "properties": {
+                    "unit": { "type": "string", "enum": ["M", "KM"] },
                     "value": { 
                         "type": "integer", "minimum": 5000, "maximum": 9999, "multipleOf": 1000,
                         "$geoweb::messages": {
@@ -347,6 +350,7 @@
                 "additionalProperties": false
             }, {
                 "properties": {
+                    "unit": { "type": "string", "enum": ["M", "KM"] },
                     "value": { "type": "integer", "enum": [9999] }
                 },
                 "additionalProperties": false
@@ -448,39 +452,47 @@
         ]},
         "forecast": {
             "type": "object",
-
-            "oneOf": [
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "wind": {"$ref": "#/definitions/wind"},
-                        "visibility": {"$ref": "#/definitions/visibility"},
-                        "weather": {"$ref": "#/definitions/weather"},
-                        "clouds": {"$ref": "#/definitions/clouds"}
-                    }
-                },
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "wind": {"$ref": "#/definitions/wind"},
-                        "visibility": {"$ref": "#/definitions/visibility"},
-                        "weather": {"$ref": "#/definitions/weather"},
-                        "vertical_visibility": {"$ref": "#/definitions/vertical_visibility"}
-                    },
-                    "required": ["wind", "visibility", "weather", "vertical_visibility"]
-                },
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "wind": {"$ref": "#/definitions/wind"},
-                        "caVOK": {"type": "boolean" }                    
-                    },
-                    "required": ["wind", "caVOK"],
-                    "$geoweb::messages": {
-                        "required": "Forecast is a wind group with visibilty, weather, either clouds or vertical visibility or CAVOK"
-                    }
-                }
-            ]
+            "allOf": [
+            {
+	            "anyOf": [
+	            	{"required": ["wind"]},
+	            	{"required": ["visibility"]},
+	            	{"required": ["weather"]},
+	            	{"required": ["clouds"]},
+	            	{"required": ["vertical_visibility"]},
+	            	{"required": ["temperature"]},
+	            	{"required": ["caVOK"]}
+	            ]
+	        }, {
+	            "anyOf": [
+	                {
+	                    "additionalProperties": false,
+	                    "properties": {
+	                        "wind": {"$ref": "#/definitions/wind"},
+	                        "visibility": {"$ref": "#/definitions/visibility"},
+	                        "weather": {"$ref": "#/definitions/weather"},
+	                        "clouds": {"$ref": "#/definitions/clouds"}
+	                    }
+	                },
+	                {
+	                    "additionalProperties": false,
+	                    "properties": {
+	                        "wind": {"$ref": "#/definitions/wind"},
+	                        "visibility": {"$ref": "#/definitions/visibility"},
+	                        "weather": {"$ref": "#/definitions/weather"},
+	                        "vertical_visibility": {"$ref": "#/definitions/vertical_visibility"}
+	                    }
+	                },
+	                {
+	                    "additionalProperties": false,
+	                    "properties": {
+	                        "wind": {"$ref": "#/definitions/wind"},
+	                        "caVOK": {"type": "boolean" }                    
+	                    }
+	                }
+	            ]
+	            }
+	        ]
         },
         "base_forecast": {
             "type": "object",
@@ -534,7 +546,7 @@
                 "location": { "type": "string", "enum": ["EHAL", "EHAM", "EHBD", "EHBK", "EHDB", "EHDL", "EHDP", "EHDR", "EHEH", "EHGG", "EHGR", "EHND", "EHHO", "EHHV", "EHKD", "EHVK", "EHLE", "EHLW", "EHMC", "EHMZ", "EHOW", "EHRD", "EHSB", "EHSE", "EHST", "EHTE", "EHTL", "EHTW", "EHTX", "EHVB", "EHVE", "EHWO", "EHYB", "EHYP"]}
             },
             "additionalProperties": false,
-            "required": ["issueTime", "validityStart", "validityEnd", "status", "type", "location"],
+            "required": ["issueTime", "validityStart", "validityEnd", "location"],
             "$geoweb::messages": {
                 "required": "Type, status, location, and validity times are required"
             }
