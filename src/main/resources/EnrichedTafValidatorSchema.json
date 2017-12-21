@@ -187,8 +187,7 @@
                     }]
                 }
     		},
-            "additionalProperties": true,
-            "required": ["wind"]
+            "additionalProperties": true
     	}
 	},
     "type": "object",

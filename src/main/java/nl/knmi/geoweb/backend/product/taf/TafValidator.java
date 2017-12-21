@@ -407,6 +407,7 @@ public class TafValidator {
 	private static void augmentAscendingClouds(JsonNode input) throws ParseException {
 		List<JsonNode> forecasts = input.findParents("clouds");
 		for (JsonNode forecast : forecasts) {
+			if (forecast == null || forecast.isNull() || forecast.isMissingNode()) continue;
 			ObjectNode editableForecast = (ObjectNode) forecast;
 			int prevHeight = 0;
 			JsonNode node = forecast.findValue("clouds");
@@ -416,6 +417,7 @@ public class TafValidator {
 			};
 			boolean ascending = true;
 			for (JsonNode cloud : node) {
+				if (cloud == null || cloud.isNull() || cloud.isMissingNode()) continue;
 				ObjectNode cloudNode = (ObjectNode) cloud;
 				JsonNode cloudHeight = cloudNode.findValue("height");
 				if (cloudHeight == null || cloudHeight.asText().equals("null")) continue;
