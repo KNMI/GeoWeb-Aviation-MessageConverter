@@ -51,7 +51,7 @@ public class TafValidator {
 		this.tafSchemaStore = tafSchemaStore;
 	}
 	
-	public JsonNode validate(Taf taf) throws IOException, ProcessingException, JSONException, ParseException {
+	public ValidationResult validate(Taf taf) throws IOException, ProcessingException, JSONException, ParseException {
 		return validate(taf.toJSON());
 	}
 
@@ -395,12 +395,16 @@ public class TafValidator {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			JsonNode changeStartNode = changegroup.findValue("changeStart");
 			if (changeStartNode == null) continue;
-			Date changeStart = formatter.parse(changeStartNode.asText());
-			Date changeEnd = null; 
-			JsonNode end = changegroup.findValue("changeEnd");
-			if (end == null) continue;
-			changeEnd = formatter.parse(end.asText());
-			changegroup.put("endAfterStart", changeStart.compareTo(changeEnd) < 1);
+			try {
+				Date changeStart = formatter.parse(changeStartNode.asText());
+				Date changeEnd = null; 
+				JsonNode end = changegroup.findValue("changeEnd");
+				if (end == null) continue;
+				changeEnd = formatter.parse(end.asText());
+				changegroup.put("endAfterStart", changeStart.compareTo(changeEnd) < 1);
+			} catch (ParseException e) {
+				continue;
+			}
 		}
 	}
 	
@@ -443,9 +447,13 @@ public class TafValidator {
 			ObjectNode windNode = (ObjectNode) node;
 			JsonNode gustField = node.findValue("gusts");
 			if(gustField == null) continue;
-			int gust = Integer.parseInt(gustField.asText());
-			int windspeed = Integer.parseInt(node.findValue("speed").asText());
-			windNode.put("gustFastEnough", gust >= (windspeed + 10));
+			try {
+				int gust = Integer.parseInt(gustField.asText());
+				int windspeed = Integer.parseInt(node.findValue("speed").asText());
+				windNode.put("gustFastEnough", gust >= (windspeed + 10));
+			} catch (NumberFormatException e) {
+				continue;
+			}
 		}
 	}
 	
@@ -458,17 +466,21 @@ public class TafValidator {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			JsonNode changeStartNode = changegroup.findValue("changeStart");
 			if (changeStartNode == null) continue;
-			Date changeStart = formatter.parse(changeStartNode.asText());
-			Date changeEnd = null; 
-			JsonNode end = changegroup.findValue("changeEnd");
-			if (end != null) {
-				changeEnd = formatter.parse(end.asText());
-			} else {
-				changeEnd = formatter.parse(input.findValue("validityEnd").asText());
+			try {
+				Date changeStart = formatter.parse(changeStartNode.asText());
+				Date changeEnd = null; 
+				JsonNode end = changegroup.findValue("changeEnd");
+				if (end != null) {
+					changeEnd = formatter.parse(end.asText());
+				} else {
+					changeEnd = formatter.parse(input.findValue("validityEnd").asText());
+				}
+				long diffInMillies = Math.abs(changeEnd.getTime() - changeStart.getTime());
+				long diffInHours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+				changegroup.put("changeDurationInHours", diffInHours);
+			} catch (ParseException e) {
+				continue;
 			}
-			long diffInMillies = Math.abs(changeEnd.getTime() - changeStart.getTime());
-			long diffInHours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-			changegroup.put("changeDurationInHours", diffInHours);
 		}
 	}
 	
@@ -481,6 +493,11 @@ public class TafValidator {
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
+			JsonNode changeType = changegroup.findValue("changeType");
+			JsonNode changeStart = changegroup.findValue("changeStart");
+			if(changeType == null || changeType.isMissingNode() || changeType.isNull()) continue;
+			if(changeStart == null || changeStart.isMissingNode() || changeStart.isNull()) continue;
+
 			String type = changegroup.findValue("changeType").asText();
 			if (!"BECMG".equals(type)) continue;
 			Date becmgStart = formatter.parse(changegroup.findValue("changeStart").asText());
@@ -498,8 +515,12 @@ public class TafValidator {
 	private static void augmentChangegroupsIncreasingInTime(JsonNode input) throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		Date prevChangeStart = formatter.parse(input.findValue("validityStart").asText());
+		Date prevChangeStart;
+		try {
+			prevChangeStart = formatter.parse(input.findValue("validityStart").asText());
+		} catch (ParseException e) {
+			return;
+		}
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
@@ -507,10 +528,14 @@ public class TafValidator {
 			JsonNode changeStartNode = changegroup.findValue("changeStart");
 			if (changeStartNode == null) continue;
 			String changeStart = changeStartNode.asText();
-			Date parsedDate = formatter.parse(changeStart);
-			boolean comesAfter = parsedDate.after(prevChangeStart);
-			changegroup.put("changegroupsAscending", comesAfter);
-			prevChangeStart = parsedDate;
+			try {
+				Date parsedDate = formatter.parse(changeStart);
+				boolean comesAfter = parsedDate.after(prevChangeStart);
+				changegroup.put("changegroupsAscending", comesAfter);
+				prevChangeStart = parsedDate;
+			} catch (ParseException e) {
+				changegroup.put("changegroupsAscending", false);
+			}
 		}
 	}
 	
@@ -530,6 +555,24 @@ public class TafValidator {
 		public DualReturn(ProcessingReport report, Map<String, Map<String, String>> messages) {
 			this.report = report;
 			this.messages = messages;
+		}
+	}
+	
+	// Return the validation result and (if present) the human readable errors
+	// if succeeded is true, the value of errors is undefined
+	// if succeeded is false, errors is an object where the key is the pointer in the (enriched) json and the value is an array of errors (strings)
+	public class ValidationResult {
+		@Getter
+		@Setter
+		private boolean succeeded = false;
+		
+		@Getter
+		@Setter
+		private ObjectNode errors = null;
+		
+		public ValidationResult(boolean succeeded, ObjectNode errors) {
+			this.succeeded = succeeded;
+			this.errors = errors;
 		}
 	}
 
@@ -557,13 +600,14 @@ public class TafValidator {
 		if (changegroupsNode == null || changegroupsNode.isMissingNode() || changegroupsNode.isNull()) return;
 		ArrayNode changegroups = (ArrayNode)changegroupsNode;
 		// If there are no changegroups we are done
-		if (changegroups == null || changegroups.size() == 0) return;
+		if (changegroups == null || changegroups.size() <= 1) return;
 		for (int i = 0; i < changegroups.size(); i++) {
 			JsonNode elem = changegroups.get(i);
 			if (elem == null || elem.isMissingNode() || elem.isNull() || elem.size() == 0) {
 				changegroups.remove(i);
 			}
 		}
+		if (changegroups.size() <= 1) return;
 		JsonNode lastChangegroup = changegroups.get(changegroups.size() - 1);
 
 		// If the last changegroup is null or {} we can throw it away
@@ -589,11 +633,13 @@ public class TafValidator {
 		}
 	}
 	
-	public JsonNode validate(String tafStr) throws  ProcessingException, JSONException, IOException, ParseException {
+	public ValidationResult validate(String tafStr) throws  ProcessingException, JSONException, IOException, ParseException {
 		String schemaFile = tafSchemaStore.getLatestTafSchema();
 		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);
+
 		removeLastEmptyChangegroup(jsonNode);
-		
+		System.out.println(jsonNode);
+
 		DualReturn ret = performValidation(schemaFile, jsonNode);
 		ProcessingReport validationReport = ret.getReport();
 		Map<String, Map<String, String>> messagesMap = ret.getMessages();
@@ -602,17 +648,16 @@ public class TafValidator {
 		// They are relevant if the error path in the schema exist in the possibleMessages set
 		if (validationReport == null) {
 			ObjectMapper om = new ObjectMapper();
-			JsonNode errorNode = om.readTree("{\"succeeded\": false, \"message\": \"Validation report was null\"");
-			return errorNode;
+			return new ValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
 		}
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
-		JsonNode errorJson = new ObjectMapper().readTree("{\"succeeded\": false}");
+		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
 			String errorsAsJson = new ObjectMapper().writeValueAsString(errorMessages);
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
 			((ObjectNode)errorJson).setAll((ObjectNode)(ValidationUtils.getJsonNode(errorsAsJson)));
 		} 
-		
+
 		// Enrich the JSON with custom data validation, this is validated using a second schema
 		enrich(jsonNode);
 		String enrichedSchemaFile = tafSchemaStore.getLatestEnrichedTafSchema();
@@ -621,8 +666,7 @@ public class TafValidator {
 		Map<String, Map<String, String>> enrichedMessagesMap = ret.getMessages();
 		if (enrichedValidationReport == null) {
 			ObjectMapper om = new ObjectMapper();
-			JsonNode errorNode = om.readTree("{\"succeeded\": false, \"message\": \"Validation report was null\"");
-			return errorNode;
+			return new ValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
 		}
 		if(!enrichedValidationReport.isSuccess()) {
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
@@ -632,11 +676,10 @@ public class TafValidator {
 			((ObjectNode)errorJson).setAll((ObjectNode)ValidationUtils.getJsonNode(errorsAsJson));
 		}
 		
+		// If everything is okay, return true as succeeded with null as errors
 		if (enrichedValidationReport.isSuccess() && validationReport.isSuccess()) {
-			JSONObject succeededObject = new JSONObject();
-			succeededObject.put("succeeded", "true");
-			return ValidationUtils.getJsonNode(succeededObject.toString());
+			return new ValidationResult(true, null);
 		}
-		return errorJson;
+		return new ValidationResult(false, (ObjectNode)errorJson);
 	}
 }

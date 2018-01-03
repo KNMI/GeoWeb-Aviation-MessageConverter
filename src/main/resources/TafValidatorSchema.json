@@ -93,13 +93,28 @@
         },
         "second_cloud_mod": {
             "type": "object",
-            "required": ["amount", "height"],
-            "properties": {
-                "amount": { 
-                    "type": "string", "enum": ["SCT", "BKN", "OVC"],
-                    "$geoweb::messages": {
-                        "enum": "Second cloud group can only be one of scattered, broken, or overcast"
-                    }
+            "oneOf": [{
+	            "required": ["amount", "height"],
+	            "properties": {
+	                "amount": { 
+	                    "type": "string", "enum": ["SCT", "BKN", "OVC"],
+	                    "$geoweb::messages": {
+	                        "enum": "Second cloud group can only be one of scattered, broken, or overcast"
+	                    }
+	                },
+	                "height": { 
+	                    "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
+	                    "$geoweb::messages": {
+	                        "minimum": "Clouds cannot be lower than FL000",
+	                        "maximum": "Clouds cannot be higher than FL1000",
+	                        "multipleOf": "Cloud height must a multiple of 100ft"
+	                    }
+	                }
+	            }, "additionalProperties": false
+	        }, {
+	        	"required": ["amount", "height", "mod"],
+	        	"amount": { 
+                    "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
                 },
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
@@ -109,28 +124,46 @@
                         "multipleOf": "Cloud height must a multiple of 100ft"
                     }
                 },
-                "mod": { "type": "string", "enum": ["CB", "TCU"]}
-            }, "additionalProperties": false
+                "mod": { "type": "string", "enum": ["CB"]},
+	            "additionalProperties": false
+	        }]
         }, 
         "third_cloud": {
             "type": "object",
-            "required": ["amount", "height"],
-            "properties": {
-                "amount": { 
-                    "type": "string", "enum": ["BKN", "OVC"],
-                    "$geoweb::messages": {
-                        "enum": "Third cloud group can only be broken or overcast"
-                    }
-                },
-                "height": { 
-                    "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
-                    "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than FL000",
-                        "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of 100ft"
-                    }
-                }
-            }, "additionalProperties": false
+            "oneOf": [{
+	            "required": ["amount", "height"],
+	            "properties": {
+	                "amount": { 
+	                    "type": "string", "enum": ["BKN", "OVC"],
+	                    "$geoweb::messages": {
+	                        "enum": "Third cloud group can only be broken or overcast"
+	                    }
+	                },
+	                "height": { 
+	                    "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
+	                    "$geoweb::messages": {
+	                        "minimum": "Clouds cannot be lower than FL000",
+	                        "maximum": "Clouds cannot be higher than FL1000",
+	                        "multipleOf": "Cloud height must a multiple of 100ft"
+	                    }
+	                }
+	            }, "additionalProperties": false
+	        }, {
+	        	"required": ["amount", "height", "mod"],
+	        	"amount": { 
+	                "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
+	            },
+	            "height": { 
+	                "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
+	                "$geoweb::messages": {
+	                    "minimum": "Clouds cannot be lower than FL000",
+	                    "maximum": "Clouds cannot be higher than FL1000",
+	                    "multipleOf": "Cloud height must a multiple of 100ft"
+	                }
+	            },
+	            "mod": { "type": "string", "enum": ["CB"]},
+	            "additionalProperties": false
+	        }]
         },
         "third_cloud_mod": {
             "type": "object",
@@ -154,9 +187,15 @@
             }, "additionalProperties": false
         }, 
         "fourth_cloud": {
-            "required": ["mod", "height"],
+            "required": ["mod", "height", "amount"],
             "type": "object",
             "properties": {
+	            "amount": { 
+	                "type": "string", "enum": ["BKN", "OVC"],
+	                "$geoweb::messages": {
+	                    "enum": "Fourth cloud group can only be broken or overcast"
+	                }
+	            },
                 "mod": { "type": "string", "enum": ["CB", "TCU"]},
                 "height": { 
                     "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
@@ -179,7 +218,7 @@
                 {"$ref": "#/definitions/third_cloud_mod"}
             ], 
                 "$geoweb::messages": {
-                    "maxItems": "Four cloud groups are only possible if the fourth cloud is just CB or TCU and the former three cloud groups have no such qualifiers"
+                    "maxItems": "Four cloud groups are only possible if the fourth cloud has CB or TCU and the former three cloud groups have no such qualifiers"
                 }
             }, {
                 "type": "array",
@@ -561,7 +600,10 @@
                     "changeEnd": { "type": "string", "format": "date-time" },
                     "forecast": {"$ref": "#/definitions/forecast"}
                 },
-                "required": ["changeType", "changeStart", "changeEnd", "forecast"]
+                "required": ["changeType", "changeStart", "changeEnd", "forecast"],
+	            "$geoweb::messages": {
+	                "required": "A changegroup must have a type, time (duration or start), and a change"
+	            }
             }, {
                 "additionalProperties": false,
                 "properties": {
