@@ -340,13 +340,14 @@
                 "type": "array",
                 "minItems": 1,
                 "maxItems": 3,
-                "items":  {"$ref": "#/definitions/weather_group"}
+                "items":  {"$ref": "#/definitions/weather_group"},
+                "uniqueItems": true,
+                "$geoweb::messages": {
+                	"uniqueItems": "Weather groups must be unique"
+                }
             }, {
                 "type": "string", "enum": ["NSW"]
-            }],
-            "$geoweb::messages": {
-                "oneOf": "There are either maximally three weather groups or there is NSW"
-            }
+            }]
         },
         "visibility": {
             "required": ["value"],
