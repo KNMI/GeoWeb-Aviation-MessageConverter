@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 
 import nl.knmi.adaguc.tools.Tools;
-import nl.knmi.geoweb.backend.product.taf.TafValidator.ValidationResult;
+import nl.knmi.geoweb.backend.product.taf.TafValidationResult;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes={TafValidatorTestContext.class})
@@ -37,7 +37,7 @@ public class TafValidatorTest {
 		String taf = Tools.readResource( "Taf_valid.json");
 		
 		JSONObject tafAsJSON = new JSONObject(taf);
-		ValidationResult report = tafValidator.validate(tafAsJSON.toString());
+		TafValidationResult report = tafValidator.validate(tafAsJSON.toString());
 		assertThat(report.isSucceeded(), is(true));
 	}
 	
@@ -48,7 +48,7 @@ public class TafValidatorTest {
 
 		String taf = Tools.readResource( "./Taf_invalid.json");
 		JSONObject tafAsJSON = new JSONObject(taf);
-		ValidationResult report = tafValidator.validate(tafAsJSON.toString());
+		TafValidationResult report = tafValidator.validate(tafAsJSON.toString());
 		assertThat(report.isSucceeded(), is(false));
 	}
 	
