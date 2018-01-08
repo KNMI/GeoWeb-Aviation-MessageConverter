@@ -51,7 +51,7 @@ public class TafValidator {
 		this.tafSchemaStore = tafSchemaStore;
 	}
 	
-	public ValidationResult validate(Taf taf) throws IOException, ProcessingException, JSONException, ParseException {
+	public TafValidationResult validate(Taf taf) throws IOException, ProcessingException, JSONException, ParseException {
 		return validate(taf.toJSON());
 	}
 
@@ -557,24 +557,6 @@ public class TafValidator {
 			this.messages = messages;
 		}
 	}
-	
-	// Return the validation result and (if present) the human readable errors
-	// if succeeded is true, the value of errors is undefined
-	// if succeeded is false, errors is an object where the key is the pointer in the (enriched) json and the value is an array of errors (strings)
-	public class ValidationResult {
-		@Getter
-		@Setter
-		private boolean succeeded = false;
-		
-		@Getter
-		@Setter
-		private ObjectNode errors = null;
-		
-		public ValidationResult(boolean succeeded, ObjectNode errors) {
-			this.succeeded = succeeded;
-			this.errors = errors;
-		}
-	}
 
 	public DualReturn performValidation(String schemaFile, JsonNode jsonNode) throws IOException, ProcessingException {
 		JsonNode schemaNode = ValidationUtils.getJsonNode(schemaFile);
@@ -633,7 +615,7 @@ public class TafValidator {
 		}
 	}
 	
-	public ValidationResult validate(String tafStr) throws  ProcessingException, JSONException, IOException, ParseException {
+	public TafValidationResult validate(String tafStr) throws  ProcessingException, JSONException, IOException, ParseException {
 		String schemaFile = tafSchemaStore.getLatestTafSchema();
 		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);
 
@@ -648,7 +630,7 @@ public class TafValidator {
 		// They are relevant if the error path in the schema exist in the possibleMessages set
 		if (validationReport == null) {
 			ObjectMapper om = new ObjectMapper();
-			return new ValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
+			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
 		}
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
@@ -666,7 +648,7 @@ public class TafValidator {
 		Map<String, Map<String, String>> enrichedMessagesMap = ret.getMessages();
 		if (enrichedValidationReport == null) {
 			ObjectMapper om = new ObjectMapper();
-			return new ValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
+			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
 		}
 		if(!enrichedValidationReport.isSuccess()) {
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
@@ -678,8 +660,8 @@ public class TafValidator {
 		
 		// If everything is okay, return true as succeeded with null as errors
 		if (enrichedValidationReport.isSuccess() && validationReport.isSuccess()) {
-			return new ValidationResult(true, null);
+			return new TafValidationResult(true, null);
 		}
-		return new ValidationResult(false, (ObjectNode)errorJson);
+		return new TafValidationResult(false, (ObjectNode)errorJson);
 	}
 }
