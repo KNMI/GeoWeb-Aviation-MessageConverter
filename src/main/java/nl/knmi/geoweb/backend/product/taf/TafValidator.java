@@ -526,11 +526,16 @@ public class TafValidator {
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			JsonNode changeStartNode = changegroup.findValue("changeStart");
+			
 			if (changeStartNode == null) continue;
 			String changeStart = changeStartNode.asText();
+			JsonNode changeTypeNode = changegroup.findValue("changeType");
+			if (changeTypeNode == null) continue;
+			String changeType = changeTypeNode.asText();
+
 			try {
 				Date parsedDate = formatter.parse(changeStart);
-				boolean comesAfter = parsedDate.after(prevChangeStart);
+				boolean comesAfter = parsedDate.after(prevChangeStart) || (parsedDate.equals(prevChangeStart) && changeType.startsWith("PROB"));
 				changegroup.put("changegroupsAscending", comesAfter);
 				prevChangeStart = parsedDate;
 			} catch (ParseException e) {
@@ -632,6 +637,7 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
 		}
+		System.out.println(validationReport);
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
@@ -650,6 +656,8 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
 		}
+		System.out.println(enrichedValidationReport);
+
 		if(!enrichedValidationReport.isSuccess()) {
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
 			// Append them to any previous errors, if any

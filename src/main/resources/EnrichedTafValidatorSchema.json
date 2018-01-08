@@ -159,7 +159,7 @@
                                 "type": "integer"
                             },
                             "direction": {
-                                "type": "integer"
+                                "oneOf": [{"type": "integer"}, {"type": "string"}]
                             },
                             "unit": {
                                 "type": "string"
@@ -177,7 +177,7 @@
                                 "type": "integer"
                             },
                             "direction": {
-                                "type": "integer"
+                                "oneOf": [{"type": "integer"}, {"type": "string"}]
                             },
                             "unit": {
                                 "type": "string"
