@@ -113,18 +113,20 @@
 	            }, "additionalProperties": false
 	        }, {
 	        	"required": ["amount", "height", "mod"],
-	        	"amount": { 
-                    "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
-                },
-                "height": { 
-                    "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
-                    "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than FL000",
-                        "maximum": "Clouds cannot be higher than FL1000",
-                        "multipleOf": "Cloud height must a multiple of 100ft"
-                    }
-                },
-                "mod": { "type": "string", "enum": ["CB"]},
+	        	"properties": {
+		        	"amount": { 
+	                    "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
+	                },
+	                "height": { 
+	                    "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
+	                    "$geoweb::messages": {
+	                        "minimum": "Clouds cannot be lower than FL000",
+	                        "maximum": "Clouds cannot be higher than FL1000",
+	                        "multipleOf": "Cloud height must a multiple of 100ft"
+	                    }
+	                },
+	                "mod": { "type": "string", "enum": ["CB", "TCU"]}
+	            },
 	            "additionalProperties": false
 	        }]
         }, 
@@ -150,18 +152,20 @@
 	            }, "additionalProperties": false
 	        }, {
 	        	"required": ["amount", "height", "mod"],
-	        	"amount": { 
-	                "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
-	            },
-	            "height": { 
-	                "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
-	                "$geoweb::messages": {
-	                    "minimum": "Clouds cannot be lower than FL000",
-	                    "maximum": "Clouds cannot be higher than FL1000",
-	                    "multipleOf": "Cloud height must a multiple of 100ft"
-	                }
-	            },
-	            "mod": { "type": "string", "enum": ["CB"]},
+	        	"properties": {
+		        	"amount": { 
+		                "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
+		            },
+		            "height": { 
+		                "type": "integer", "minimum": 0, "maximum": 999, "multipleOf": 30,
+		                "$geoweb::messages": {
+		                    "minimum": "Clouds cannot be lower than FL000",
+		                    "maximum": "Clouds cannot be higher than FL1000",
+		                    "multipleOf": "Cloud height must a multiple of 100ft"
+		                }
+		            },
+		            "mod": { "type": "string", "enum": ["CB"]}
+		        },
 	            "additionalProperties": false
 	        }]
         },

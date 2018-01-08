@@ -45,7 +45,7 @@
 					"value": 9000
 				},
 				"wind": {
-					"direction": 220,
+					"direction": 230,
 					"speed": 17,
 					"gusts": 27,
 					"unit": "KT"
@@ -71,8 +71,8 @@
 				},
 				"wind": {
 					"direction": 220,
-					"speed": 17,
-					"gusts": 27,
+					"speed": 37,
+					"gusts": 47,
 					"unit": "KT"
 				}
 			}			
