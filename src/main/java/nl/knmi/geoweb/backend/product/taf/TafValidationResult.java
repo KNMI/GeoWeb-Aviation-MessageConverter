@@ -1,6 +1,7 @@
 package nl.knmi.geoweb.backend.product.taf;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.fge.jsonschema.core.report.ProcessingReport;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,8 +18,30 @@ public class TafValidationResult {
 	@Setter
 	private ObjectNode errors = null;
 	
+	@Getter
+	@Setter
+	private ProcessingReport structureReport = null;
+	
+	@Getter
+	@Setter
+	private ProcessingReport enrichedReport = null;
+
+	public TafValidationResult(boolean succeeded) {
+		this(succeeded, null, null, null);
+	}
+	
 	public TafValidationResult(boolean succeeded, ObjectNode errors) {
+		this(succeeded, errors, null, null);
+	}
+	
+	public TafValidationResult(boolean succeeded, ObjectNode errors, ProcessingReport structureReport) {
+		this(succeeded, errors, structureReport, null);
+	}
+	
+	public TafValidationResult(boolean succeeded, ObjectNode errors, ProcessingReport structureReport, ProcessingReport enrichedReport) {
 		this.succeeded = succeeded;
 		this.errors = errors;
+		this.structureReport = structureReport;
+		this.enrichedReport = enrichedReport;
 	}
 }
