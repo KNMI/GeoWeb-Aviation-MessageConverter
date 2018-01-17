@@ -347,25 +347,31 @@ public class TafValidator {
 
 		JsonNode forecastWind = forecastNode.get("wind");
 		if (forecastWind == null || forecastWind.isNull() || forecastWind.isMissingNode()) return;
-
+		
+		
 		if (forecastWind == null || !forecastWind.has("direction") || !forecastWind.has("speed")) return;
+		
+		JsonNode forecastGustNode = forecastWind.get("gusts");
+		
 		int forecastWindDirection = forecastWind.get("direction").asInt();
 		int forecastWindSpeed = forecastWind.get("speed").asInt();
+		boolean forecastGust = forecastGustNode == null || forecastGustNode.isNull() || forecastGustNode.isMissingNode() || forecastGustNode.asInt() > 0;
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
+			boolean becomesGusty = false;
 			ObjectNode changegroup = (ObjectNode) change.next();
 			if (!changegroup.has("forecast")) continue;
 			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
 			if (changeForecast.has("wind")) {
 				JsonNode wind = changeForecast.get("wind");
 				if (!wind.has("direction") || !wind.has("speed")) continue;
-
+				becomesGusty = !forecastGust && wind.has("gusts") && wind.get("gusts").asInt() > 0;
 				int changeWindDirection = wind.get("direction").asInt();
 				int changeWindSpeed = wind.get("speed").asInt();
 				int speedDifference = Math.abs(changeWindSpeed - forecastWindSpeed);
 				int directionDifference = Math.abs(changeWindDirection - forecastWindDirection);
-				changegroup.put("windEnoughDifference", directionDifference >= 30 || speedDifference >= 5);
+				changegroup.put("windEnoughDifference", directionDifference >= 30 || speedDifference >= 5 || becomesGusty);
 			}
 		}
 	}
@@ -635,7 +641,7 @@ public class TafValidator {
 		// They are relevant if the error path in the schema exist in the possibleMessages set
 		if (validationReport == null) {
 			ObjectMapper om = new ObjectMapper();
-			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
+			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
 		System.out.println(validationReport);
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
@@ -654,7 +660,7 @@ public class TafValidator {
 		Map<String, Map<String, String>> enrichedMessagesMap = ret.getMessages();
 		if (enrichedValidationReport == null) {
 			ObjectMapper om = new ObjectMapper();
-			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"));
+			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport, enrichedValidationReport);
 		}
 		System.out.println(enrichedValidationReport);
 
@@ -668,8 +674,8 @@ public class TafValidator {
 		
 		// If everything is okay, return true as succeeded with null as errors
 		if (enrichedValidationReport.isSuccess() && validationReport.isSuccess()) {
-			return new TafValidationResult(true, null);
+			return new TafValidationResult(true);
 		}
-		return new TafValidationResult(false, (ObjectNode)errorJson);
+		return new TafValidationResult(false, (ObjectNode)errorJson, validationReport, enrichedValidationReport);
 	}
 }
