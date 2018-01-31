@@ -8,6 +8,21 @@
                 "required": ["changegroupsAscending"],
                 "properties": {
                     "forecast": {"$ref": "#/definitions/forecast"},
+	                "cloudsCBorTCUNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are showers, a CB or TCU cloud is required"
+	                    }
+	    			},
+	    			"cloudsCBNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are thunderstorms, a CB cloud is required"
+	                    }
+	    			},
+                    
                     "changegroupsAscending": {
                         "type": "boolean",
                         "enum": [true],
@@ -15,9 +30,16 @@
                             "enum": "Changegroups must be ascending in starting time"
                      	}
                     },
+                    "repeatingChange": {
+                        "type": "boolean",
+                        "enum": [false],
+                        "$geoweb::messages": {
+                            "enum": "A change in a changegroup must be unique"
+                     	}
+                    },
                     "changeType": {
                     	"type": "string",
-                    	"enum": ["PROB30", "FM", "PROB40", "PROB30 TEMPO", "PROB40 TEMPO"]
+                    	"enum": ["PROB30", "TEMPO", "FM", "PROB40", "PROB30 TEMPO", "PROB40 TEMPO"]
                     },
                     "changeDurationInHours": {
                         "type": "integer", 
@@ -62,6 +84,20 @@
                 "required": ["changegroupsAscending", "changegroupBecomingOverlaps", "changeType", "changeDurationInHours"],
                 "properties": {
                     "forecast": {"$ref": "#/definitions/forecast"},
+	    			"cloudsCBorTCUNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are showers, a CB or TCU cloud is required"
+	                    }
+	    			},
+	    			"cloudsCBNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are thunderstorms, a CB cloud is required"
+	                    }
+	    			},
 
                     "changegroupsAscending": {
                         "type": "boolean",
@@ -70,7 +106,13 @@
                             "enum": "Changegroups must be ascending in starting time"
                      	}
                     },
-
+					"repeatingChange": {
+                        "type": "boolean",
+                        "enum": [false],
+                        "$geoweb::messages": {
+                            "enum": "A change in a changegroup must be unique"
+                     	}
+                    },
                     "cloudsNeededAndPresent":{
                     	"type": "boolean",
                     	"enum": [true],
@@ -126,7 +168,21 @@
 		"forecast": {
     		"type": "object",
     		"properties": {
-    		
+    			"cloudsCBorTCUNeededAndPresent": {
+    			    "type": "boolean",
+                	"enum": [true],
+                    "$geoweb::messages": {
+                		"enum": "When there are showers, a CB or TCU cloud is required"
+                    }
+    			},
+    			"cloudsCBNeededAndPresent": {
+    			    "type": "boolean",
+                	"enum": [true],
+                    "$geoweb::messages": {
+                		"enum": "When there are thunderstorms, a CB cloud is required"
+                    }
+    			},
+    			
                 "cloudsNeededAndPresent":{
                 	"type": "boolean",
                 	"enum": [true],
@@ -139,6 +195,13 @@
                     "enum": [true],
                     "$geoweb::messages": {
                         "enum": "Cloud groups must be ascending in height"
+                 	}
+                },
+                "visibilityWithinLimit": {
+                    "type": "boolean",
+                    "enum": [true],
+                    "$geoweb::messages": {
+                        "enum": "When foggy, visibility is limited to 1000m. With shallow fog it is limited to 5000m and fog banks are limited to 2000m."
                  	}
                 },
     			"wind": {
@@ -197,8 +260,8 @@
         "changegroups": {
             "type": "array",
             "minItems": 0,
-            "maxItems": 5,
-            "items": [{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"}],
+            "maxItems": 10,
+            "items": [{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"}],
             "additionalProperties": false
         }
 	}
