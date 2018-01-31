@@ -70,6 +70,49 @@ public class TafValidator {
 		jsonNode.findParents(GEOWEB_DIRECTIVE_MESSAGE_ELEMENT).stream()
 		.forEach(node -> ((ObjectNode) node).remove(GEOWEB_DIRECTIVE_MESSAGE_ELEMENT));
 	}
+    private static long modularAbs(long n, long mod) {
+        n %= mod;
+        if (n < 0)
+            n += mod;
+        return n;
+    }
+
+
+    /**
+     * Adds two numbers in modulo arithmetic.
+     * This function is safe for large numbers and won't overflow long.
+     *
+     * @param a
+     * @param b
+     * @param mod grater than 0
+     * @return (a+b)%mod
+     */
+    public static long add(long a, long b, long mod) {
+        if(mod <= 0)
+            throw new IllegalArgumentException("Mod argument is not grater then 0");
+        a = modularAbs(a, mod);
+        b = modularAbs(b, mod);
+        if(b > mod-a) {
+            return b - (mod - a);
+        }
+        return (a + b)%mod;
+    }
+
+    /**
+     * Subtract two numbers in modulo arithmetic.
+     * This function is safe for large numbers and won't overflow or underflow long.
+     *
+     * @param a
+     * @param b
+     * @param mod grater than 0
+     * @return (a-b)%mod
+     */
+    public static long subtract(long a, long b, long mod) {
+        if(mod <= 0)
+            throw new IllegalArgumentException("Mod argument is not grater then 0");
+        return add(a, -b, mod);
+    }
+
 
 	private static void harvestFields(JsonNode node, Predicate<String> fieldNamePredicate, JsonPointer parentPointer, Set<FoundJsonField> harvestedSoFar, boolean shouldVisitSubNodes) {
 
@@ -291,6 +334,123 @@ public class TafValidator {
 		augmentVisibilityWeatherRequired(input);
 		augmentEnoughWindChange(input);
 		augmentCloudNeededRain(input);
+		augmentFogMaxVisibility(input);
+		augmentNonRepeatingChanges(input);
+	}
+	
+	private static void augmentNonRepeatingChanges(JsonNode input) {
+		ObjectNode forecast = (ObjectNode) input.get("forecast");
+		if (forecast == null || forecast.isNull() || forecast.isMissingNode()) return;
+		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
+
+		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
+			ObjectNode changegroup = (ObjectNode)change.next();
+			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
+			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode()) continue;
+			
+			boolean nonRepeatingChange = false;
+			
+			JsonNode forecastWind = forecast.get("wind");
+			JsonNode changeWind = changeForecast.get("wind");
+			
+			JsonNode forecastVisibility = forecast.get("visibility");
+			JsonNode changeVisibility = changeForecast.get("visibility");
+			
+			JsonNode forecastWeather = forecast.get("weather");
+			JsonNode changeWeather = changeForecast.get("weather");
+
+			JsonNode forecastClouds = forecast.get("clouds");
+			JsonNode changeClouds = changeForecast.get("clouds");
+
+			nonRepeatingChange |= forecastWind.equals(changeWind);
+			nonRepeatingChange |= forecastVisibility.equals(changeVisibility);
+			nonRepeatingChange |= forecastWeather.equals(changeWeather);
+			nonRepeatingChange |= forecastClouds.equals(changeClouds);
+
+			System.out.println(nonRepeatingChange);
+			changegroup.put("repeatingChange", nonRepeatingChange);
+			JsonNode changeType = changegroup.get("changeType");
+			if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && changegroup.get("changeType").asText().equals("BECMG")) {
+				forecast = changeForecast;
+			}
+
+		}
+	}
+	
+	private static void augmentFogMaxVisibility(JsonNode input) {
+		ObjectNode forecast = (ObjectNode) input.get("forecast");
+		if (forecast == null || forecast.isNull() || forecast.isMissingNode()) return;
+
+		JsonNode forecastWeather = input.get("forecast").get("weather");
+		JsonNode forecastVisibility = input.get("forecast").get("visibility");
+		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode() ||
+			forecastVisibility == null || forecastVisibility.isNull() || forecastVisibility.isMissingNode()) return;
+		int visibility = forecastVisibility.get("value").asInt();
+		for (Iterator<JsonNode> weatherNode = forecastWeather.elements(); weatherNode.hasNext(); ) {
+			JsonNode weatherGroup = (ObjectNode) weatherNode.next();
+			if (!weatherGroup.has("phenomena")) continue;
+			ArrayNode phenomena = (ArrayNode)weatherGroup.get("phenomena");
+			boolean isFoggy = StreamSupport.stream(phenomena.spliterator(), false).anyMatch(phenomenon -> phenomenon.asText().equals("fog"));
+			if (isFoggy) {
+				if (!weatherGroup.has("descriptor")) {
+					forecast.put("visibilityWithinLimit", visibility < 1000);
+				} else {
+					String descriptor = weatherGroup.get("descriptor").asText();
+					if (descriptor.equals("shallow")) {
+						forecast.put("visibilityWithinLimit", visibility < 5000);
+					} else {
+						forecast.put("visibilityWithinLimit", visibility < 2000);
+					}
+				}
+			}
+		}
+		
+		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
+
+		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
+			JsonNode changegroup = (ObjectNode) change.next();
+			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
+			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode()) return;
+
+			JsonNode changeWeather = changeForecast.get("weather");
+			JsonNode changeVisibility = changeForecast.get("visibility");
+			if ((changeWeather == null || changeWeather.isNull() || changeWeather.isMissingNode()) &&
+				(changeVisibility == null || changeVisibility.isNull() || changeVisibility.isMissingNode())) return;
+			if (changeWeather == null || changeWeather.isNull() || changeWeather.isMissingNode()) {
+				changeWeather = forecastWeather;
+			}
+			if (changeVisibility == null || changeVisibility.isNull() || changeVisibility.isMissingNode()) {
+				changeVisibility = forecastVisibility;
+			}
+			
+			visibility = changeVisibility.get("value").asInt();
+			for (Iterator<JsonNode> weatherNode = changeWeather.elements(); weatherNode.hasNext(); ) {
+				JsonNode weatherGroup = (ObjectNode) weatherNode.next();
+				if (!weatherGroup.has("phenomena")) continue;
+				ArrayNode phenomena = (ArrayNode)weatherGroup.get("phenomena");
+				boolean isFoggy = StreamSupport.stream(phenomena.spliterator(), false).anyMatch(phenomenon -> phenomenon.asText().equals("fog"));
+				if (isFoggy) {
+					if (!weatherGroup.has("descriptor")) {
+						changeForecast.put("visibilityWithinLimit", visibility < 1000);
+					} else {
+						String descriptor = weatherGroup.get("descriptor").asText();
+						if (descriptor.equals("shallow")) {
+							changeForecast.put("visibilityWithinLimit", visibility < 5000);
+						} else {
+							changeForecast.put("visibilityWithinLimit", visibility < 2000);
+						}
+					}
+				}
+			}
+
+
+			if (changegroup.get("changeType").asText().equals("BECMG")) { 
+				forecastWeather = changeWeather;
+				forecastVisibility = changeVisibility;
+			}
+		}	
 	}
 	
 	private static void augmentCloudNeededRain(JsonNode input) {
@@ -340,7 +500,7 @@ public class TafValidator {
 			}
 		}
 	}
-	
+		
 	private static void augmentEnoughWindChange(JsonNode input) {
 		JsonNode forecastNode = input.get("forecast");
 		if (forecastNode == null || forecastNode.isNull() || forecastNode.isMissingNode()) return;
@@ -370,8 +530,15 @@ public class TafValidator {
 				int changeWindDirection = wind.get("direction").asInt();
 				int changeWindSpeed = wind.get("speed").asInt();
 				int speedDifference = Math.abs(changeWindSpeed - forecastWindSpeed);
-				int directionDifference = Math.abs(changeWindDirection - forecastWindDirection);
+				long directionDifference = Math.min(subtract(changeWindDirection, forecastWindDirection, 360), subtract(forecastWindDirection, changeWindDirection, 360));
+				changegroup.put("directionDiff", directionDifference);
+				changegroup.put("speedDiff", speedDifference);
 				changegroup.put("windEnoughDifference", directionDifference >= 30 || speedDifference >= 5 || becomesGusty);
+				JsonNode changeType = changegroup.get("changeType");
+				if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && changegroup.get("changeType").asText().equals("BECMG")) {
+					forecastWindDirection = changeWindDirection;
+					forecastWindSpeed = changeWindSpeed;
+				}
 			}
 		}
 	}
@@ -538,10 +705,10 @@ public class TafValidator {
 			JsonNode changeTypeNode = changegroup.findValue("changeType");
 			if (changeTypeNode == null) continue;
 			String changeType = changeTypeNode.asText();
-
+			System.out.println(changeType);
 			try {
 				Date parsedDate = formatter.parse(changeStart);
-				boolean comesAfter = parsedDate.after(prevChangeStart) || (parsedDate.equals(prevChangeStart) && changeType.startsWith("PROB"));
+				boolean comesAfter = parsedDate.after(prevChangeStart) || parsedDate.equals(prevChangeStart);
 				changegroup.put("changegroupsAscending", comesAfter);
 				prevChangeStart = parsedDate;
 			} catch (ParseException e) {
@@ -631,8 +798,6 @@ public class TafValidator {
 		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);
 
 		removeLastEmptyChangegroup(jsonNode);
-		System.out.println(jsonNode);
-
 		DualReturn ret = performValidation(schemaFile, jsonNode);
 		ProcessingReport validationReport = ret.getReport();
 		Map<String, Map<String, String>> messagesMap = ret.getMessages();
@@ -643,7 +808,7 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
-		System.out.println(validationReport);
+		System.out.println("First validation: " + validationReport);
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
@@ -654,6 +819,7 @@ public class TafValidator {
 
 		// Enrich the JSON with custom data validation, this is validated using a second schema
 		enrich(jsonNode);
+		System.out.println("Enriched TAF: " + jsonNode);
 		String enrichedSchemaFile = tafSchemaStore.getLatestEnrichedTafSchema();
 		ret = performValidation(enrichedSchemaFile, jsonNode);
 		ProcessingReport enrichedValidationReport = ret.getReport();
@@ -662,7 +828,7 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport, enrichedValidationReport);
 		}
-		System.out.println(enrichedValidationReport);
+		System.out.println("Second validation: " + enrichedValidationReport);
 
 		if(!enrichedValidationReport.isSuccess()) {
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
