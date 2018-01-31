@@ -339,8 +339,8 @@ public class TafValidator {
 	}
 	
 	private static void augmentNonRepeatingChanges(JsonNode input) {
-		ObjectNode forecast = (ObjectNode) input.get("forecast");
-		if (forecast == null || forecast.isNull() || forecast.isMissingNode()) return;
+		ObjectNode currentForecast = (ObjectNode) input.get("forecast");
+		if (currentForecast == null || currentForecast.isNull() || currentForecast.isMissingNode()) return;
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 
@@ -351,16 +351,16 @@ public class TafValidator {
 			
 			boolean nonRepeatingChange = false;
 			
-			JsonNode forecastWind = forecast.get("wind");
+			JsonNode forecastWind = currentForecast.get("wind");
 			JsonNode changeWind = changeForecast.get("wind");
 			
-			JsonNode forecastVisibility = forecast.get("visibility");
+			JsonNode forecastVisibility = currentForecast.get("visibility");
 			JsonNode changeVisibility = changeForecast.get("visibility");
 			
-			JsonNode forecastWeather = forecast.get("weather");
+			JsonNode forecastWeather = currentForecast.get("weather");
 			JsonNode changeWeather = changeForecast.get("weather");
 
-			JsonNode forecastClouds = forecast.get("clouds");
+			JsonNode forecastClouds = currentForecast.get("clouds");
 			JsonNode changeClouds = changeForecast.get("clouds");
 
 			nonRepeatingChange |= forecastWind.equals(changeWind);
@@ -368,11 +368,11 @@ public class TafValidator {
 			nonRepeatingChange |= forecastWeather.equals(changeWeather);
 			nonRepeatingChange |= forecastClouds.equals(changeClouds);
 
-			System.out.println(nonRepeatingChange);
 			changegroup.put("repeatingChange", nonRepeatingChange);
 			JsonNode changeType = changegroup.get("changeType");
-			if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && changegroup.get("changeType").asText().equals("BECMG")) {
-				forecast = changeForecast;
+			if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && 
+					!changegroup.get("changeType").asText().startsWith("PROB")) {
+				currentForecast = changeForecast;
 			}
 
 		}
@@ -446,7 +446,7 @@ public class TafValidator {
 			}
 
 
-			if (changegroup.get("changeType").asText().equals("BECMG")) { 
+			if (!changegroup.get("changeType").asText().startsWith("PROB")) { 
 				forecastWeather = changeWeather;
 				forecastVisibility = changeVisibility;
 			}
@@ -535,7 +535,7 @@ public class TafValidator {
 				changegroup.put("speedDiff", speedDifference);
 				changegroup.put("windEnoughDifference", directionDifference >= 30 || speedDifference >= 5 || becomesGusty);
 				JsonNode changeType = changegroup.get("changeType");
-				if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && changegroup.get("changeType").asText().equals("BECMG")) {
+				if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && !changegroup.get("changeType").asText().startsWith("PROB")) {
 					forecastWindDirection = changeWindDirection;
 					forecastWindSpeed = changeWindSpeed;
 				}
@@ -689,8 +689,10 @@ public class TafValidator {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 		Date prevChangeStart;
+		Date tafStartTime;
 		try {
 			prevChangeStart = formatter.parse(input.findValue("validityStart").asText());
+			tafStartTime = (Date) prevChangeStart.clone();
 		} catch (ParseException e) {
 			return;
 		}
@@ -705,10 +707,11 @@ public class TafValidator {
 			JsonNode changeTypeNode = changegroup.findValue("changeType");
 			if (changeTypeNode == null) continue;
 			String changeType = changeTypeNode.asText();
-			System.out.println(changeType);
 			try {
 				Date parsedDate = formatter.parse(changeStart);
-				boolean comesAfter = parsedDate.after(prevChangeStart) || parsedDate.equals(prevChangeStart);
+				boolean comesAfter = parsedDate.after(prevChangeStart) || 
+						(parsedDate.equals(prevChangeStart) && changeType.startsWith("PROB")) ||
+						(parsedDate.equals(prevChangeStart) && changeType.startsWith("BECMG") && parsedDate.equals(tafStartTime));
 				changegroup.put("changegroupsAscending", comesAfter);
 				prevChangeStart = parsedDate;
 			} catch (ParseException e) {
@@ -808,7 +811,6 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
-		System.out.println("First validation: " + validationReport);
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
@@ -819,7 +821,6 @@ public class TafValidator {
 
 		// Enrich the JSON with custom data validation, this is validated using a second schema
 		enrich(jsonNode);
-		System.out.println("Enriched TAF: " + jsonNode);
 		String enrichedSchemaFile = tafSchemaStore.getLatestEnrichedTafSchema();
 		ret = performValidation(enrichedSchemaFile, jsonNode);
 		ProcessingReport enrichedValidationReport = ret.getReport();
@@ -828,7 +829,6 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport, enrichedValidationReport);
 		}
-		System.out.println("Second validation: " + enrichedValidationReport);
 
 		if(!enrichedValidationReport.isSuccess()) {
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
