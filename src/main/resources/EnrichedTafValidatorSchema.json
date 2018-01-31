@@ -8,6 +8,21 @@
                 "required": ["changegroupsAscending"],
                 "properties": {
                     "forecast": {"$ref": "#/definitions/forecast"},
+	                "cloudsCBorTCUNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are showers, a CB or TCU cloud is required"
+	                    }
+	    			},
+	    			"cloudsCBNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are thunderstorms, a CB cloud is required"
+	                    }
+	    			},
+                    
                     "changegroupsAscending": {
                         "type": "boolean",
                         "enum": [true],
@@ -69,6 +84,20 @@
                 "required": ["changegroupsAscending", "changegroupBecomingOverlaps", "changeType", "changeDurationInHours"],
                 "properties": {
                     "forecast": {"$ref": "#/definitions/forecast"},
+	    			"cloudsCBorTCUNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are showers, a CB or TCU cloud is required"
+	                    }
+	    			},
+	    			"cloudsCBNeededAndPresent": {
+	    			    "type": "boolean",
+	                	"enum": [true],
+	                    "$geoweb::messages": {
+	                		"enum": "When there are thunderstorms, a CB cloud is required"
+	                    }
+	    			},
 
                     "changegroupsAscending": {
                         "type": "boolean",
@@ -139,7 +168,21 @@
 		"forecast": {
     		"type": "object",
     		"properties": {
-    		
+    			"cloudsCBorTCUNeededAndPresent": {
+    			    "type": "boolean",
+                	"enum": [true],
+                    "$geoweb::messages": {
+                		"enum": "When there are showers, a CB or TCU cloud is required"
+                    }
+    			},
+    			"cloudsCBNeededAndPresent": {
+    			    "type": "boolean",
+                	"enum": [true],
+                    "$geoweb::messages": {
+                		"enum": "When there are thunderstorms, a CB cloud is required"
+                    }
+    			},
+    			
                 "cloudsNeededAndPresent":{
                 	"type": "boolean",
                 	"enum": [true],

@@ -333,11 +333,11 @@ public class TafValidator {
 		augmentEndTimes(input);
 		augmentVisibilityWeatherRequired(input);
 		augmentEnoughWindChange(input);
-		augmentCloudNeededRain(input);
+		augmentCloudNeededRainOrModifierNecessary(input);
 		augmentFogMaxVisibility(input);
 		augmentNonRepeatingChanges(input);
 	}
-	
+		
 	private static void augmentNonRepeatingChanges(JsonNode input) {
 		ObjectNode currentForecast = (ObjectNode) input.get("forecast");
 		if (currentForecast == null || currentForecast.isNull() || currentForecast.isMissingNode()) return;
@@ -453,7 +453,7 @@ public class TafValidator {
 		}	
 	}
 	
-	private static void augmentCloudNeededRain(JsonNode input) {
+	private static void augmentCloudNeededRainOrModifierNecessary(JsonNode input) {
 		ObjectNode forecast = (ObjectNode) input.get("forecast");
 		if (forecast == null || forecast.isNull() || forecast.isMissingNode()) return;
 
@@ -481,11 +481,18 @@ public class TafValidator {
 			JsonNode forecastClouds) {
 		if (forecastWeather != null && !forecastWeather.asText().equals("NSW")) {
 			boolean requiresClouds = false;
+			boolean requiresCB = false;
+			boolean requiresCBorTCU = false;
 			ArrayNode weatherArray = (ArrayNode) forecastWeather;
 			for (Iterator<JsonNode> weather = weatherArray.elements(); weather.hasNext(); ) {
 				JsonNode weatherDescriptor = weather.next();
 				if (weatherDescriptor.has("descriptor") && weatherDescriptor.get("descriptor").asText().equals("showers")) {
 					requiresClouds = true;
+					requiresCBorTCU =true;
+					break;
+				}
+				if (weatherDescriptor.has("descriptor") && weatherDescriptor.get("descriptor").asText().equals("thunderstorm")) {
+					requiresCB = true;
 					break;
 				}
 			}
@@ -498,6 +505,26 @@ public class TafValidator {
 					forecast.put("cloudsNeededAndPresent", cloudsArray.size() > 0);
 				}
 			}
+			
+			if (requiresCB) {
+				if (forecastClouds == null || forecastClouds.asText().equals("NSC")) {
+					forecast.put("cloudsCBNeededAndPresent", false);
+				} else {
+					ArrayNode cloudsArray = (ArrayNode) forecastClouds;
+					forecast.put("cloudsCBNeededAndPresent", StreamSupport.stream(cloudsArray.spliterator(), true).anyMatch(cloud -> cloud.has("mod") && cloud.get("mod").asText().equals("CB")));
+				}
+			}
+			if (requiresCBorTCU) {
+				if (forecastClouds == null || forecastClouds.asText().equals("NSC")) {
+					forecast.put("cloudsCBorTCUNeededAndPresent", false);
+				} else {
+					ArrayNode cloudsArray = (ArrayNode) forecastClouds;
+					forecast.put("cloudsCBorTCUNeededAndPresent", StreamSupport.stream(cloudsArray.spliterator(), true).anyMatch(cloud -> 
+						cloud.has("mod") && (cloud.get("mod").asText().equals("CB") || cloud.get("mod").asText().equals("TCU"))
+					)); 
+				}
+			}
+
 		}
 	}
 		
