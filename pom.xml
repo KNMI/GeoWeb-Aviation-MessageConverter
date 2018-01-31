@@ -19,7 +19,8 @@
 	<description>Aviation weather message conversions - GeoWeb module</description>
 	<groupId>com.github.KNMI</groupId>
 	<artifactId>geoweb-aviation-messageconverter</artifactId>
-	<version>1.0.15</version>
+	<version>1.0.16</version>
+
 
 	<scm>
 		<connection>scm:git:https://github.com/ernstdevreede/geoweb-aviation-messageconverter.git</connection>

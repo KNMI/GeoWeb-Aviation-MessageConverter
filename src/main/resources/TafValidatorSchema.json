@@ -262,7 +262,7 @@
                         } 
                     }
                 },
-                "required": ["phenomena", "descriptor"]
+                "required": ["phenomena"]
             },
             {
                 "additionalProperties": false,
@@ -341,6 +341,17 @@
             }, {
                 "type": "string", "enum": ["NSW"]
             }]
+        },
+        "base_weather": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items":  {"$ref": "#/definitions/weather_group"},
+            "uniqueItems": true,
+            "$geoweb::messages": {
+            	"uniqueItems": "Weather groups must be unique",
+            	"type": "Base forecast cannot contain NSW"
+			}
         },
         "visibility": {
             "required": ["value"],
@@ -535,7 +546,7 @@
                     "properties": {
                         "wind": {"$ref": "#/definitions/wind"},
                         "visibility": {"$ref": "#/definitions/visibility"},
-                        "weather": {"$ref": "#/definitions/weather"},
+                        "weather": {"$ref": "#/definitions/base_weather"},
                         "clouds": {"$ref": "#/definitions/clouds"},
                         "temperature": {"$ref": "#/definitions/temperature"}
                     },
@@ -546,7 +557,7 @@
                     "properties": {
                         "wind": {"$ref": "#/definitions/wind"},
                         "visibility": {"$ref": "#/definitions/visibility"},
-                        "weather": {"$ref": "#/definitions/weather"},
+                        "weather": {"$ref": "#/definitions/base_weather"},
                         "vertical_visibility": {"$ref": "#/definitions/vertical_visibility"},
                         "temperature": {"$ref": "#/definitions/temperature"}
                     },
@@ -611,9 +622,12 @@
         "changegroups": {
             "type": "array",
             "minItems": 0,
-            "maxItems": 5,
-            "items": [{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"}],
-            "additionalProperties": false
+            "maxItems": 10,
+            "items": [{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"}],
+            "additionalProperties": false,
+        	"$geoweb::messages": {
+                "maxItems": "That's way too many changegroups'"
+            }
         }
     },
 
