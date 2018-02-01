@@ -407,7 +407,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		} else {
 			fct.setValidityStartTime(ZonedDateTime.from(input.getChangeStart()));
 		}
-		if (!input.getCaVOK()) {
+		if (!input.getForecast().getCaVOK()) {
 			retval.addAll(updateChangeForecastSurfaceWind(fct, input, hints));
 			retval.addAll(updateChangeVisibility(fct, input, hints));
 			retval.addAll(updateChangeWeather(fct, input, hints));

@@ -52,6 +52,7 @@ public class TafValidator {
 	}
 	
 	public TafValidationResult validate(Taf taf) throws IOException, ProcessingException, JSONException, ParseException {
+		System.out.println(taf.toJSON());
 		return validate(taf.toJSON());
 	}
 
@@ -363,10 +364,14 @@ public class TafValidator {
 			JsonNode forecastClouds = currentForecast.get("clouds");
 			JsonNode changeClouds = changeForecast.get("clouds");
 
-			nonRepeatingChange |= forecastWind.equals(changeWind);
-			nonRepeatingChange |= forecastVisibility.equals(changeVisibility);
-			nonRepeatingChange |= forecastWeather.equals(changeWeather);
-			nonRepeatingChange |= forecastClouds.equals(changeClouds);
+			if (forecastWind != null && !forecastWind.isNull() && !forecastWind.isMissingNode())
+				nonRepeatingChange |= forecastWind.equals(changeWind);
+			if (forecastVisibility != null && !forecastVisibility.isNull() && !forecastVisibility.isMissingNode())
+				nonRepeatingChange |= forecastVisibility.equals(changeVisibility);
+			if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode())
+				nonRepeatingChange |= forecastWeather.equals(changeWeather);
+			if (forecastClouds != null && !forecastClouds.isNull() && !forecastClouds.isMissingNode())
+				nonRepeatingChange |= forecastClouds.equals(changeClouds);
 
 			changegroup.put("repeatingChange", nonRepeatingChange);
 			JsonNode changeType = changegroup.get("changeType");

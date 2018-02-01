@@ -53,8 +53,8 @@ public class Taf {
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime validityEnd;
 		String location;
-		TAFReportPublishedConcept status = TAFReportPublishedConcept.concept;
-		TAFReportType type = TAFReportType.normal;
+		TAFReportPublishedConcept status;
+		TAFReportType type;
 	};
 	public Metadata metadata;
 
@@ -64,6 +64,7 @@ public class Taf {
 		@Getter
 		@Setter
 		public static class TAFCloudType {
+			@JsonInclude(JsonInclude.Include.NON_NULL)
 			Boolean isNSC=null;
 			String amount;
 			String mod;
@@ -92,7 +93,7 @@ public class Taf {
 			}
 		}
 
-		@JsonInclude(JsonInclude.Include.NON_NULL)
+//		@JsonInclude(JsonInclude.Include.NON_NULL)
 		Integer vertical_visibility;
 		
 		@JsonSerialize(using = CloudsSerializer.class)
@@ -102,6 +103,7 @@ public class Taf {
 		@Getter
 		@Setter
 		public static class TAFWeather {
+			@JsonInclude(JsonInclude.Include.NON_NULL)
 			Boolean isNSW=null;
 			String qualifier;
 			String descriptor;
@@ -123,7 +125,7 @@ public class Taf {
 				if(this.descriptor != null) {
 					sb.append(TAFtoTACMaps.getDescriptor(this.descriptor));
 				}
-				if(this.phenomena != null) {
+				if(this.phenomena != null && !this.phenomena.isEmpty()) {
 					for (String phenomenon : this.phenomena) {
 						sb.append(TAFtoTACMaps.getPhenomena(phenomenon));
 					}
@@ -142,7 +144,7 @@ public class Taf {
 			Integer value;
 			String unit;
 			public String toTAC() {
-				if(unit == null) {
+				if(unit == null || unit.equalsIgnoreCase("M")) {
 					return String.format(" %04d", value);
 				}
 				if(unit.equals("KM")) {
@@ -181,11 +183,16 @@ public class Taf {
 		@Getter
 		@Setter
 		public class TAFTemperature {
-			float maxTemperature;
+			Float maximum;
+			@JsonFormat(shape = JsonFormat.Shape.STRING)
+			@JsonInclude(JsonInclude.Include.NON_NULL)
 			OffsetDateTime maxTime;
-			float minTemperature;
+			Float minimum;
+			@JsonFormat(shape = JsonFormat.Shape.STRING)
+			@JsonInclude(JsonInclude.Include.NON_NULL)
 			OffsetDateTime minTime;
 		}
+
 		TAFTemperature temperature;
 
 		Boolean CaVOK;
@@ -225,14 +232,14 @@ public class Taf {
 
 	@Getter
 	@Setter
-	public static class ChangeForecast extends Forecast{
+	public static class ChangeForecast {
 		String changeType;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime changeStart;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime changeEnd;
 		Forecast forecast;
-		@Override
+
 		public String toTAC() {
 			StringBuilder sb=new StringBuilder();
 			sb.append(changeType.toString());
