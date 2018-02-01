@@ -21,7 +21,6 @@
 	<artifactId>geoweb-aviation-messageconverter</artifactId>
 	<version>1.0.18</version>
 
-
 	<scm>
 		<connection>scm:git:https://github.com/ernstdevreede/geoweb-aviation-messageconverter.git</connection>
 		<developerConnection>scm:git:https://github.com/ernstdevreede/geoweb-aviation-messageconverter.git</developerConnection>
