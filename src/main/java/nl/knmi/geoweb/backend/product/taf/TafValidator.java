@@ -52,7 +52,6 @@ public class TafValidator {
 	}
 	
 	public TafValidationResult validate(Taf taf) throws IOException, ProcessingException, JSONException, ParseException {
-		System.out.println(taf.toJSON());
 		return validate(taf.toJSON());
 	}
 
@@ -466,7 +465,7 @@ public class TafValidator {
 		JsonNode forecastClouds = input.get("forecast").get("clouds");
 		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode()) return;
 		if (forecastClouds == null || forecastClouds.isNull() || forecastClouds.isMissingNode()) return;
-
+		
 		processWeatherAndCloudGroup(forecast, forecastWeather, forecastClouds);
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
@@ -831,7 +830,6 @@ public class TafValidator {
 	public TafValidationResult validate(String tafStr) throws  ProcessingException, JSONException, IOException, ParseException {
 		String schemaFile = tafSchemaStore.getLatestTafSchema();
 		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);
-
 		removeLastEmptyChangegroup(jsonNode);
 		DualReturn ret = performValidation(schemaFile, jsonNode);
 		ProcessingReport validationReport = ret.getReport();
@@ -850,7 +848,6 @@ public class TafValidator {
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
 			((ObjectNode)errorJson).setAll((ObjectNode)(ValidationUtils.getJsonNode(errorsAsJson)));
 		} 
-
 		// Enrich the JSON with custom data validation, this is validated using a second schema
 		enrich(jsonNode);
 		String enrichedSchemaFile = tafSchemaStore.getLatestEnrichedTafSchema();

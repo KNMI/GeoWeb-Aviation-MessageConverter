@@ -1,106 +1,127 @@
 {
-	"metadata": {
-		"issueTime": "2017-08-07T09:46:24.59Z",
-		"validityStart": "2017-08-04T12:00:00Z",
-		"validityEnd": "2017-08-05T18:00:00Z",
-		"status": "concept",
-		"type": "normal",
-		"location": "EHAM",
-		"uuid" : "4bc6317f-b17b-4324-943e-dc5c44442e50"
-	},
-	"forecast": {
-		"wind": {
-			"direction": 200,
-			"speed": 15,
-			"gusts": 25,
-			"unit": "KT"
-		},
-		"caVOK": true
-	},
-	"changegroups": [{
-			"changeType": "BECMG",
-			"changeStart": "2017-08-04T16:00:00Z",
-			"changeEnd": "2017-08-04T20:00:00Z",
-			"forecast": {
-				"weather": [{
-						"descriptor": "showers",
-						"phenomena": ["rain"]
-					},
-					{
-						"descriptor": "thunderstorm",
-						"phenomena": ["rain"]
-					}
-				],
-				"clouds": [{
-					"amount": "FEW",
-					"height": 90
-				}, {
-					"amount": "SCT",
-					"height": 150
-				}, {
-					"amount": "OVC",
-					"height": 720
-				}],
-				"visibility": {
-					"value": 9000
-				},
-				"wind": {
-					"direction": 230,
-					"speed": 17,
-					"gusts": 27,
-					"unit": "KT"
-				}
-			}
-		},
-		{
-			"changeType": "PROB30",
-			"changeStart": "2017-08-04T16:00:00Z",
-			"changeEnd": "2017-08-04T20:00:00Z",
-			"forecast": {
-				"weather": "NSW",
-				"clouds": [{
-					"amount": "FEW",
-					"height": 90
-				}, {
-					"amount": "OVC",
-					"height": 150,
-					"mod": "TCU"
-				}],
-				"visibility": {
-					"value": 9999
-				},
-				"wind": {
-					"direction": 220,
-					"speed": 37,
-					"gusts": 47,
-					"unit": "KT"
-				}
-			}			
-		}, {
-			"forecast": {
-				"weather": [{
-						"descriptor": "showers",
-						"phenomena": ["rain"]
-					},
-					{
-						"descriptor": "thunderstorm",
-						"phenomena": ["rain"]
-					}
-				],
-				"clouds": "NSC",
-				"visibility": {
-					"value": 9999
-				},
-				"wind": {
-					"direction": "VRB",
-					"speed": 7,
-					"gusts": 17,
-					"unit": "KT"
-				}
-			},
-			"changeType": "BECMG",
-			"changeStart": "2017-08-05T03:00:00Z",
-			"changeEnd": "2017-08-05T05:00:00Z"
-		}
-	]
+   "forecast":{
+      "caVOK":true,
+      "wind":{
+         "direction":200,
+         "speed":15,
+         "gusts":25,
+         "unit":"KT"
+      }
+   },
+   "metadata":{
+      "issueTime":"2017-08-04T11:01:20Z",
+      "location":"EHAM",
+      "validityStart":"2017-08-04T12:00:00Z",
+      "validityEnd":"2017-08-05T18:00:00Z"
+   },
+   "changegroups":[
+      {
+         "changeStart":"2018-08-04T16:00:00Z",
+         "changeEnd":"2018-08-04T20:00:00Z",
+         "changeType":"BECMG",
+         "forecast":{
+            "clouds":[
+               {
+                  "amount":"FEW",
+                  "height":90
+               },
+               {
+                  "amount":"SCT",
+                  "height":150
+               },
+               {
+                  "amount":"OVC",
+                  "height":720,
+                  "mod":"CB"
+               }
+            ],
+            "visibility":{
+               "unit":"M",
+               "value":9000
+            },
+            "weather":[
+               {
+                  "qualifier":"moderate",
+                  "descriptor":"showers",
+                  "phenomena":[
+                     "rain"
+                  ]
+               },
+               {
+                  "qualifier":"moderate",
+                  "descriptor":"thunderstorm",
+                  "phenomena":[
+                     "rain"
+                  ]
+               }
+            ],
+            "wind":{
+               "direction":230,
+               "speed":17,
+               "gusts":27,
+               "unit":"KT"
+            }
+         }
+      },
+      {
+         "changeStart":"2018-08-04T16:00:00Z",
+         "changeEnd":"2018-08-04T20:00:00Z",
+         "changeType":"PROB30",
+         "forecast":{
+            "clouds":[
+               {
+                  "amount":"FEW",
+                  "height":90
+               },
+               {
+                  "amount":"OVC",
+                  "height":150
+               }
+            ],
+            "visibility":{
+               "unit":"M",
+               "value":9999
+            },
+            "wind":{
+               "direction":220,
+               "speed":37,
+               "gusts":47,
+               "unit":"KT"
+            }
+         }
+      },
+      {
+         "changeStart":"2018-08-05T03:00:00Z",
+         "changeEnd":"2018-08-05T05:00:00Z",
+         "changeType":"BECMG",
+         "forecast":{
+            "clouds":[
+               {
+                  "amount":"FEW",
+                  "height":10,
+                  "mod":"CB"
+               }
+            ],
+            "visibility":{
+               "unit":"M",
+               "value":9999
+            },
+            "weather":[
+               {
+                  "qualifier":"moderate",
+                  "descriptor":"showers",
+                  "phenomena":[
+                     "rain"
+                  ]
+               }
+            ],
+            "wind":{
+               "direction":"VRB",
+               "speed":7,
+               "gusts":17,
+               "unit":"KT"
+            }
+         }
+      }
+   ]
 }
