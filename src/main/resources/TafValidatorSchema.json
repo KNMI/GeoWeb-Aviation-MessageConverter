@@ -268,7 +268,7 @@
                 "additionalProperties": false,
                 "properties": {
                     "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
-                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["duststorm", "funnel cloud", "squall", "snow", "snow grains", "ice pellets", "mist", "smoke", "volcanic ash", "widespread dust", "sand", "haze", "dust", "funnel clouds", "sandstorm"] } }
+                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["drizzle", "duststorm", "funnel cloud", "squall", "snow", "snow grains", "ice pellets", "mist", "smoke", "volcanic ash", "widespread dust", "sand", "haze", "dust", "funnel clouds", "sandstorm"] } }
                 },
                 "required": ["phenomena"]
             },
@@ -550,7 +550,7 @@
                         "clouds": {"$ref": "#/definitions/clouds"},
                         "temperature": {"$ref": "#/definitions/temperature"}
                     },
-                    "required": ["wind", "visibility", "weather", "clouds"]
+                    "required": ["wind", "visibility", "clouds"]
                 },
                 {
                     "additionalProperties": false,
@@ -561,7 +561,7 @@
                         "vertical_visibility": {"$ref": "#/definitions/vertical_visibility"},
                         "temperature": {"$ref": "#/definitions/temperature"}
                     },
-                    "required": ["wind", "visibility", "weather", "vertical_visibility"]
+                    "required": ["wind", "visibility", "vertical_visibility"]
                 },
                 {
                     "additionalProperties": false,
