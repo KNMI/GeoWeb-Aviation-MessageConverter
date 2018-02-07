@@ -268,7 +268,7 @@
                 "additionalProperties": false,
                 "properties": {
                     "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
-                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["drizzle", "duststorm", "funnel cloud", "squall", "snow", "snow grains", "ice pellets", "mist", "smoke", "volcanic ash", "widespread dust", "sand", "haze", "dust", "funnel clouds", "sandstorm"] } }
+                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["rain", "drizzle", "duststorm", "funnel cloud", "squall", "snow", "snow grains", "ice pellets", "mist", "smoke", "volcanic ash", "widespread dust", "sand", "haze", "dust", "funnel clouds", "sandstorm"] } }
                 },
                 "required": ["phenomena"]
             },
@@ -436,6 +436,7 @@
                 } },
                     "speed": { "type": "integer", "minimum": 3, "maximum": 99, 
                     "$geoweb::messages": {
+                    	"minimum": "If the wind speed is less than 3 knots, the direction has to be variable.",
                         "maximum": "Wind speed must be less than 100 knots or 50 meters per second"
                     } },
                     "unit": { "type": "string", "enum": ["KT"] },
@@ -572,7 +573,8 @@
                     },
                     "required": ["wind", "caVOK"],
                     "$geoweb::messages": {
-                        "required": "Forecast is a wind group with visibilty, weather, either clouds or vertical visibility or CAVOK"
+                        "required": "Forecast is a wind group with visibilty, weather, either clouds or vertical visibility or CAVOK",
+                        "additionalProperties": "If CAVOK is given, no other properties than wind may be given."
                     }
                 }
             ]

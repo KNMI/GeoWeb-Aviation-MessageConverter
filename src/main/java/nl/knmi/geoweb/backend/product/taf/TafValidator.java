@@ -711,7 +711,10 @@ public class TafValidator {
 					overlap = true;
 				}
 			}
-			becmgEndTimes.add(formatter.parse(changegroup.findValue("changeEnd").asText()));
+			JsonNode changeEndNode = changegroup.findValue("changeEnd");
+			if (changeEndNode != null && !changeEndNode.isNull() && !changeEndNode.isMissingNode()) {
+				becmgEndTimes.add(formatter.parse(changeEndNode.asText()));
+			}
 			changegroup.put("changegroupBecomingOverlaps", overlap);
 		}
 	}
@@ -742,7 +745,8 @@ public class TafValidator {
 				Date parsedDate = formatter.parse(changeStart);
 				boolean comesAfter = parsedDate.after(prevChangeStart) || 
 						(parsedDate.equals(prevChangeStart) && changeType.startsWith("PROB")) ||
-						(parsedDate.equals(prevChangeStart) && changeType.startsWith("BECMG") && parsedDate.equals(tafStartTime));
+						(parsedDate.equals(prevChangeStart) && changeType.startsWith("BECMG") && parsedDate.equals(tafStartTime)) ||
+						(parsedDate.equals(prevChangeStart) && changeType.startsWith("TEMPO") && parsedDate.equals(tafStartTime));;
 				changegroup.put("changegroupsAscending", comesAfter);
 				prevChangeStart = parsedDate;
 			} catch (ParseException e) {
@@ -841,6 +845,7 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
+		System.out.println(validationReport);
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
