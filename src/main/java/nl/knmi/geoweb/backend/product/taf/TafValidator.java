@@ -356,7 +356,6 @@ public class TafValidator {
 			ObjectNode changegroup = (ObjectNode)change.next();
 			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
 			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode()) continue;
-			System.out.println(changeForecast);
 			boolean nonRepeatingChange = false;
 			
 			JsonNode forecastWind = currentForecast.get("wind");
@@ -921,8 +920,6 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
-		System.out.println(tafStr);
-		System.out.println(validationReport);
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
