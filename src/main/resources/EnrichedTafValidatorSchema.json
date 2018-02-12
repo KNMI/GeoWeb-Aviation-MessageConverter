@@ -182,7 +182,20 @@
                 		"enum": "When there are thunderstorms, a CB cloud is required"
                     }
     			},
-    			
+    			"visibilityWeatherRequiredAndPresent": {
+                	"type": "boolean",
+                	"enum": [true],
+                	"$geoweb::messages": {
+                		"enum": "If the visibility is less than 5000 meters weather groups are required"
+                	}
+                },
+                "cloudsModifierHasWeatherPresent": {
+                    "type": "boolean",
+                	"enum": [true],
+                    "$geoweb::messages": {
+                		"enum": "In the presence of CB or TCU a weather group with SH or TS is required"
+                    }
+                },
                 "cloudsNeededAndPresent":{
                 	"type": "boolean",
                 	"enum": [true],
@@ -201,7 +214,7 @@
                     "type": "boolean",
                     "enum": [true],
                     "$geoweb::messages": {
-                        "enum": "When foggy, visibility is limited to 1000m. With shallow fog it is limited to 5000m and fog banks are limited to 2000m."
+                        "enum": "The current combination of weather group and visibility is invalid."
                  	}
                 },
     			"wind": {
