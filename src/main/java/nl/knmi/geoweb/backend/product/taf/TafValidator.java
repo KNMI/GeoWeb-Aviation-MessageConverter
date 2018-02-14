@@ -516,7 +516,14 @@ public class TafValidator {
 
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			JsonNode changegroup = (ObjectNode) change.next();
+			System.out.println(changegroup);
+			if (!changegroup.has("forecast")) { 
+				continue;
+			}
 			JsonNode changeForecastNode = changegroup.get("forecast");
+			if (changeForecastNode.isNull() || changeForecastNode == null || changeForecastNode.isMissingNode()) {
+				continue;
+			}
 			ObjectNode changeForecast = (ObjectNode) changeForecastNode;
 			JsonNode changeWeather = changeForecast.get("weather");
 			JsonNode changeClouds = changeForecast.get("clouds");
@@ -526,7 +533,7 @@ public class TafValidator {
 
 	private static void processWeatherAndCloudGroup(ObjectNode forecast, JsonNode forecastWeather,
 			JsonNode forecastClouds) {
-		if (forecastWeather != null && !forecastWeather.asText().equals("NSW")) {
+		if (forecastWeather != null && !forecastWeather.asText().equals("NSW") && !forecastWeather.asText().isEmpty()) {
 			boolean requiresClouds = false;
 			boolean requiresCB = false;
 			boolean requiresCBorTCU = false;
@@ -579,9 +586,11 @@ public class TafValidator {
 			}
 
 		} else {
-			ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-			boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true).anyMatch(cloud -> cloud.has("mod") && cloud.get("mod").asText().equals("CB"));
-			forecast.put("cloudsModifierHasWeatherPresent", !modifierPresent);
+			if (forecastClouds != null && forecastClouds.isArray()) {
+				ArrayNode cloudsArray = (ArrayNode) forecastClouds;
+				boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true).anyMatch(cloud -> cloud.has("mod") && cloud.get("mod").asText().equals("CB"));
+				forecast.put("cloudsModifierHasWeatherPresent", !modifierPresent);
+			}
 		}
 	}
 		
