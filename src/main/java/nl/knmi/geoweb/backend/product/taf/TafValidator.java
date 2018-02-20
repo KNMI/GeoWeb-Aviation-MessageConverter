@@ -39,6 +39,7 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 import lombok.Getter;
 import lombok.Setter;
+import nl.knmi.adaguc.tools.Debug;
 
 
 @Component
