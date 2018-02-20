@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,7 +37,6 @@ import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
-import nl.knmi.adaguc.tools.Debug;
 import lombok.Getter;
 import lombok.Setter;
 

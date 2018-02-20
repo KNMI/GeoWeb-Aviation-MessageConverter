@@ -8,7 +8,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 
-import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast;
 
 
