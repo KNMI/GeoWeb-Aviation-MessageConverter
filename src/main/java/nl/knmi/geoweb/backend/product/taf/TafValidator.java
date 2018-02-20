@@ -515,7 +515,6 @@ public class TafValidator {
 
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			JsonNode changegroup = (ObjectNode) change.next();
-			System.out.println(changegroup);
 			if (!changegroup.has("forecast")) { 
 				continue;
 			}
