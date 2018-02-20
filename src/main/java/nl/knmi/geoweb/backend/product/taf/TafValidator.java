@@ -417,7 +417,7 @@ public class TafValidator {
 				}
 				if (StreamSupport.stream(phenomena.spliterator(), false).anyMatch(phenomenon -> 
 					phenomenon.asText().equals("smoke") || 
-					phenomenon.asText().equals("dust") ||
+					phenomenon.asText().equals("widespread dust") ||
 					phenomenon.asText().equals("sand") ||
 					phenomenon.asText().equals("volcanic ash"))) {
 					forecast.put("visibilityWithinLimit", visibility < 5000);
