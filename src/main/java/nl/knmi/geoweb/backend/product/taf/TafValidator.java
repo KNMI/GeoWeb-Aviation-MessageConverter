@@ -415,7 +415,7 @@ public class TafValidator {
 				}
 				if (StreamSupport.stream(phenomena.spliterator(), false).anyMatch(phenomenon -> 
 					phenomenon.asText().equals("smoke") || 
-					phenomenon.asText().equals("dust") ||
+					phenomenon.asText().equals("widespread dust") ||
 					phenomenon.asText().equals("sand") ||
 					phenomenon.asText().equals("volcanic ash"))) {
 					forecast.put("visibilityWithinLimit", visibility < 5000);
@@ -504,8 +504,6 @@ public class TafValidator {
 
 		JsonNode forecastWeather = input.get("forecast").get("weather");
 		JsonNode forecastClouds = input.get("forecast").get("clouds");
-//		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode()) return;
-		if (forecastClouds == null || forecastClouds.isNull() || forecastClouds.isMissingNode()) return;
 		
 		processWeatherAndCloudGroup(forecast, forecastWeather, forecastClouds);
 		JsonNode changeGroups = input.get("changegroups");
@@ -522,14 +520,26 @@ public class TafValidator {
 			}
 			ObjectNode changeForecast = (ObjectNode) changeForecastNode;
 			JsonNode changeWeather = changeForecast.get("weather");
+			if (changeWeather == null) {
+				changeWeather = forecastWeather;
+			}
 			JsonNode changeClouds = changeForecast.get("clouds");
+			if (changeClouds == null) {
+				changeClouds = forecastClouds;
+			}
+
 			processWeatherAndCloudGroup(changeForecast, changeWeather, changeClouds);
+			
+			if (changegroup.has("changeType") && !changegroup.get("changeType").asText().startsWith("PROB")) {
+				forecastWeather = changeWeather;
+				forecastClouds = changeClouds;
+			}
 		}
 	}
 
 	private static void processWeatherAndCloudGroup(ObjectNode forecast, JsonNode forecastWeather,
-			JsonNode forecastClouds) {
-		if (forecastWeather != null && !forecastWeather.asText().equals("NSW") && !forecastWeather.asText().isEmpty()) {
+			JsonNode forecastClouds) {		
+		if (forecastWeather != null && !forecastWeather.asText().equals("NSW")) {
 			boolean requiresClouds = false;
 			boolean requiresCB = false;
 			boolean requiresCBorTCU = false;
@@ -575,10 +585,12 @@ public class TafValidator {
 					)); 
 				}
 			}
-			ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-			boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true).anyMatch(cloud -> cloud.has("mod") && cloud.get("mod").asText().equals("CB"));
-			if (modifierPresent) {
-			 forecast.put("cloudsModifierHasWeatherPresent", rainOrThunderstormPresent);
+			if (forecastClouds != null && forecastClouds.isArray()) {
+				ArrayNode cloudsArray = (ArrayNode) forecastClouds;
+				boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true).anyMatch(cloud -> cloud.has("mod") && cloud.get("mod").asText().equals("CB"));
+				if (modifierPresent) {
+				 forecast.put("cloudsModifierHasWeatherPresent", rainOrThunderstormPresent);
+				}
 			}
 
 		} else {
@@ -613,7 +625,8 @@ public class TafValidator {
 			if (!changegroup.has("forecast")) continue;
 			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
 			if (changeForecast.has("wind")) {
-				JsonNode wind = changeForecast.get("wind");
+				JsonNode//		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode()) return;
+ wind = changeForecast.get("wind");
 				if (!wind.has("direction") || !wind.has("speed")) continue;
 				becomesGusty = !forecastGust && wind.has("gusts") && wind.get("gusts").asInt() > 0;
 				int changeWindDirection = wind.get("direction").asInt();
@@ -646,17 +659,20 @@ public class TafValidator {
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext(); ) {
 			ObjectNode changegroup = (ObjectNode) change.next();
-			JsonNode changeVisibilityNode = changegroup.findValue("visibility");
+			ObjectNode changegroupForecast = (ObjectNode)changegroup.get("forecast");
+			if (changegroupForecast == null || changegroupForecast.isNull() || changegroupForecast.isMissingNode()) continue;
+
+			JsonNode changeVisibilityNode = changegroupForecast.findValue("visibility");
 			if (changeVisibilityNode == null || !changeVisibilityNode.has("value")) {
 				changeVisibilityNode = visibilityNode;
 			};
 			int visibility = changeVisibilityNode.get("value").asInt();
-			JsonNode weather = changegroup.findValue("weather");
+			JsonNode weather = changegroupForecast.findValue("weather");
 			if (weather == null) {
 				weather = forecastWeather;
 			}
 			if (visibility <= 5000) {
-				changegroup.put("visibilityWeatherRequiredAndPresent", weather != null && weather.isArray());
+				changegroupForecast.put("visibilityWeatherRequiredAndPresent", weather != null && weather.isArray());
 			}
 			JsonNode changeType = changegroup.get("changeType");
 			if (changeType != null && !changeType.asText().startsWith("PROB")) {
@@ -695,7 +711,8 @@ public class TafValidator {
 	
 	private static void augmentAscendingClouds(JsonNode input) throws ParseException {
 		List<JsonNode> forecasts = input.findParents("clouds");
-		for (JsonNode forecast : forecasts) {
+		for (JsonNode forecast//		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode()) return;
+ : forecasts) {
 			if (forecast == null || forecast.isNull() || forecast.isMissingNode()) continue;
 			ObjectNode editableForecast = (ObjectNode) forecast;
 			int prevHeight = 0;
@@ -926,6 +943,7 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
+		Debug.println("First: " + validationReport.toString());
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
@@ -943,6 +961,7 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport, enrichedValidationReport);
 		}
+		Debug.println("Second: " + enrichedValidationReport.toString());
 
 		if(!enrichedValidationReport.isSuccess()) {
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
