@@ -217,50 +217,14 @@
                         "enum": "The current combination of weather group and visibility is invalid."
                  	}
                 },
-    			"wind": {
-    				"type": "object",
-                    "oneOf": [{
-        				"properties": {
-        					"gustFastEnough": {
-        						"type": "boolean",
-        						"enum": [true],
-        						"$geoweb::messages": {
-		                            "enum": "Wind gusts must at least be 10 knots greater than the wind speed"
-		                     	}
-        					},
-                            "gusts": {
-                                "type": "integer"
-                            },
-                            "speed": {
-                                "type": "integer"
-                            },
-                            "direction": {
-                                "oneOf": [{"type": "integer"}, {"type": "string"}]
-                            },
-                            "unit": {
-                                "type": "string"
-                            }
-        				},
-        				"additionalProperties": false,
-        				"required": ["gustFastEnough", "gusts"]
-                    }, {
-                        "properties": {
-                            "gustFastEnough": {
-                                "type": "boolean",
-                                "enum": [true]
-                            },
-                            "speed": {
-                                "type": "integer"
-                            },
-                            "direction": {
-                                "oneOf": [{"type": "integer"}, {"type": "string"}]
-                            },
-                            "unit": {
-                                "type": "string"
-                            }
-                        },
-                        "additionalProperties": false
-                    }]
+                "gustFastEnough": {
+                    "type": "boolean",
+                    "enum": [
+                        true
+                    ],
+                    "$geoweb::messages": {
+                        "enum": "Wind gusts must at least be 10 knots greater than the wind speed"
+                    }
                 }
     		},
             "additionalProperties": true
