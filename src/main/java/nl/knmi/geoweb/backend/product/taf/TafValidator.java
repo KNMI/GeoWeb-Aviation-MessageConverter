@@ -627,8 +627,7 @@ public class TafValidator {
 			if (!changegroup.has("forecast")) continue;
 			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
 			if (changeForecast.has("wind")) {
-				JsonNode//		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode()) return;
- wind = changeForecast.get("wind");
+				JsonNode wind = changeForecast.get("wind");
 				if (!wind.has("direction") || !wind.has("speed")) continue;
 				becomesGusty = !forecastGust && wind.has("gusts") && wind.get("gusts").asInt() > 0;
 				int changeWindDirection = wind.get("direction").asInt();
@@ -668,7 +667,13 @@ public class TafValidator {
 			if (changeVisibilityNode == null || !changeVisibilityNode.has("value")) {
 				changeVisibilityNode = visibilityNode;
 			};
-			int visibility = changeVisibilityNode.get("value").asInt();
+			int visibility;
+			if (changeVisibilityNode == null || !changeVisibilityNode.has("value")) {
+				// cavok
+				visibility = 9999;
+			} else {
+				visibility = changeVisibilityNode.get("value").asInt();
+			}
 			JsonNode weather = changegroupForecast.findValue("weather");
 			if (weather == null) {
 				weather = forecastWeather;
@@ -713,8 +718,7 @@ public class TafValidator {
 	
 	private static void augmentAscendingClouds(JsonNode input) throws ParseException {
 		List<JsonNode> forecasts = input.findParents("clouds");
-		for (JsonNode forecast//		if (forecastWeather == null || forecastWeather.isNull() || forecastWeather.isMissingNode()) return;
- : forecasts) {
+		for (JsonNode forecast : forecasts) {
 			if (forecast == null || forecast.isNull() || forecast.isMissingNode()) continue;
 			ObjectNode editableForecast = (ObjectNode) forecast;
 			int prevHeight = 0;
