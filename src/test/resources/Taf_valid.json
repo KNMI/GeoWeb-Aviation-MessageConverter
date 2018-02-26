@@ -75,7 +75,8 @@
                },
                {
                   "amount":"OVC",
-                  "height":150
+                  "height":150,
+                  "mod": "CB"
                }
             ],
             "visibility":{
