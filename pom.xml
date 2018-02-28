@@ -37,15 +37,16 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
     <!-- Github site plugin for Github mvn repo deployment -->
-    <site-maven-plugin.version>0.11</site-maven-plugin.version>
+    <site-maven-plugin.version>0.12</site-maven-plugin.version>
 
     <!-- Most of these SHOULD NOT be overriden in child POMs -->
     <project.scm.id>github</project.scm.id>
     <github-repo-owner>ernstdevreede</github-repo-owner>
-    <github.global.server>github</github.global.server>
+    <!-- <github.global.server>github</github.global.server> -->
     <github-mvn-release-repo>knmi-mvn-repo</github-mvn-release-repo>
     <github-mvn-snapshot-repo>knmi-mvn-snapshot-repo</github-mvn-snapshot-repo>
-    <scm-url>scm:git:https://github.com/${github-repo-owner}/${project.artifactId}.git/</scm-url>
+    <scm-url>scm:git:git@github.com:${github-repo-owner}/${project.artifactId}.git/</scm-url>
+<!--    <scm-url>scm:git:ssh://git@github.com/${github-repo-owner}/${project.artifactId}.git/</scm-url> -->
     <scm-web-url>https://github.com/${github-repo-owner}/${project.artifactId}</scm-web-url>
     
   </properties>
