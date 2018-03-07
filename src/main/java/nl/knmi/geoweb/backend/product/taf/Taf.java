@@ -32,16 +32,17 @@ public class Taf {
 	public static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 	public enum TAFReportType {
-		retarded, normal, amendment, cancel, correction, missing;
+		retarded, normal, amendment, canceled, correction, missing;
 	}
 
 	public enum TAFReportPublishedConcept {
-		concept, published
+		concept, published, inactive
 	}
 	
 	@Getter
 	@Setter
 	public static class Metadata {
+		private String previousUuid = null;
 		private String uuid = null;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime issueTime;
@@ -295,7 +296,7 @@ public class Taf {
 		}
 		sb.append(" "+TAFtoTACMaps.toDDHH(taf.metadata.validityStart)+"/"+TAFtoTACMaps.toDDHH(taf.metadata.validityEnd));
 		switch(taf.metadata.type) {
-		case cancel:
+		case canceled:
 			// In case of a cancel there are no change groups so we're done here
 			sb.append(" CNL");
 			return sb.toString();

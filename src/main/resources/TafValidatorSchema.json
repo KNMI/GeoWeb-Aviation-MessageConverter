@@ -588,10 +588,10 @@
                 "validityStart": { "type": "string", "format": "date-time" },
                 "validityEnd": { "type": "string", "format": "date-time" },
                 "status": { "type": "string", "enum": ["concept", "published", "expired"] },
-                "type": { "type": "string", "enum": ["normal", "amendment", "correction", "cancel", "missing", "retarded"] },
+                "type": { "type": "string", "enum": ["normal", "amendment", "correction", "canceled", "missing", "retarded"] },
                 "location": { "type": "string", "enum": ["EHAL", "EHAM", "EHBD", "EHBK", "EHDB", "EHDL", "EHDP", "EHDR", "EHEH", "EHGG", "EHGR", "EHND", "EHHO", "EHHV", "EHKD", "EHVK", "EHLE", "EHLW", "EHMC", "EHMZ", "EHOW", "EHRD", "EHSB", "EHSE", "EHST", "EHTE", "EHTL", "EHTW", "EHTX", "EHVB", "EHVE", "EHWO", "EHYB", "EHYP"]}
             },
-            "additionalProperties": false,
+            "additionalProperties": true,
             "required": ["issueTime", "validityStart", "validityEnd", "location"],
             "$geoweb::messages": {
                 "required": "Type, status, location, and validity times are required"
