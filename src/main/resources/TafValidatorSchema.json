@@ -268,7 +268,7 @@
                 "additionalProperties": false,
                 "properties": {
                     "qualifier": { "type": "string", "enum": ["light", "moderate", "heavy"]},
-                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 1, "items": { "type": "string", "enum": ["rain", "drizzle", "duststorm", "funnel cloud", "squall", "snow", "snow grains", "ice pellets", "mist", "smoke", "volcanic ash", "widespread dust", "sand", "haze", "dust", "funnel clouds", "sandstorm"] } }
+                    "phenomena": { "type": "array", "uniqueItems": true, "minItems": 1, "maxItems": 2, "items": { "type": "string", "enum": ["rain", "drizzle", "duststorm", "funnel cloud", "squall", "snow", "snow grains", "ice pellets", "mist", "smoke", "volcanic ash", "widespread dust", "sand", "haze", "dust", "funnel clouds", "sandstorm"] } }
                 },
                 "required": ["phenomena"]
             },

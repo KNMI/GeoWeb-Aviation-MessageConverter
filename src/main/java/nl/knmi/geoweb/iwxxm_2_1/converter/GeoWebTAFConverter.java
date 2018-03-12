@@ -53,7 +53,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		case correction:
 			st=TAFStatus.CORRECTION;
 			break;
-		case cancel:
+		case canceled:
 			st=TAFStatus.CANCELLATION;
 		case retarded:
 			st=TAFStatus.MISSING;
