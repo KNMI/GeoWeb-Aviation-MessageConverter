@@ -15,6 +15,8 @@ import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.Aerodrome;
 import fi.fmi.avi.model.GeoPosition;
 import fi.fmi.avi.model.taf.TAF;
+import nl.knmi.geoweb.backend.aviation.AirportInfo;
+import nl.knmi.geoweb.backend.aviation.AirportStore;
 import nl.knmi.geoweb.backend.product.taf.Taf;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
@@ -39,18 +41,27 @@ public class TafConverter {
 		return p;
 	}
 
+	@Autowired
+	AirportStore airportStore;
+
 	public String ToIWXXM_2_1(Taf geoWebTaf) {
 
 		ConversionResult<TAF> result = geoWebTafImporter.convertMessage(geoWebTaf,ConversionHints.TAF);
 		if (ConversionResult.Status.SUCCESS == result.getStatus()) {
 			TAF pojo = result.getConvertedMessage();
-			//			pojo.amendTimeReferences(ZonedDateTime.of(2017, 9, 4, 6, 0, 0, 0, ZoneId.of("Z")));
-			Aerodrome ad=pojo.getAerodrome();
-			ad.setReferencePoint(new GeoPosition("EPSG:4326", 52.0, 5.2));
-			ad.setFieldElevation(-4.);
-			ad.setLocationIndicatorICAO("EHAM");
-			ad.setName("AMSTERDAM");
-
+			String airportName=	geoWebTaf.getMetadata().getLocation();
+			AirportInfo airportInfo=airportStore.lookup(airportName);
+			if (airportInfo!=null) {
+				Aerodrome ad=pojo.getAerodrome();
+				ad.setReferencePoint(new GeoPosition(airportInfo.getGeoLocation().getEPSG(),
+						airportInfo.getGeoLocation().getLat(), airportInfo.getGeoLocation().getLon()));
+				ad.setFieldElevation(airportInfo.getFieldElevation());
+				ad.setLocationIndicatorICAO(airportInfo.getICAOName());
+				ad.setName(airportInfo.getName());
+			}
+			else {
+				System.err.println("airportinfo for "+airportName+" not found");
+			}
 			ConversionResult<String>iwxxmResult=tafIWXXMStringSerializer.convertMessage(pojo, ConversionHints.TAF);
 			if (ConversionResult.Status.SUCCESS == iwxxmResult.getStatus()) {
 				return iwxxmResult.getConvertedMessage();

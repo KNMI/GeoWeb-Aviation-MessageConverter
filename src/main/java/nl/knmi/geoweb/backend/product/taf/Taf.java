@@ -6,7 +6,11 @@ import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.TimeZone;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,11 +26,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
 import nl.knmi.geoweb.backend.product.taf.serializers.CloudsSerializer;
 import nl.knmi.geoweb.backend.product.taf.serializers.WeathersSerializer;
 
 @Getter
 @Setter
+@Configuration
+@Import({nl.knmi.geoweb.backend.product.taf.converter.TafConverter.class})
 public class Taf {
 
 	public static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
@@ -253,7 +260,7 @@ public class Taf {
 		ObjectMapper om=getTafObjectMapperBean();	
 		return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
 	}
-
+	
 	public static Taf fromJSONString(String tafJson) throws JsonParseException, JsonMappingException, IOException{
 		ObjectMapper om=getTafObjectMapperBean();	
 		Taf taf = om.readValue(tafJson, Taf.class);
@@ -264,6 +271,11 @@ public class Taf {
 		return fromJSONString(Tools.readFile(f.getAbsolutePath()));
 	}
 
+	
+	public String toIWWXM(TafConverter tafConverter) {
+	  return tafConverter.ToIWXXM_2_1(this);	
+	}
+	
 	public String toTAC() {
 		Taf taf = this;
 		StringBuilder sb=new StringBuilder();
