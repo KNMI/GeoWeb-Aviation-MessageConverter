@@ -62,6 +62,9 @@ public class Taf implements IExportable {
 		OffsetDateTime validityStart;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime validityEnd;
+		@JsonFormat(shape = JsonFormat.Shape.STRING)
+		OffsetDateTime baseTime;
+
 		String location;
 		TAFReportPublishedConcept status;
 		TAFReportType type;
@@ -291,7 +294,6 @@ public class Taf implements IExportable {
 	}
 
 	public String toTAC() {
-		System.out.println(this.metadata.type);
 		StringBuilder sb = new StringBuilder();
 		sb.append("TAF ");
 		switch (this.metadata.type) {
@@ -359,9 +361,14 @@ public class Taf implements IExportable {
 			}
 		}
 		publishTAC += line;
-		OffsetDateTime minusOne = this.metadata.validityStart.minusHours(1);
+		OffsetDateTime minusOne;
+		if (this.metadata.baseTime != null) {
+			Debug.println("basetime");
+			minusOne = this.metadata.baseTime.minusHours(1);
+		} else {
+			minusOne = this.metadata.validityStart.minusHours(1);
+		}
 		String time = TAFtoTACMaps.toDDHH(minusOne) + "00";
-		String paddedDayOfMonth = String.format("%02d", minusOne.getDayOfMonth());
 		String status = "";
 		switch (this.metadata.type) {
 		case amendment:
@@ -386,7 +393,7 @@ public class Taf implements IExportable {
 		}
 
 		
-		String header = "FTNL99 " + this.metadata.location + " " + paddedDayOfMonth + time + status +'\n';
+		String header = "FTNL99 " + this.metadata.location + " " + time + status +'\n';
 		String footer = "=";
 		return header + publishTAC + footer;
 	}
@@ -419,14 +426,14 @@ public class Taf implements IExportable {
 	}
 
 	@Override
-	public void export(File path) {
+	public void export(File path, TafConverter converter) {
 		try {
 			String time = this.metadata.validityStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 
 			String name = "TAF_" + this.metadata.getLocation() + "_" + time;
 			Tools.writeFile(path.getPath() + "/" + name + "_" + this.metadata.uuid + ".tac", this.getPublishableTAC());
 			Tools.writeFile(path.getPath() + "/" + name + "_" + this.metadata.uuid + ".json", this.toJSON());
-			// TODO: Tools.writeFile(path.getPath() + this.metadata.uuid + ".xml", this.toIWXXM());
+			Tools.writeFile(path.getPath() + "/" + name + "_" + this.metadata.uuid + ".xml", converter.ToIWXXM_2_1(this));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
