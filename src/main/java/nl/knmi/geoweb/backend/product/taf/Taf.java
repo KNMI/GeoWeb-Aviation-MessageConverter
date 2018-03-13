@@ -346,7 +346,6 @@ public class Taf implements IExportable {
 	private String getPublishableTAC() {
 		String line = "";
 		String publishTAC = "";
-		System.out.println("Publish: " + this.toTAC());
 		String[] TACwords = this.toTAC().split("\\s+");
 		for(int i = 0; i < TACwords.length; ++i) {
 			if (line.length() + TACwords[i].length() + 1 <= 69) {
