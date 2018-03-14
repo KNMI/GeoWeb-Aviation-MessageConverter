@@ -582,17 +582,36 @@
         },
         "base_metadata": {
             "type": "object",
-            "properties": {
-                "uuid": { "type": "string", "format": "uuid" },
-                "issueTime": { "type": "string", "format": "date-time" },
-                "validityStart": { "type": "string", "format": "date-time" },
-                "validityEnd": { "type": "string", "format": "date-time" },
-                "status": { "type": "string", "enum": ["concept", "published", "expired"] },
-                "type": { "type": "string", "enum": ["normal", "amendment", "correction", "canceled", "missing", "retarded"] },
-                "location": { "type": "string", "enum": ["EHAL", "EHAM", "EHBD", "EHBK", "EHDB", "EHDL", "EHDP", "EHDR", "EHEH", "EHGG", "EHGR", "EHND", "EHHO", "EHHV", "EHKD", "EHVK", "EHLE", "EHLW", "EHMC", "EHMZ", "EHOW", "EHRD", "EHSB", "EHSE", "EHST", "EHTE", "EHTL", "EHTW", "EHTX", "EHVB", "EHVE", "EHWO", "EHYB", "EHYP"]}
-            },
-            "additionalProperties": true,
-            "required": ["issueTime", "validityStart", "validityEnd", "location"],
+            "oneOf": [{
+	            "properties": {
+	                "uuid": { "type": "string", "format": "uuid" },
+	                "validityStart": { "type": "string", "format": "date-time" },
+	                "validityEnd": { "type": "string", "format": "date-time" },
+	                "status": { "type": "string", "enum": ["concept"] },
+	                "type": { "type": "string", "enum": ["normal", "amendment", "correction", "canceled", "missing", "retarded"] },
+	                "location": { "type": "string", "enum": ["EHAL", "EHAM", "EHBD", "EHBK", "EHDB", "EHDL", "EHDP", "EHDR", "EHEH", "EHGG", "EHGR", "EHND", "EHHO", "EHHV", "EHKD", "EHVK", "EHLE", "EHLW", "EHMC", "EHMZ", "EHOW", "EHRD", "EHSB", "EHSE", "EHST", "EHTE", "EHTL", "EHTW", "EHTX", "EHVB", "EHVE", "EHWO", "EHYB", "EHYP"]}
+	            },
+	            "additionalProperties": true,
+	            "required": ["validityStart", "validityEnd", "location"]
+	        }, {
+	        	"properties": {
+	                "uuid": { "type": "string", "format": "uuid" },
+	                "issueTime": { "type": "string", "format": "date-time" },
+	                "validityStart": { "type": "string", "format": "date-time" },
+	                "validityEnd": { "type": "string", "format": "date-time" },
+	                "status": { "type": "string", "enum": ["published", "expired", "inactive"] },
+	                "type": { "type": "string", "enum": ["normal", "amendment", "correction", "canceled", "missing", "retarded"] },
+	                "location": { 
+	                	"type": "string", 
+	                	"enum": ["EHAL", "EHAM", "EHBD", "EHBK", "EHDB", "EHDL", "EHDP", "EHDR", "EHEH", "EHGG", "EHGR", "EHND", "EHHO", "EHHV", "EHKD", "EHVK", "EHLE", "EHLW", "EHMC", "EHMZ", "EHOW", "EHRD", "EHSB", "EHSE", "EHST", "EHTE", "EHTL", "EHTW", "EHTX", "EHVB", "EHVE", "EHWO", "EHYB", "EHYP"],
+	                    "$geoweb::messages": {
+	                		"enum": "Location is not valid"
+	                	}
+	                }
+	            },
+	            "additionalProperties": true,
+	            "required": ["issueTime", "validityStart", "validityEnd", "location"]
+	        }],
             "$geoweb::messages": {
                 "required": "Type, status, location, and validity times are required"
             }
