@@ -948,10 +948,11 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
-		Debug.println("First: " + validationReport.toString());
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
+			Debug.println("Validation report failed: " + validationReport.toString());
+
 			String errorsAsJson = new ObjectMapper().writeValueAsString(errorMessages);
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
 			((ObjectNode)errorJson).setAll((ObjectNode)(ValidationUtils.getJsonNode(errorsAsJson)));
