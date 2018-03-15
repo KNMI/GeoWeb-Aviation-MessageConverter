@@ -864,7 +864,7 @@ public class TafValidator {
 			String changeType = changeTypeNode.asText();
 			try {
 				Date parsedDate = formatter.parse(changeStart);
-				boolean comesAfter = parsedDate.after(prevChangeStart) || 
+				boolean comesAfter = parsedDate.compareTo(prevChangeStart) < 0 || 
 						(parsedDate.equals(prevChangeStart) && changeType.startsWith("PROB")) ||
 						(parsedDate.equals(prevChangeStart) && changeType.startsWith("BECMG") && parsedDate.equals(tafStartTime)) ||
 						(parsedDate.equals(prevChangeStart) && changeType.startsWith("TEMPO") && parsedDate.equals(tafStartTime));;
