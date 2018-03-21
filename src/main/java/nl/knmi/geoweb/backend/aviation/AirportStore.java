@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import nl.knmi.adaguc.tools.Debug;
+import nl.knmi.adaguc.tools.Tools;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -19,14 +20,26 @@ import lombok.Setter;
 @Component
 public class AirportStore {
 	private String airportFile;
+	private String directory;
 	private Map<String, AirportInfo> airportInfos;
 	public AirportStore(@Value(value = "${productstorelocation}") String productstorelocation){
-		this.airportFile=productstorelocation+"/admin/config/"+"BREM_20160310.json";
+		this.directory=productstorelocation+"/admin/config";
+		this.airportFile="BREM_20160310.json";
 	}
 
-	public void initStore() {
+	public void initStore() throws IOException {
 		this.airportInfos=new HashMap<String,AirportInfo>();
-		File fn=new File(this.airportFile);
+		File fn=new File(this.directory+"/"+this.airportFile);
+		Debug.println("fn:"+fn);
+		if (fn.exists()&&fn.isFile()) {
+
+		}else {
+			Debug.errprintln("No airportfile found, copying one from resources dir to "+this.directory);
+			String s = Tools.readResource(this.airportFile);
+			String airportText=String.format("%s/%s", this.directory,  this.airportFile);
+			Tools.writeFile(airportText, s);
+		}
+		
 		ObjectMapper om=new ObjectMapper();
 		try {
 			AirportJsonRecord[] airports = om.readValue(fn, AirportJsonRecord[].class);
@@ -46,7 +59,11 @@ public class AirportStore {
 
 	public AirportInfo lookup(String ICAO) {
 		if (airportInfos==null) {
-			initStore();
+			try {
+				initStore();
+			} catch (IOException e) {
+				return null;
+			}
 		}
 		return airportInfos.get(ICAO);
 	}
