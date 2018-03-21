@@ -381,7 +381,7 @@ public class TafValidator {
 			changegroup.put("repeatingChange", nonRepeatingChange);
 			JsonNode changeType = changegroup.get("changeType");
 			if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && 
-					!changegroup.get("changeType").asText().startsWith("PROB")) {
+					!changeType.asText().startsWith("PROB") && !changeType.asText().equalsIgnoreCase("TEMPO")) {
 				currentForecast = changeForecast;
 			}
 
@@ -492,7 +492,7 @@ public class TafValidator {
 			}
 
 
-			if (changegroup.get("changeType") != null && !changegroup.get("changeType").asText().startsWith("PROB")) { 
+			if (changegroup.get("changeType") != null && !changegroup.get("changeType").asText().startsWith("PROB") && !changegroup.get("changeType").asText().equalsIgnoreCase("TEMPO")) {
 				forecastWeather = changeWeather;
 				forecastVisibility = changeVisibility;
 			}
@@ -531,7 +531,7 @@ public class TafValidator {
 
 			processWeatherAndCloudGroup(changeForecast, changeWeather, changeClouds);
 			
-			if (changegroup.has("changeType") && !changegroup.get("changeType").asText().startsWith("PROB")) {
+			if (changegroup.has("changeType") && !changegroup.get("changeType").asText().startsWith("PROB") && !changegroup.get("changeType").asText().equalsIgnoreCase("TEMPO")) {
 				forecastWeather = changeWeather;
 				forecastClouds = changeClouds;
 			}
@@ -615,6 +615,8 @@ public class TafValidator {
 		
 		JsonNode forecastGustNode = forecastWind.get("gusts");
 		
+		String unit = forecastWind.get("unit").asText();
+		
 		int forecastWindDirection = forecastWind.get("direction").asInt();
 		int forecastWindSpeed = forecastWind.get("speed").asInt();
 		boolean forecastGust = forecastGustNode == null || forecastGustNode.isNull() || forecastGustNode.isMissingNode() || forecastGustNode.asInt() > 0;
@@ -631,13 +633,29 @@ public class TafValidator {
 				becomesGusty = !forecastGust && wind.has("gusts") && wind.get("gusts").asInt() > 0;
 				int changeWindDirection = wind.get("direction").asInt();
 				int changeWindSpeed = wind.get("speed").asInt();
+				String changeUnit = wind.get("unit").asText();
+				if (!unit.equals(changeUnit)) {
+					// one is in knots and the other in meters per second.
+					// compute it such that both are in knots
+					double MPS_TO_KNOTS_FACTOR = 1.943844; // 1 mps = 1.943844kt
+					if (unit.equalsIgnoreCase("KT")) {
+						changeUnit = "KT";
+						changeWindSpeed = (int) Math.round((changeWindSpeed * MPS_TO_KNOTS_FACTOR));
+					} else{
+						unit = "KT";
+						changeWindSpeed = (int) Math.round((forecastWindSpeed * MPS_TO_KNOTS_FACTOR));
+					}
+				}
 				int speedDifference = Math.abs(changeWindSpeed - forecastWindSpeed);
+
 				long directionDifference = Math.min(subtract(changeWindDirection, forecastWindDirection, 360), subtract(forecastWindDirection, changeWindDirection, 360));
 				changegroup.put("directionDiff", directionDifference);
 				changegroup.put("speedDiff", speedDifference);
-				changegroup.put("windEnoughDifference", directionDifference >= 30 || speedDifference >= 5 || becomesGusty);
+				// Wind speed difference should be more than 5 knots or 2 meters per second.
+				int limitSpeedDifference = unit.equals("KT") ? 5 : 2;
+				changegroup.put("windEnoughDifference", directionDifference >= 30 || speedDifference >= limitSpeedDifference || becomesGusty);
 				JsonNode changeType = changegroup.get("changeType");
-				if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && !changegroup.get("changeType").asText().startsWith("PROB")) {
+				if (changeType != null && !changeType.isNull() && !changeType.isMissingNode() && !changeType.asText().startsWith("PROB") && !changeType.asText().equalsIgnoreCase("TEMPO")) {
 					forecastWindDirection = changeWindDirection;
 					forecastWindSpeed = changeWindSpeed;
 				}
@@ -948,10 +966,11 @@ public class TafValidator {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false, (ObjectNode)om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
-		Debug.println("First: " + validationReport.toString());
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);	
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if(!validationReport.isSuccess()) {
+			Debug.println("Validation report failed: " + validationReport.toString());
+
 			String errorsAsJson = new ObjectMapper().writeValueAsString(errorMessages);
 			// Try to find all possible errors and map them to the human-readable variants using the messages map
 			((ObjectNode)errorJson).setAll((ObjectNode)(ValidationUtils.getJsonNode(errorsAsJson)));
