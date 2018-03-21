@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.NotDirectoryException;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
+import nl.knmi.geoweb.backend.product.taf.Taf;
 
 @Component
 public class SigmetStore {
@@ -44,21 +47,27 @@ public class SigmetStore {
 		sigmet.serializeSigmet(fn);	
 	}
 
-	public synchronized int getSequence() {
-		Sigmet[]sigmets=getSigmets(true, null);
-		int seq=-1;
-		Date now=new Date();
-		if (sigmets.length>0){
-			seq=sigmets[0].getSequence();
-			if (seq==-1) {
-				seq=1;
-			} else if (sigmets[0].getIssuedate().getDate()!=now.getDate()) {
-				seq=1;
-			}
-		}else {
-			seq=1;
+	public synchronized int getNextSequence() {
+		// Day zero means all sigmets of today since midnight UTC
+		Sigmet[] sigmets = getPublishedSigmetsSinceDay(0);
+		int seq = 1;
+
+		if (sigmets.length > 0){
+			Arrays.sort(sigmets, (rhs, lhs) -> rhs.getSequence() < lhs.getSequence() ? 1 : (rhs.getSequence() == lhs.getSequence() ? 0 : -1));
+			seq = sigmets[0].getSequence() + 1;
 		}
-		return 1;
+		return seq;
+	}
+	
+	public Sigmet[] getPublishedSigmetsSinceDay (int daysOffset) {
+		Sigmet[] sigmets = getSigmets(false, SigmetStatus.PUBLISHED);
+		OffsetDateTime offset = OffsetDateTime.now(ZoneId.of("Z")).minusDays(daysOffset);
+		offset = offset.withHour(0);
+		offset = offset.withMinute(0);
+		offset = offset.withNano(0);
+		final OffsetDateTime offsetSinceMidnight = offset.withSecond(0);
+
+		return Arrays.stream(sigmets).filter(sigmet -> sigmet.getValiddate().isAfter(offsetSinceMidnight)).toArray(Sigmet[]::new);
 	}
 
 	public Sigmet[] getSigmets(boolean selectActive, SigmetStatus selectStatus) {
@@ -79,7 +88,7 @@ public class SigmetStore {
 			}
 		});
 
-		Date now=new Date();
+		OffsetDateTime now= OffsetDateTime.now(ZoneId.of("Z"));
 
 		if (files!=null) {
 			List<Sigmet> sigmets=new ArrayList<Sigmet>();
@@ -88,7 +97,7 @@ public class SigmetStore {
 				try {
 					sm = Sigmet.getSigmetFromFile(f);
 					if (selectActive) {
-						if ((sm.getStatus()==SigmetStatus.PUBLISHED)&&(sm.getValiddate().getTime()+Sigmet.WSVALIDTIME)<now.getTime()) {
+						if ((sm.getStatus()==SigmetStatus.PUBLISHED)&&(sm.getValiddate().isBefore(now)) && (sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);
 						}
 					}else if (selectStatus != null) {

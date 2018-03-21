@@ -4,18 +4,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Date;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 import java.util.UUID;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.Duration;
 
 import org.geojson.GeoJsonObject;
+import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +33,8 @@ import nl.knmi.adaguc.tools.Debug;
 @Setter
 public class Sigmet {
 	
-	public static final long WSVALIDTIME = 4*3600*1000;
-	public static final long WVVALIDTIME = 6*3600*1000;
+	public static final Duration WSVALIDTIME = Duration.ofHours(4); //4*3600*1000;
+	public static final Duration WVVALIDTIME = Duration.ofHours(6); //6*3600*1000;
 
 	private GeoJsonObject geojson;
 	private Phenomenon phenomenon;
@@ -36,18 +44,36 @@ public class Sigmet {
 	private SigmetChange change;
 
 	private String forecast_position;
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss'Z'")
-	private java.util.Date issuedate;
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss'Z'")
-	private Date validdate;
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-MM-dd'T'HH:mm:ss'Z'")
-	private Date validdate_end;
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	private OffsetDateTime issuedate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	private OffsetDateTime validdate;
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	private OffsetDateTime validdate_end;
 	private String firname;
 	private String location_indicator_icao;
 	private String location_indicator_mwo;
 	private String uuid;
 	private SigmetStatus status;
 	private int sequence;
+	
+	public static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+
+	
+	@Bean(name = "objectMapper")
+	public static ObjectMapper getSigmetObjectMapperBean() {
+		ObjectMapper om = new ObjectMapper();
+		om.registerModule(new JavaTimeModule());
+		om.setTimeZone(TimeZone.getTimeZone("UTC"));
+		om.setDateFormat(new SimpleDateFormat(DATEFORMAT_ISO8601));
+		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+		om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+		return om;
+
+	}
+
 	
 	@Getter
 	public enum Phenomenon {
@@ -88,13 +114,13 @@ public class Sigmet {
 	@Getter
 	public static class ObsFc {
 		private boolean obs=true ;
-		Date obsFcTime;
+		OffsetDateTime obsFcTime;
 		public ObsFc(){};
 		public ObsFc(boolean obs){
 			this.obs=obs;
 			this.obsFcTime=null;
 		}
-		public ObsFc(boolean obs, Date obsTime) {
+		public ObsFc(boolean obs, OffsetDateTime obsTime) {
 			this.obs=obs;
 			this.obsFcTime=obsTime;
 		}
@@ -208,7 +234,7 @@ public class Sigmet {
 		this.location_indicator_mwo=issuing_mwo;
 		this.uuid=uuid;
 		this.sequence=-1;
-		this.issuedate=new Date();
+		this.issuedate= OffsetDateTime.now(ZoneId.of("Z"));
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
 		this.status=SigmetStatus.PRODUCTION;
@@ -220,9 +246,7 @@ public class Sigmet {
 	public static Sigmet getRandomSigmet() {
 		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", UUID.randomUUID().toString());
 		sm.setPhenomenon(Phenomenon.getRandomPhenomenon());
-		Date dt=new Date();
-		dt.setTime(dt.getTime()+(int)(1000*3600*2*Math.random()));
-		sm.setValiddate(new Date());
+		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")));
 		sm.setChange(SigmetChange.NC);
         sm.setGeoFromString(testGeoJson);
 		sm.setSequence(getRandomSequence);
@@ -236,7 +260,7 @@ public class Sigmet {
 	}
 
 	public static Sigmet getSigmetFromFile(File f) throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper om = new ObjectMapper();
+		ObjectMapper om = getSigmetObjectMapperBean();
 		Sigmet sm=om.readValue(f, Sigmet.class);
 		return sm;
 	}
@@ -245,7 +269,7 @@ public class Sigmet {
 		Debug.println("setGeoFromString "+json);
 		GeoJsonObject geo;	
 		try {
-			geo = new ObjectMapper().readValue(testGeoJson.getBytes(), GeoJsonObject.class);
+			geo = getSigmetObjectMapperBean().readValue(testGeoJson.getBytes(), GeoJsonObject.class);
 			this.setGeojson(geo);
 			Debug.println("setGeoFromString ["+json+"] set");
 			return;
@@ -266,7 +290,7 @@ public class Sigmet {
 		if(this.status == null) {
 			this.status = SigmetStatus.PRODUCTION;
 		}
-		ObjectMapper om=new ObjectMapper();
+		ObjectMapper om=getSigmetObjectMapperBean();
 		try {
 			om.writeValue(new File(fn), this);
 		} catch (IOException e) {
@@ -276,7 +300,7 @@ public class Sigmet {
 	}
 
 	public String serializeSigmetToString() throws JsonProcessingException {
-		ObjectMapper om=new ObjectMapper();
+		ObjectMapper om=getSigmetObjectMapperBean();
 		return om.writeValueAsString(this);
 	}
 
