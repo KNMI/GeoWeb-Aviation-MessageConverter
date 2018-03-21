@@ -864,10 +864,10 @@ public class TafValidator {
 			String changeType = changeTypeNode.asText();
 			try {
 				Date parsedDate = formatter.parse(changeStart);
-				boolean comesAfter = parsedDate.compareTo(prevChangeStart) < 0 || 
+				boolean comesAfter = parsedDate.compareTo(prevChangeStart) >= 0 || 
 						(parsedDate.equals(prevChangeStart) && changeType.startsWith("PROB")) ||
 						(parsedDate.equals(prevChangeStart) && changeType.startsWith("BECMG") && parsedDate.equals(tafStartTime)) ||
-						(parsedDate.equals(prevChangeStart) && changeType.startsWith("TEMPO") && parsedDate.equals(tafStartTime));;
+						(parsedDate.equals(prevChangeStart) && changeType.startsWith("TEMPO") && parsedDate.equals(tafStartTime));
 				changegroup.put("changegroupsAscending", comesAfter);
 				prevChangeStart = parsedDate;
 			} catch (ParseException e) {
