@@ -27,7 +27,7 @@
                         "type": "boolean",
                         "enum": [true],
                         "$geoweb::messages": {
-                            "enum": "Changegroups must be ascending in starting time"
+                            "enum": "Changegroups must be equal to or ascending in starting time"
                      	}
                     },
                     "repeatingChange": {
@@ -103,7 +103,7 @@
                         "type": "boolean",
                         "enum": [true],
                         "$geoweb::messages": {
-                            "enum": "Changegroups must be ascending in starting time"
+                            "enum": "Changegroups must be equal to or ascending in starting time"
                      	}
                     },
 					"repeatingChange": {
