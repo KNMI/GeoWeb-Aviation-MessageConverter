@@ -4,6 +4,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Date;
 
 import org.junit.Test;
@@ -38,7 +41,7 @@ public class SigmetStoreTest {
 	public Sigmet createSigmet () throws Exception {
 		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
 		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));
-		sm.setValiddate(new Date(117,2,13,16,0));
+		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")).minusHours(1));
 		sm.setChange(SigmetChange.NC);
 		sm.setGeoFromString(testGeoJson);
 		return sm;
