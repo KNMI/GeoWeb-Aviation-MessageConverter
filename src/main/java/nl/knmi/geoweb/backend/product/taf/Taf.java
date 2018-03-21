@@ -26,6 +26,7 @@ import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.IExportable;
+import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWeather;
 import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
 import nl.knmi.geoweb.backend.product.taf.serializers.CloudsSerializer;
 import nl.knmi.geoweb.backend.product.taf.serializers.WeathersSerializer;
@@ -86,6 +87,13 @@ public class Taf implements IExportable {
 				}
 			}
 
+			public TAFCloudType(TAFCloudType cld) {
+				this.isNSC=cld.getIsNSC();
+				this.amount=cld.getAmount();
+				this.mod=cld.getMod();
+				this.height=cld.getHeight();
+			}
+
 			public String toTAC() {
 				StringBuilder sb = new StringBuilder();
 				if (isNSC != null && isNSC) {
@@ -125,6 +133,12 @@ public class Taf implements IExportable {
 
 			public TAFWeather() {
 				isNSW = null;
+			}
+
+			public TAFWeather(TAFWeather w) {
+				this.isNSW=w.getIsNSW();
+				this.phenomena=w.getPhenomena();
+				this.qualifier=w.qualifier;
 			}
 
 			public String toString() {
@@ -212,7 +226,7 @@ public class Taf implements IExportable {
 		TAFTemperature temperature;
 
 		Boolean CaVOK;
-
+		
 		/**
 		 * Converts Forecast to TAC
 		 * 
@@ -262,7 +276,9 @@ public class Taf implements IExportable {
 			StringBuilder sb = new StringBuilder();
 			sb.append(changeType.toString());
 			sb.append(" " + TAFtoTACMaps.toDDHH(changeStart));
-			sb.append("/" + TAFtoTACMaps.toDDHH(changeEnd));
+			if (changeEnd!=null) { 
+			  sb.append("/" + TAFtoTACMaps.toDDHH(changeEnd));
+			}
 			sb.append(" " + forecast.toTAC());
 			return sb.toString();
 		}

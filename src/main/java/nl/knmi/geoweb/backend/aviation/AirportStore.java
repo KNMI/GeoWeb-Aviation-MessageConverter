@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import nl.knmi.adaguc.tools.Debug;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -34,13 +35,13 @@ public class AirportStore {
 					AirportInfo airportInfo=new AirportInfo(airport.getIcao(), airport.getName(), Float.parseFloat(airport.getLat()), Float.parseFloat(airport.getLon()), Float.parseFloat(airport.getHeight()));
 					airportInfos.put(airport.getIcao(), airportInfo);
 				} catch (NumberFormatException e) {
-					System.err.println("Error parsing record "+airport.getIcao());
+					Debug.println("Error parsing airport record "+airport.getIcao());
 				}
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.err.println("Found "+airportInfos.size()+" records of airrportinfo");
+		Debug.println("Found "+airportInfos.size()+" records of airportinfo");
 	}
 
 	public AirportInfo lookup(String ICAO) {
