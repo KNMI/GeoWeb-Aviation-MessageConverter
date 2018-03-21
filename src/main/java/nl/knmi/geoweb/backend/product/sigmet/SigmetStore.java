@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
-import nl.knmi.geoweb.backend.product.taf.Taf;
 
 @Component
 public class SigmetStore {
@@ -62,10 +61,7 @@ public class SigmetStore {
 	public Sigmet[] getPublishedSigmetsSinceDay (int daysOffset) {
 		Sigmet[] sigmets = getSigmets(false, SigmetStatus.PUBLISHED);
 		OffsetDateTime offset = OffsetDateTime.now(ZoneId.of("Z")).minusDays(daysOffset);
-		offset = offset.withHour(0);
-		offset = offset.withMinute(0);
-		offset = offset.withNano(0);
-		final OffsetDateTime offsetSinceMidnight = offset.withSecond(0);
+		OffsetDateTime offsetSinceMidnight = offset.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
 		return Arrays.stream(sigmets).filter(sigmet -> sigmet.getValiddate().isAfter(offsetSinceMidnight)).toArray(Sigmet[]::new);
 	}
