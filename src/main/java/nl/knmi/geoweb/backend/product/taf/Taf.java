@@ -5,15 +5,10 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -26,17 +21,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import fi.fmi.avi.converter.ConversionHints;
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.IExportable;
+import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWeather;
 import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
 import nl.knmi.geoweb.backend.product.taf.serializers.CloudsSerializer;
 import nl.knmi.geoweb.backend.product.taf.serializers.WeathersSerializer;
-import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebConverter;
-import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTAFConverter;
 
 @Getter
 @Setter
@@ -94,6 +87,13 @@ public class Taf implements IExportable {
 				}
 			}
 
+			public TAFCloudType(TAFCloudType cld) {
+				this.isNSC=cld.getIsNSC();
+				this.amount=cld.getAmount();
+				this.mod=cld.getMod();
+				this.height=cld.getHeight();
+			}
+
 			public String toTAC() {
 				StringBuilder sb = new StringBuilder();
 				if (isNSC != null && isNSC) {
@@ -133,6 +133,12 @@ public class Taf implements IExportable {
 
 			public TAFWeather() {
 				isNSW = null;
+			}
+
+			public TAFWeather(TAFWeather w) {
+				this.isNSW=w.getIsNSW();
+				this.phenomena=w.getPhenomena();
+				this.qualifier=w.qualifier;
 			}
 
 			public String toString() {
@@ -220,7 +226,7 @@ public class Taf implements IExportable {
 		TAFTemperature temperature;
 
 		Boolean CaVOK;
-
+		
 		/**
 		 * Converts Forecast to TAC
 		 * 
@@ -270,7 +276,9 @@ public class Taf implements IExportable {
 			StringBuilder sb = new StringBuilder();
 			sb.append(changeType.toString());
 			sb.append(" " + TAFtoTACMaps.toDDHH(changeStart));
-			sb.append("/" + TAFtoTACMaps.toDDHH(changeEnd));
+			if (changeEnd!=null) { 
+			  sb.append("/" + TAFtoTACMaps.toDDHH(changeEnd));
+			}
 			sb.append(" " + forecast.toTAC());
 			return sb.toString();
 		}
@@ -282,8 +290,8 @@ public class Taf implements IExportable {
 		ObjectMapper om = getTafObjectMapperBean();
 		return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
 	}
-
-	public static Taf fromJSONString(String tafJson) throws JsonParseException, JsonMappingException, IOException {
+	
+	public static Taf fromJSONString(String tafJson) throws JsonParseException, JsonMappingException, IOException{
 		ObjectMapper om = getTafObjectMapperBean();
 		Taf taf = om.readValue(tafJson, Taf.class);
 		return taf;
@@ -293,6 +301,11 @@ public class Taf implements IExportable {
 		return fromJSONString(Tools.readFile(f.getAbsolutePath()));
 	}
 
+	
+	public String toIWWXM(TafConverter tafConverter) {
+	  return tafConverter.ToIWXXM_2_1(this);	
+	}
+	
 	public String toTAC() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TAF ");
