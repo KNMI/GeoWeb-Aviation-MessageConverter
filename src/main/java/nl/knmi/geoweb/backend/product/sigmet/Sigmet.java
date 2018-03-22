@@ -226,6 +226,7 @@ public class Sigmet {
 	}
 
 	public Sigmet() {
+		this.sequence=-1;
 	}
 
 	public Sigmet(String firname, String location, String issuing_mwo, String uuid) {
@@ -234,7 +235,6 @@ public class Sigmet {
 		this.location_indicator_mwo=issuing_mwo;
 		this.uuid=uuid;
 		this.sequence=-1;
-		this.issuedate= OffsetDateTime.now(ZoneId.of("Z"));
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
 		this.status=SigmetStatus.PRODUCTION;
@@ -290,6 +290,7 @@ public class Sigmet {
 		if(this.status == null) {
 			this.status = SigmetStatus.PRODUCTION;
 		}
+		System.out.println(fn);
 		ObjectMapper om=getSigmetObjectMapperBean();
 		try {
 			om.writeValue(new File(fn), this);
