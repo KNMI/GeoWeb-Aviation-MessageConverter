@@ -69,11 +69,12 @@ public class SigmetStore {
 	public Sigmet[] getSigmets(boolean selectActive, SigmetStatus selectStatus) {
 		Comparator<Sigmet> comp = new Comparator<Sigmet>() {
 			public int compare(Sigmet lhs, Sigmet rhs) {
-				return rhs.getIssuedate().compareTo(lhs.getIssuedate());
+				if (rhs.getIssuedate() != null && lhs.getIssuedate() != null)
+					return rhs.getIssuedate().compareTo(lhs.getIssuedate());
+				else 
+					return rhs.getValiddate().compareTo(lhs.getValiddate());
 			}
 		};
-		//				(Sigmet lhs, Sigmet rhs) -> { return rhs.compareTo(lhs);};
-
 		//Scan directory for sigmets
 		File dir=new File(directory);
 		File[] files=dir.listFiles(new FilenameFilter() {
