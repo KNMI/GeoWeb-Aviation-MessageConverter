@@ -57,6 +57,9 @@ public class Sigmet {
 	private SigmetStatus status;
 	private int sequence;
 	
+	@JsonInclude(Include.NON_NULL)
+	private Integer cancels;
+	
 	public static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 	
@@ -195,7 +198,7 @@ public class Sigmet {
 	
 	@Getter
 	public enum SigmetStatus {
-		PRODUCTION("Production"), CANCELLED("Cancelled"), PUBLISHED("Published"); 
+		PRODUCTION("Production"), CANCELLED("Cancelled"), PUBLISHED("Published"), TEST("Test"); 
 		private String status;
 		private SigmetStatus (String status) {
 			this.status = status;
@@ -226,6 +229,24 @@ public class Sigmet {
 	}
 
 	public Sigmet() {
+		this.sequence=-1;
+	}
+	
+	public Sigmet(Sigmet otherSigmet) {
+		this.firname=otherSigmet.getFirname();
+		this.location_indicator_icao=otherSigmet.getLocation_indicator_icao();
+		this.location_indicator_mwo=otherSigmet.getLocation_indicator_mwo();
+		this.sequence=-1;
+		this.phenomenon = otherSigmet.getPhenomenon();
+		this.change = otherSigmet.getChange();
+		this.forecast_position = otherSigmet.getForecast_position();
+		this.geojson = otherSigmet.getGeojson();
+		this.level = otherSigmet.getLevel();
+		this.movement = otherSigmet.getMovement();
+		this.obs_or_forecast = otherSigmet.getObs_or_forecast();
+		this.validdate = otherSigmet.getValiddate();
+		this.validdate_end = otherSigmet.getValiddate_end();
+		this.issuedate = otherSigmet.getIssuedate();
 	}
 
 	public Sigmet(String firname, String location, String issuing_mwo, String uuid) {
@@ -234,7 +255,6 @@ public class Sigmet {
 		this.location_indicator_mwo=issuing_mwo;
 		this.uuid=uuid;
 		this.sequence=-1;
-		this.issuedate= OffsetDateTime.now(ZoneId.of("Z"));
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
 		this.status=SigmetStatus.PRODUCTION;
@@ -290,6 +310,7 @@ public class Sigmet {
 		if(this.status == null) {
 			this.status = SigmetStatus.PRODUCTION;
 		}
+		System.out.println(fn);
 		ObjectMapper om=getSigmetObjectMapperBean();
 		try {
 			om.writeValue(new File(fn), this);

@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.Getter;
@@ -57,6 +58,8 @@ public class Taf implements IExportable {
 		OffsetDateTime validityEnd;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime baseTime;
+		
+		ObjectNode extraInfo;
 
 		String location;
 		TAFReportPublishedConcept status;
