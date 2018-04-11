@@ -15,6 +15,7 @@ import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.Aerodrome;
 import fi.fmi.avi.model.GeoPosition;
 import fi.fmi.avi.model.taf.TAF;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.aviation.AirportInfo;
 import nl.knmi.geoweb.backend.aviation.AirportStore;
 import nl.knmi.geoweb.backend.product.taf.Taf;
@@ -53,11 +54,18 @@ public class TafConverter {
 			AirportInfo airportInfo=airportStore.lookup(airportName);
 			if (airportInfo!=null) {
 				Aerodrome ad=pojo.getAerodrome();
-				ad.setReferencePoint(new GeoPosition(airportInfo.getGeoLocation().getEPSG(),
-						airportInfo.getGeoLocation().getLat(), airportInfo.getGeoLocation().getLon()));
+				GeoPosition refPoint =new GeoPosition(airportInfo.getGeoLocation().getEPSG(),
+						airportInfo.getGeoLocation().getLat(), airportInfo.getGeoLocation().getLon());
+				refPoint.setElevationValue(airportInfo.getFieldElevation());
+		        refPoint.setElevationUom("m");
+				ad.setReferencePoint(refPoint);
+				
 				ad.setFieldElevation(airportInfo.getFieldElevation());
 				ad.setLocationIndicatorICAO(airportInfo.getICAOName());
 				ad.setName(airportInfo.getName());
+				ad.setDesignator(airportName);
+				
+				pojo.amendAerodromeInfo(ad);
 			}
 			else {
 				System.err.println("airportinfo for "+airportName+" not found");

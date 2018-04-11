@@ -88,6 +88,8 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		previousForecast=updateForecast(previousForecast, previousForecast);
 
 		retval.addIssue(updateChangeForecasts(taf, input, previousForecast, hints));
+		
+
 		return retval;
 	}
 
@@ -408,7 +410,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 				break;
 			case "FM":
 				changeFct.setChangeIndicator(TAFChangeIndicator.FROM);
-				//            	changeFct.setPartialValidityStartTime(ch.getChangeStart().toString()); //TODO still needed??
+                //changeFct.setPartialValidityStartTime(ch.getChangeStart().toString()); //TODO still needed??
 				updateChangeForecastContents(changeFct, ch, previousForecast, true, hints);
 				changeFct.setValidityEndTime(fct.getValidityEndTime());//TODO correct to put the endTime of baseForecast here?
 				break;
@@ -449,11 +451,14 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		List<ConversionIssue> retval = new ArrayList<>();
 		if (fct.getChangeIndicator()!=TAFChangeIndicator.FROM) {
 			fct.setValidityStartTime(ZonedDateTime.from(input.getChangeStart()));
-//			fct.setValidityEndTime(ZonedDateTime.from(input.getChangeEnd()));
+			fct.setValidityEndTime(ZonedDateTime.from(input.getChangeEnd()));
 		} else {
 			fct.setValidityStartTime(ZonedDateTime.from(input.getChangeStart()));
 		}
-		if ((input.getForecast().getCaVOK()==null)||(!input.getForecast().getCaVOK())) {
+		if ((input.getForecast().getCaVOK()!=null)&&input.getForecast().getCaVOK()) {
+			fct.setCeilingAndVisibilityOk(input.getForecast().getCaVOK());
+			retval.addAll(updateChangeForecastSurfaceWind(fct, input, previousForecast, hints));
+		} else if ((input.getForecast().getCaVOK()==null)||(!input.getForecast().getCaVOK())) {
 			retval.addAll(updateChangeForecastSurfaceWind(fct, input, previousForecast, hints));
 			retval.addAll(updateChangeVisibility(fct, input, hints));
 			retval.addAll(updateChangeWeather(fct, input, hints));
