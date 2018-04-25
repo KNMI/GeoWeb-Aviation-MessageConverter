@@ -275,11 +275,11 @@ public class Sigmet {
 	private static String END="end";
 	private static String INTERSECTION="intersection";
 
-	public List<GeoJsonObject> findStartGeometries() {
+	public List<GeoJsonObject> findIntersectableGeometries() {
 		List<GeoJsonObject>objs=new ArrayList<GeoJsonObject>();
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
+			if ((f.getProperty("featureFunction")!=null)&&(f.getProperty("featureFunction").equals(START)||f.getProperty("featureFunction").equals(END))){
                 objs.add(f);
 			}
 		}
