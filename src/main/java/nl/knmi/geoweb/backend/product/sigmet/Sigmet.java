@@ -245,7 +245,7 @@ public class Sigmet {
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
 		Sigmet sm=om.readValue(f, Sigmet.class);
 		Debug.println("Sigmet from "+f.getName());
-		Debug.println(sm.dumpSigmetGeometryInfo());
+//		Debug.println(sm.dumpSigmetGeometryInfo());
 		return sm;
 	}
 
@@ -275,11 +275,11 @@ public class Sigmet {
 	private static String END="end";
 	private static String INTERSECTION="intersection";
 
-	public List<GeoJsonObject> findStartGeometries() {
+	public List<GeoJsonObject> findIntersectableGeometries() {
 		List<GeoJsonObject>objs=new ArrayList<GeoJsonObject>();
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
+			if ((f.getProperty("featureFunction")!=null)&&(f.getProperty("featureFunction").equals(START)||f.getProperty("featureFunction").equals(END))){
                 objs.add(f);
 			}
 		}
@@ -355,7 +355,7 @@ public class Sigmet {
 		fc.getFeatures().add(newFeature);
 	}
 
-	public List<String>getGeometryIds() {
+	public List<String>fetchGeometryIds() {
 		List<String>ids=new ArrayList<String>();
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
@@ -382,7 +382,7 @@ public class Sigmet {
 		pw.println("SIGMET ");
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
-			pw.print(f.getId());
+			pw.print((f.getId()==null)?"  ":f.getId());
 			pw.print(" ");
 			pw.print((f.getProperty("featureFunction")==null)?"  ":f.getProperty("featureFunction").toString());
 			pw.print(" ");
