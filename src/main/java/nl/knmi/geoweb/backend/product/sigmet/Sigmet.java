@@ -4,9 +4,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.TimeZone;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.time.OffsetDateTime;
 import java.time.Duration;
 
@@ -244,14 +245,13 @@ public class Sigmet {
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
 		Sigmet sm=om.readValue(f, Sigmet.class);
 		Debug.println("Sigmet from "+f.getName());
-		Debug.println("RequestGeometry: "+om.writeValueAsString(sm.findRequestGeometry(0)));
-		Debug.println("ResultGeometry: "+om.writeValueAsString(sm.findResultGeometry(0)));
+		Debug.println(sm.dumpSigmetGeometryInfo());
 		return sm;
 	}
 
 
 	public void serializeSigmet(ObjectMapper om, String fn) {
-		Debug.println("serializeSigmet to "+fn);
+		Debug.println("serializeSigmet to "+fn);		
 		if(this.geojson == null || this.phenomenon == null) {
 			throw new IllegalArgumentException("GeoJSON and Phenomenon are required");
 		}
@@ -271,42 +271,126 @@ public class Sigmet {
 		return om.writeValueAsString(this);
 	}
 
-	public GeoJsonObject findRequestGeometry(int nr) {
+	private static String START="start";
+	private static String END="end";
+	private static String INTERSECTION="intersection";
+
+	public List<GeoJsonObject> findStartGeometries() {
+		List<GeoJsonObject>objs=new ArrayList<GeoJsonObject>();
 		FeatureCollection fc=(FeatureCollection)this.geojson;
-		int cnt=0;
 		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("type")!=null)&&f.getProperty("type").equals(REQUEST)){
-				if (cnt==nr) return f;
-				cnt++;
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
+                objs.add(f);
 			}
 		}
-		return null;
+		return objs;
 	}
-
-	public GeoJsonObject findResultGeometry(int nr) {
-		FeatureCollection fc=(FeatureCollection)this.geojson;
-		int cnt=0;
-		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("type")!=null)&&f.getProperty("type").equals(RESULT)){
-				if (cnt==nr) return f;
-				cnt++;
-			}
-		}
-		return null;
-	}
-
-	private static String REQUEST="request";
-	private static String RESULT="result";
 	
-	public void setResultGeometry(int nr, Feature newFeature) {
+	public List<GeoJsonObject> findEndGeometries() {
+		List<GeoJsonObject>objs=new ArrayList<GeoJsonObject>();
 		FeatureCollection fc=(FeatureCollection)this.geojson;
-		newFeature.setProperty("type", REQUEST);
-		int cnt=0;
 		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("type")!=null)&&f.getProperty("type").equals("result")){
-				if (cnt==nr) Collections.replaceAll(fc.getFeatures(), f, newFeature);
-				cnt++;
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
+                objs.add(f);
 			}
 		}
+		return objs;
+	}
+	
+	public GeoJsonObject findEndGeometry(String relatesTo) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
+				if ((f.getProperty("relatesTo")!=null)&&f.getProperty("relatesTo").equals(relatesTo)) {
+					return f;
+				}
+			}
+		}
+		return null;
+	}
+
+	public void putIntersectionGeometry(String relatesTo, Feature intersection) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+
+		//Remove old intersection for id if it exists
+		List<Feature> toremove=new ArrayList<Feature>();
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("relatesTo")!=null)&&f.getProperty("relatesTo").equals(relatesTo)){
+				if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(INTERSECTION)){
+					toremove.add(f);
+				}
+			}
+		}
+		if (!toremove.isEmpty()) {
+			fc.getFeatures().removeAll(toremove);
+		}
+		//Add intersection
+//		intersection.setId(UUID.randomUUID().toString());
+		intersection.setId(relatesTo+"-i");
+		intersection.getProperties().put("relatesTo", relatesTo);
+		intersection.getProperties().put("featureFunction", INTERSECTION);
+		fc.getFeatures().add(intersection);
+	}
+
+	public void putEndGeometry(String relatesTo, Feature newFeature) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+
+		//Remove old endGeometry for id if it exists
+		List<Feature> toremove=new ArrayList<Feature>();
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("relatesTo")!=null)&&f.getProperty("relatesTo").equals(relatesTo)){
+				if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
+					toremove.add(f);
+				}
+			}
+		}
+
+		if (!toremove.isEmpty()) {
+			fc.getFeatures().removeAll(toremove);
+		}
+		//Add intersection
+//		newFeature.setId(UUID.randomUUID().toString());
+		newFeature.getProperties().put("relatesTo", relatesTo);
+		newFeature.getProperties().put("featureFunction", END);
+		fc.getFeatures().add(newFeature);
+	}
+
+	public List<String>getGeometryIds() {
+		List<String>ids=new ArrayList<String>();
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getId()!=null)) {
+				ids.add(f.getId());
+			}else {
+				ids.add("null");
+			}
+		}
+		return ids;
+	}
+
+	public void putStartGeometry(Feature newFeature) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+
+		//Add intersection
+		newFeature.getProperties().put("featureFunction", START);
+		fc.getFeatures().add(newFeature);
+	}
+
+	public String dumpSigmetGeometryInfo() {
+		StringWriter sw=new StringWriter();
+		PrintWriter pw=new PrintWriter(sw);
+		pw.println("SIGMET ");
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			pw.print(f.getId());
+			pw.print(" ");
+			pw.print((f.getProperty("featureFunction")==null)?"  ":f.getProperty("featureFunction").toString());
+			pw.print(" ");
+			pw.print((f.getProperty("selectionType")==null)?"  ":f.getProperty("selectionType").toString());
+			pw.print(" ");
+			pw.print((f.getProperty("relatesTo")==null)?"  ":f.getProperty("relatesTo").toString());
+			pw.println();
+		}
+		return sw.toString();
 	}
 }

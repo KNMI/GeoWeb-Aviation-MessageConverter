@@ -108,6 +108,7 @@ public class SigmetStore {
 		if (files!=null) {
 			List<Sigmet> sigmets=new ArrayList<Sigmet>();
 			for (File f: files) {
+				Debug.println("f:"+f);
 				Sigmet sm;
 				try {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
