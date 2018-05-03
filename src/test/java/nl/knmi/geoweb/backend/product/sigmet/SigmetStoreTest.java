@@ -37,7 +37,6 @@ public class SigmetStoreTest {
 	
 	
 	
-
 	public Sigmet createSigmet () throws Exception {
 		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
 		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));

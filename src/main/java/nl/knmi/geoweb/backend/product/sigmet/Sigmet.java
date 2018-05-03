@@ -127,6 +127,21 @@ public class Sigmet {
 			this.obs=obs;
 			this.obsFcTime=obsTime;
 		}
+		public String toTAC () {
+			StringBuilder sb = new StringBuilder();
+		
+			if (this.obs) { 
+				sb.append("OBS");
+			} else {
+				sb.append("FCST");
+			}
+			
+			if (this.obsFcTime != null) {
+				sb.append(" AT " + this.obsFcTime.toString());
+			}
+			
+			return sb.toString();
+		}
 	}
 
 	public enum SigmetLevelUnit {
@@ -323,6 +338,19 @@ public class Sigmet {
 	public String serializeSigmetToString() throws JsonProcessingException {
 		ObjectMapper om=getSigmetObjectMapperBean();
 		return om.writeValueAsString(this);
+	}
+
+	public String toTAC() {
+		// TODO Auto-generated method stub
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.location_indicator_icao).append(' ').append(this.sequence).append(' ').append(this.validdate).append('/').append(this.validdate_end).append(' ').append(this.location_indicator_mwo);
+		sb.append('\n');
+		sb.append(this.location_indicator_icao).append(' ').append(this.firname);
+		sb.append('\n');
+		sb.append(this.phenomenon);
+		sb.append('\n');
+		sb.append(this.obs_or_forecast.toTAC());
+		return sb.toString();
 	}
 
 //	public static void main(String args[]) throws IOException {
