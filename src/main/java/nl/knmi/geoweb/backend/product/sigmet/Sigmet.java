@@ -4,26 +4,24 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.time.Duration;
 
+import org.geojson.Feature;
+import org.geojson.FeatureCollection;
 import org.geojson.GeoJsonObject;
-import org.springframework.context.annotation.Bean;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,18 +30,19 @@ import nl.knmi.adaguc.tools.Debug;
 @Getter
 @Setter
 public class Sigmet {
-	
+
 	public static final Duration WSVALIDTIME = Duration.ofHours(4); //4*3600*1000;
 	public static final Duration WVVALIDTIME = Duration.ofHours(6); //6*3600*1000;
 
 	private GeoJsonObject geojson;
 	private Phenomenon phenomenon;
 	private ObsFc obs_or_forecast;
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	private OffsetDateTime forecast_position_time;
 	private SigmetLevel level;
 	private SigmetMovement movement;
 	private SigmetChange change;
 
-	private String forecast_position;
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	private OffsetDateTime issuedate;
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -56,28 +55,10 @@ public class Sigmet {
 	private String uuid;
 	private SigmetStatus status;
 	private int sequence;
-	
+
 	@JsonInclude(Include.NON_NULL)
 	private Integer cancels;
-	
-	public static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-	
-	@Bean(name = "objectMapper")
-	public static ObjectMapper getSigmetObjectMapperBean() {
-		ObjectMapper om = new ObjectMapper();
-		om.registerModule(new JavaTimeModule());
-		om.setTimeZone(TimeZone.getTimeZone("UTC"));
-		om.setDateFormat(new SimpleDateFormat(DATEFORMAT_ISO8601));
-		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-		return om;
-
-	}
-
-	
 	@Getter
 	public enum Phenomenon {
 		OBSC_TS("OBSC TS", "Obscured Thunderstorms"),OBSC_TSGR("OBSC TSGR", "Obscured Thunderstorms with hail"),
@@ -117,6 +98,7 @@ public class Sigmet {
 	@Getter
 	public static class ObsFc {
 		private boolean obs=true ;
+		@JsonFormat(shape = JsonFormat.Shape.STRING)		
 		OffsetDateTime obsFcTime;
 		public ObsFc(){};
 		public ObsFc(boolean obs){
@@ -210,7 +192,7 @@ public class Sigmet {
 			this.description=desc;
 		}
 	}
-	
+
 	@Getter
 	public enum SigmetStatus {
 		PRODUCTION("Production"), CANCELLED("Cancelled"), PUBLISHED("Published"), TEST("Test"); 
@@ -231,8 +213,6 @@ public class Sigmet {
 
 	}
 
-
-
 	@Override
 	public String toString() {
 		ByteArrayOutputStream baos=new ByteArrayOutputStream();
@@ -246,7 +226,7 @@ public class Sigmet {
 	public Sigmet() {
 		this.sequence=-1;
 	}
-	
+
 	public Sigmet(Sigmet otherSigmet) {
 		this.firname=otherSigmet.getFirname();
 		this.location_indicator_icao=otherSigmet.getLocation_indicator_icao();
@@ -254,11 +234,11 @@ public class Sigmet {
 		this.sequence=-1;
 		this.phenomenon = otherSigmet.getPhenomenon();
 		this.change = otherSigmet.getChange();
-		this.forecast_position = otherSigmet.getForecast_position();
 		this.geojson = otherSigmet.getGeojson();
 		this.level = otherSigmet.getLevel();
 		this.movement = otherSigmet.getMovement();
 		this.obs_or_forecast = otherSigmet.getObs_or_forecast();
+		this.forecast_position_time = otherSigmet.getForecast_position_time();
 		this.validdate = otherSigmet.getValiddate();
 		this.validdate_end = otherSigmet.getValiddate_end();
 		this.issuedate = otherSigmet.getIssuedate();
@@ -277,47 +257,16 @@ public class Sigmet {
 
 	static String testGeoJson="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]},\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}}}]}";
 
-	static int getRandomSequence=0;
-	public static Sigmet getRandomSigmet() {
-		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", UUID.randomUUID().toString());
-		sm.setPhenomenon(Phenomenon.getRandomPhenomenon());
-		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")));
-		sm.setChange(SigmetChange.NC);
-        sm.setGeoFromString(testGeoJson);
-		sm.setSequence(getRandomSequence);
-		getRandomSequence++;
-
-		sm.setLevel(new SigmetLevel(new SigmetLevelPart(SigmetLevelUnit.FL, 100)));
-		sm.setObs_or_forecast(new Sigmet.ObsFc(true));
-		sm.setMovement(new Sigmet.SigmetMovement(true));
-
-		return sm;
-	}
-
-	public static Sigmet getSigmetFromFile(File f) throws JsonParseException, JsonMappingException, IOException {
-		ObjectMapper om = getSigmetObjectMapperBean();
+	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
 		Sigmet sm=om.readValue(f, Sigmet.class);
+		Debug.println("Sigmet from "+f.getName());
+//		Debug.println(sm.dumpSigmetGeometryInfo());
 		return sm;
 	}
-	
-	public void setGeoFromString(String json) {
-		Debug.println("setGeoFromString "+json);
-		GeoJsonObject geo;	
-		try {
-			geo = getSigmetObjectMapperBean().readValue(testGeoJson.getBytes(), GeoJsonObject.class);
-			this.setGeojson(geo);
-			Debug.println("setGeoFromString ["+json+"] set");
-			return;
-		} catch (JsonParseException e) {
-		} catch (JsonMappingException e) {
-		} catch (IOException e) {
-		}
-		Debug.errprintln("setGeoFromString on ["+json+"] failed");
-		this.setGeojson(null);
-	}
 
-	public void serializeSigmet(String fn) {
-		Debug.println("serializeSigmet to "+fn);
+
+	public void serializeSigmet(ObjectMapper om, String fn) {
+		Debug.println("serializeSigmet to "+fn);		
 		if(this.geojson == null || this.phenomenon == null) {
 			throw new IllegalArgumentException("GeoJSON and Phenomenon are required");
 		}
@@ -325,8 +274,6 @@ public class Sigmet {
 		if(this.status == null) {
 			this.status = SigmetStatus.PRODUCTION;
 		}
-		System.out.println(fn);
-		ObjectMapper om=getSigmetObjectMapperBean();
 		try {
 			om.writeValue(new File(fn), this);
 		} catch (IOException e) {
@@ -335,8 +282,7 @@ public class Sigmet {
 		}
 	}
 
-	public String serializeSigmetToString() throws JsonProcessingException {
-		ObjectMapper om=getSigmetObjectMapperBean();
+	public String serializeSigmetToString(ObjectMapper om) throws JsonProcessingException {
 		return om.writeValueAsString(this);
 	}
 
@@ -387,4 +333,126 @@ public class Sigmet {
 ////			System.err.println(i+": "+sm);
 ////		}
 //	}
+	private static String START="start";
+	private static String END="end";
+	private static String INTERSECTION="intersection";
+
+	public List<GeoJsonObject> findIntersectableGeometries() {
+		List<GeoJsonObject>objs=new ArrayList<GeoJsonObject>();
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("featureFunction")!=null)&&(f.getProperty("featureFunction").equals(START)||f.getProperty("featureFunction").equals(END))){
+                objs.add(f);
+			}
+		}
+		return objs;
+	}
+	
+	public List<GeoJsonObject> findEndGeometries() {
+		List<GeoJsonObject>objs=new ArrayList<GeoJsonObject>();
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
+                objs.add(f);
+			}
+		}
+		return objs;
+	}
+	
+	public GeoJsonObject findEndGeometry(String relatesTo) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
+				if ((f.getProperty("relatesTo")!=null)&&f.getProperty("relatesTo").equals(relatesTo)) {
+					return f;
+				}
+			}
+		}
+		return null;
+	}
+
+	public void putIntersectionGeometry(String relatesTo, Feature intersection) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+
+		//Remove old intersection for id if it exists
+		List<Feature> toremove=new ArrayList<Feature>();
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("relatesTo")!=null)&&f.getProperty("relatesTo").equals(relatesTo)){
+				if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(INTERSECTION)){
+					toremove.add(f);
+				}
+			}
+		}
+		if (!toremove.isEmpty()) {
+			fc.getFeatures().removeAll(toremove);
+		}
+		//Add intersection
+//		intersection.setId(UUID.randomUUID().toString());
+		intersection.setId(relatesTo+"-i");
+		intersection.getProperties().put("relatesTo", relatesTo);
+		intersection.getProperties().put("featureFunction", INTERSECTION);
+		fc.getFeatures().add(intersection);
+	}
+
+	public void putEndGeometry(String relatesTo, Feature newFeature) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+
+		//Remove old endGeometry for id if it exists
+		List<Feature> toremove=new ArrayList<Feature>();
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("relatesTo")!=null)&&f.getProperty("relatesTo").equals(relatesTo)){
+				if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
+					toremove.add(f);
+				}
+			}
+		}
+
+		if (!toremove.isEmpty()) {
+			fc.getFeatures().removeAll(toremove);
+		}
+		//Add intersection
+//		newFeature.setId(UUID.randomUUID().toString());
+		newFeature.getProperties().put("relatesTo", relatesTo);
+		newFeature.getProperties().put("featureFunction", END);
+		fc.getFeatures().add(newFeature);
+	}
+
+	public List<String>fetchGeometryIds() {
+		List<String>ids=new ArrayList<String>();
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getId()!=null)) {
+				ids.add(f.getId());
+			}else {
+				ids.add("null");
+			}
+		}
+		return ids;
+	}
+
+	public void putStartGeometry(Feature newFeature) {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+
+		//Add intersection
+		newFeature.getProperties().put("featureFunction", START);
+		fc.getFeatures().add(newFeature);
+	}
+
+	public String dumpSigmetGeometryInfo() {
+		StringWriter sw=new StringWriter();
+		PrintWriter pw=new PrintWriter(sw);
+		pw.println("SIGMET ");
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			pw.print((f.getId()==null)?"  ":f.getId());
+			pw.print(" ");
+			pw.print((f.getProperty("featureFunction")==null)?"  ":f.getProperty("featureFunction").toString());
+			pw.print(" ");
+			pw.print((f.getProperty("selectionType")==null)?"  ":f.getProperty("selectionType").toString());
+			pw.print(" ");
+			pw.print((f.getProperty("relatesTo")==null)?"  ":f.getProperty("relatesTo").toString());
+			pw.println();
+		}
+		return sw.toString();
+	}
 }

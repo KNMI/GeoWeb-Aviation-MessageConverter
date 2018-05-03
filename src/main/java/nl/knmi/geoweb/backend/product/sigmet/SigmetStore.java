@@ -11,11 +11,14 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
@@ -26,7 +29,17 @@ public class SigmetStore {
 	
 	private String directory;
 	
+	@Autowired
+	@Qualifier("sigmetObjectMapper")
+	private ObjectMapper sigmetObjectMapper;
+	
+	public ObjectMapper getOM(){ return sigmetObjectMapper;}
+	
 	public SigmetStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
+		this.setLocation(productstorelocation);
+	}
+	
+	public void setLocation(String productstorelocation) throws IOException {
 		String dir = productstorelocation + "/sigmets";
 		Debug.println("SIGMET STORE at " + dir);
 		File f = new File(dir);
@@ -34,16 +47,21 @@ public class SigmetStore {
 			Tools.mksubdirs(f.getAbsolutePath());
 			Debug.println("Creating sigmet store at ["+f.getAbsolutePath()+"]");		}
 		if(f.isDirectory() == false){
-			Debug.errprintln("Sigmet directory location is not a directorty");
+			Debug.errprintln("Sigmet directory location is not a directory");
 			throw new NotDirectoryException("Sigmet directory location is not a directorty");
 		}
 		
 		this.directory=dir;
 	}
 
+	public void storeSigmet(ObjectMapper om, Sigmet sigmet) {
+		String fn=String.format("%s/sigmet_%s.json", this.directory, sigmet.getUuid());
+		sigmet.serializeSigmet(om, fn);	
+	}
+	
 	public void storeSigmet(Sigmet sigmet) {
 		String fn=String.format("%s/sigmet_%s.json", this.directory, sigmet.getUuid());
-		sigmet.serializeSigmet(fn);	
+		sigmet.serializeSigmet(sigmetObjectMapper, fn);	
 	}
 
 	public synchronized int getNextSequence() {
@@ -90,9 +108,10 @@ public class SigmetStore {
 		if (files!=null) {
 			List<Sigmet> sigmets=new ArrayList<Sigmet>();
 			for (File f: files) {
+				Debug.println("f:"+f);
 				Sigmet sm;
 				try {
-					sm = Sigmet.getSigmetFromFile(f);
+					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
 						if ((sm.getStatus()==SigmetStatus.PUBLISHED)&&(sm.getValiddate().isBefore(now)) && (sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);

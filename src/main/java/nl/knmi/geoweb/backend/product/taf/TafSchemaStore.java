@@ -118,8 +118,9 @@ public class TafSchemaStore {
 			String s = Tools.readResource("EnrichedTafValidatorSchema.json");
 			String fn=String.format("%s/enriched_taf_schema_%d.json",  this.directory, new Date().getTime()/1000);
 			Tools.writeFile(fn, s);
-			return getLatestTafSchema();
+			return getLatestEnrichedTafSchema();
 		}
+		
 
 	}
 	public String getLatestTafSchema() throws IOException {

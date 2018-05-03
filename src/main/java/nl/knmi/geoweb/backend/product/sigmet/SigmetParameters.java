@@ -28,7 +28,7 @@ public class SigmetParameters {
 		this.hoursbeforevalidity=4;
 		this.location_indicator_wmo="EHDB";
 		this.firareas=new ArrayList<FirArea>();
-		firareas.add(new FirArea("EHAA", "AMSTERDAM FIR", "NL_FIR"));
+		firareas.add(new FirArea("EHAA", "FIR AMSTERDAM", "NL_FIR"));
 	}
 	
 }
