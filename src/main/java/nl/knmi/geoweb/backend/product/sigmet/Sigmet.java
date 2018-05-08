@@ -71,6 +71,8 @@ public class Sigmet {
 
 	@JsonInclude(Include.NON_NULL)
 	private Integer cancels;
+	@JsonInclude(Include.NON_NULL)
+	private OffsetDateTime cancelsStart;
 
 	@Getter
 	public enum Phenomenon {
@@ -132,7 +134,7 @@ public class Sigmet {
 			}
 			
 			if (this.obsFcTime != null) {
-				sb.append(" AT " + this.obsFcTime.toString());
+				sb.append(" AT ").append(String.format("%02d", this.obsFcTime.getHour())).append(String.format("%02d", this.obsFcTime.getMinute())).append("Z");
 			}
 			
 			return sb.toString();
@@ -483,11 +485,19 @@ public class Sigmet {
 
 	public String toTAC(Feature FIR) {
 		GeoJsonObject startGeometry = this.findStartGeometry();
-		// TODO Auto-generated method stub
 		StringBuilder sb = new StringBuilder();
-		sb.append(this.location_indicator_icao).append(' ').append(this.sequence).append(' ').append(this.validdate).append('/').append(this.validdate_end).append(' ').append(this.location_indicator_mwo);
+		String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth()) + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
+		String validdateEndFormatted = String.format("%02d", this.validdate_end.getDayOfMonth()) + String.format("%02d", this.validdate_end.getHour()) + String.format("%02d", this.validdate_end.getMinute());
+
+		sb.append(this.location_indicator_icao).append(' ').append(this.sequence).append(" VALID ").append(validdateFormatted).append('/').append(validdateEndFormatted).append(' ').append(this.location_indicator_mwo).append('-');
 		sb.append('\n');
 		sb.append(this.location_indicator_icao).append(' ').append(this.firname);
+		if (this.cancels != null && this.cancelsStart != null) {
+			String validdateCancelled = String.format("%02d", this.cancelsStart.getDayOfMonth()) + String.format("%02d", this.cancelsStart.getHour()) + String.format("%02d", this.cancelsStart.getMinute());
+
+			sb.append("CNL SIGMET ").append(this.cancels).append(" ").append(validdateCancelled).append('/').append(validdateEndFormatted);
+			return sb.toString();	
+		}
 		sb.append('\n');
 		sb.append(this.phenomenon);
 		sb.append('\n');
@@ -504,7 +514,7 @@ public class Sigmet {
 		sb.append(this.change.toTAC());
 		sb.append('\n');
 		if (this.movement != null && this.movement.stationary == false && this.forecast_position_time != null) {
-			sb.append("FCST AT ").append(this.forecast_position_time.getHour()).append(this.forecast_position_time.getMinute()).append("Z");
+			sb.append("FCST AT ").append(String.format("%02d", this.forecast_position_time.getHour())).append(String.format("%02d", this.forecast_position_time.getMinute())).append("Z");
 			sb.append('\n');
 			sb.append(this.featureToTAC((Feature)this.findEndGeometry(((Feature)startGeometry).getId()), FIR));
 		}
