@@ -489,7 +489,7 @@ public class Sigmet {
 		String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth()) + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
 		String validdateEndFormatted = String.format("%02d", this.validdate_end.getDayOfMonth()) + String.format("%02d", this.validdate_end.getHour()) + String.format("%02d", this.validdate_end.getMinute());
 
-		sb.append(this.location_indicator_icao).append(' ').append(this.sequence).append(" VALID ").append(validdateFormatted).append('/').append(validdateEndFormatted).append(' ').append(this.location_indicator_mwo).append('-');
+		sb.append(this.location_indicator_icao).append(" SIGMET ").append(this.sequence).append(" VALID ").append(validdateFormatted).append('/').append(validdateEndFormatted).append(' ').append(this.location_indicator_mwo).append('-');
 		sb.append('\n');
 		sb.append(this.location_indicator_icao).append(' ').append(this.firname);
 		if (this.cancels != null && this.cancelsStart != null) {
