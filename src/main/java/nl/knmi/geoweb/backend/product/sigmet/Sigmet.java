@@ -144,6 +144,10 @@ public class Sigmet {
 	public enum SigmetLevelUnit {
 		FT, FL, SFC, M, TOP, TOP_ABV, ABV;
 	}
+	
+//	public enum SigmetLevelOperator {
+//		TOP, TOP_ABV;
+//	}
 
 	@JsonInclude(Include.NON_NULL)
 	@Getter
@@ -206,12 +210,21 @@ public class Sigmet {
 	}
 
 	public enum SigmetDirection {
-		N,NNE,NE,ENE,E,ESE,SE,SSE,S,SSW,SW,WSW,W,WNW;
+		N(0),NNE(22.5),NE(45),ENE(67.5),E(90),ESE(112.5),SE(135),SSE(157.5),S(180),SSW(202.5),SW(225),WSW(247.5),W(270),WNW(292.5),NW(315),NNW(337.5);
 		public static SigmetDirection getSigmetDirection(String dir) {
 			for (SigmetDirection v: SigmetDirection.values()) {
 				if (dir.equals(v.toString())) return v;
 			}
 			return null;
+		}
+		private double dir;
+		
+		public double getDir() {
+			return this.dir;
+		}
+		
+		SigmetDirection(double dir) {
+			this.dir=dir;
 		}
 	}
 
@@ -603,6 +616,46 @@ public class Sigmet {
 		return null;
 	}
 
+	public GeoJsonObject getSingleStartGeometryORG() {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
+              return f;
+			}
+		}
+		return null;
+	}
+	
+	public GeoJsonObject getSingleStartGeometry() {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
+              for (Feature f2: fc.getFeatures()) {
+            	  if ((f2.getProperty("featureFunction")!=null)&&f2.getProperty("featureFunction").equals(INTERSECTION)&&f.getId().equals(f2.getProperty("relatesTo"))){
+            		  return f2;
+            	  }
+              }
+              return f;
+			}
+		}
+		return null;
+	}
+	
+	public GeoJsonObject getSingleEndGeometry() {
+		FeatureCollection fc=(FeatureCollection)this.geojson;
+		for (Feature f: fc.getFeatures()) {
+			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
+              for (Feature f2: fc.getFeatures()) {
+            	  if ((f2.getProperty("featureFunction")!=null)&&f2.getProperty("featureFunction").equals(INTERSECTION)&&f.getId().equals(f2.getProperty("relatesTo"))){
+            		  return f2;
+            	  }
+              }
+              return f;
+			}
+		}
+		return null;
+	}
+	
 	public void putIntersectionGeometry(String relatesTo, Feature intersection) {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 
