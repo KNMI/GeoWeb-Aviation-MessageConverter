@@ -74,6 +74,8 @@ public class SigmetPhenomenaMapping {
 		phenomena.add(phen);
 		phen=new SigmetPhenomenon("Radioactive cloud", "RDOACT_CLD", "sigmet_layer_RDOACT_CLD");
 		phenomena.add(phen);
+		phen=new SigmetPhenomenon("Severe Mountainwaves", "SEV_MTW", "sigmet_layer_SEV_MTW");
+		phenomena.add(phen);
 	}
 
 }
