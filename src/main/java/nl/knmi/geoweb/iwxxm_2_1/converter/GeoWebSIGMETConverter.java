@@ -67,6 +67,9 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 					sa.setSingleMovingSpeed(numDir);
 					fpaRequired=false;
 				}
+			} else {
+				sa.setSingleMovingDirection(null);
+                sa.setSingleMovingSpeed(null);
 			}
 		}
 		if ((input.getLevel()!=null)&&(input.getLevel().getLev1()!=null)) {

@@ -512,7 +512,7 @@ public class Sigmet {
 			return sb.toString();	
 		}
 		sb.append('\n');
-		sb.append(this.phenomenon);
+		sb.append(this.phenomenon.getShortDescription());
 		sb.append('\n');
 		sb.append(this.obs_or_forecast.toTAC());
 		sb.append('\n');
