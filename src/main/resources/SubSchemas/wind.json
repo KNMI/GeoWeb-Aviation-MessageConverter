@@ -4,7 +4,15 @@
         "wind": { 
             "required": ["direction", "speed", "unit"],
             "type": "object",
-            "oneOf": [{
+            "oneOf": [
+            {
+                "additionalProperties": false,
+                "properties": {
+                    "direction": { "type": "integer", "minimum": 0, "maximum": 0 },
+                    "speed": { "type": "integer", "maximum": 0, "minimum": 0 },
+                    "unit": { "type": "string", "enum": ["KT", "MPS"] }
+                }
+            },{
                 "additionalProperties": false,
                 "properties": {
                     "direction": { "type": "string", "enum": ["VRB"],
