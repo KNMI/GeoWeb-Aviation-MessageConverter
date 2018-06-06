@@ -113,6 +113,7 @@ public class SigmetStore {
 				try {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
+						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
 						if ((sm.getStatus()==SigmetStatus.PUBLISHED)&&(sm.getValiddate().isBefore(now)) && (sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);
 						}

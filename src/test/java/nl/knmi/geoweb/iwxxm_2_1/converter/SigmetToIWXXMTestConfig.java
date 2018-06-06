@@ -14,6 +14,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import nl.knmi.adaguc.tools.Debug;
+import nl.knmi.geoweb.backend.aviation.FIRStore;
 
 @Configuration
 @ComponentScan({"nl.knmi.geoweb.backend.product.sigmet"})
@@ -31,5 +32,13 @@ public class SigmetToIWXXMTestConfig {
 		om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
 		return om;
+	}
+	
+	@Bean 
+	public static FIRStore getFirStore() {
+		System.err.println("Init firStore");
+		FIRStore firStore=new FIRStore("/tmp/test");
+		return firStore;
+		
 	}
 }

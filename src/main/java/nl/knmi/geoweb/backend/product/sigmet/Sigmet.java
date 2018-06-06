@@ -52,7 +52,7 @@ public class Sigmet {
 	private ObsFc obs_or_forecast;
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	private OffsetDateTime forecast_position_time;
-	private SigmetLevel level;
+	private SigmetLevel levelinfo;
 	private SigmetMovement movement;
 	private SigmetChange change;
 
@@ -126,28 +126,31 @@ public class Sigmet {
 		}
 		public String toTAC () {
 			StringBuilder sb = new StringBuilder();
-		
+
 			if (this.obs) { 
 				sb.append("OBS");
 			} else {
 				sb.append("FCST");
 			}
-			
+
 			if (this.obsFcTime != null) {
 				sb.append(" AT ").append(String.format("%02d", this.obsFcTime.getHour())).append(String.format("%02d", this.obsFcTime.getMinute())).append("Z");
 			}
-			
+
 			return sb.toString();
 		}
 	}
 
 	public enum SigmetLevelUnit {
-		FT, FL, SFC, M, TOP, TOP_ABV, ABV;
+		FT, FL, M;
 	}
-	
-//	public enum SigmetLevelOperator {
-//		TOP, TOP_ABV;
-//	}
+	public enum SigmetLevelMode {
+		AT, ABV, BETW, BETW_SFC, TOPS, TOPS_ABV, TOPS_BLW;
+	}
+
+	//	public enum SigmetLevelOperator {
+	//		TOP, TOP_ABV;
+	//	}
 
 	@JsonInclude(Include.NON_NULL)
 	@Getter
@@ -159,51 +162,83 @@ public class Sigmet {
 			this.unit=unit;
 			this.value=val;
 		}
+
+		public String toTAC() {
+			if (this.unit==SigmetLevelUnit.FL) {
+				return "FL"+value;
+			}
+			if (this.unit==SigmetLevelUnit.FT) {
+				return value+"FT";
+			}
+			if (this.unit==SigmetLevelUnit.M) {
+				return value+"M";
+			}
+			return "";
+		}
 	}
 
 	@JsonInclude(Include.NON_NULL)
 	@Getter
 	public static class SigmetLevel {
-		SigmetLevelPart lev1;
-		SigmetLevelPart lev2;
+		SigmetLevelPart[]levels;
+		SigmetLevelMode mode;
+
 		public SigmetLevel(){};
-		public SigmetLevel(SigmetLevelPart lev1) {
-			this.lev1=lev1;
+		public SigmetLevel(SigmetLevelPart lev1, SigmetLevelMode mode) {
+			this.levels=new SigmetLevelPart[1];
+			this.levels[0]=lev1;
+			this.mode=mode;
 		}
-		public SigmetLevel(SigmetLevelPart lev1, SigmetLevelPart lev2) {
-			this.lev1=lev1;
-			this.lev2=lev2;
+		public SigmetLevel(SigmetLevelPart lev1, SigmetLevelPart lev2, SigmetLevelMode mode) {
+			levels=new SigmetLevelPart[2];
+			this.levels[0]=lev1;
+			this.levels[1]=lev2;
+			this.mode=mode;
 		}
 		public String toTAC() {
-			if (this.lev1 != null) {
-				if (this.lev2 != null) {
-					if (this.lev1.unit == this.lev2.unit) {
-						if (this.lev1.unit == SigmetLevelUnit.FL) {
-							return "FL" + this.lev1.value + "/" + this.lev2.value;
-						}
-					}
-					if (this.lev1.unit == SigmetLevelUnit.SFC) {
-						return "SFC/" + (this.lev2.unit == SigmetLevelUnit.FL ? "FL" + this.lev2.value : this.lev2.value + this.lev2.unit.toString().toUpperCase());
-					}
-					
-					if (this.lev1.unit == SigmetLevelUnit.ABV) {
-						return "ABV " + (this.lev2.unit == SigmetLevelUnit.FL ? "FL" + this.lev2.value : this.lev2.value + this.lev2.unit.toString().toUpperCase());
-					}
-					if (this.lev1.unit == SigmetLevelUnit.TOP_ABV) {
-						return "TOP ABV " + (this.lev2.unit == SigmetLevelUnit.FL ? "FL" + this.lev2.value : this.lev2.value + this.lev2.unit.toString().toUpperCase());
-					}
-					if (this.lev1.unit == SigmetLevelUnit.TOP) {
-						return "TOP " + (this.lev2.unit == SigmetLevelUnit.FL ? "FL" + this.lev2.value : this.lev2.value + this.lev2.unit.toString().toUpperCase());
-					}
-
-				} else {
-					if (this.lev1.unit == SigmetLevelUnit.M || this.lev1.unit == SigmetLevelUnit.FT) {
-						return this.lev1.value + this.lev1.unit.toString().toUpperCase();
-					}
-					if (this.lev1.unit == SigmetLevelUnit.FL) {
-						return "FL" + this.lev1.value;
+			switch (this.mode) {
+			case BETW:
+				if ((this.levels[0] != null)  && (this.levels[1] != null)) {
+					if (this.levels[0].getUnit().equals(this.levels[1].getUnit())&&this.levels[0].getUnit().equals(SigmetLevelUnit.FL)){
+						return this.levels[0].toTAC() + "/" + this.levels[1].value;
 					}
 				}
+				break;
+			case BETW_SFC:
+				if (this.levels[0] != null) {
+					if (this.levels[0].unit == SigmetLevelUnit.M || this.levels[0].unit == SigmetLevelUnit.FT) {
+						return "SFC/"+this.levels[0].value + this.levels[0].unit.toString().toUpperCase();
+					} else 	if (this.levels[0].unit == SigmetLevelUnit.FL) {
+						return "SFC/FL" + this.levels[0].value;
+					}
+				}
+				break;
+			case ABV:
+				if (this.levels[0]!=null) {
+					return "ABV "+this.levels[0].toTAC();
+				}
+				break;
+			case AT:
+				if (this.levels[0]!=null) {
+					return ""+this.levels[0].toTAC();
+				}
+				break;
+			case TOPS:
+				if (this.levels[0]!=null) {
+					return "TOPS "+this.levels[0].toTAC();
+				}
+				break;
+			case TOPS_ABV:
+				if (this.levels[0]!=null) {
+					return "TOPS ABV "+this.levels[0].toTAC();
+				}
+				break;
+			case TOPS_BLW:
+				if (this.levels[0]!=null) {
+					return "TOPS BLW "+this.levels[0].toTAC();
+				}
+				break;
+			default:
 			}
 			return "";
 		}
@@ -218,11 +253,11 @@ public class Sigmet {
 			return null;
 		}
 		private double dir;
-		
+
 		public double getDir() {
 			return this.dir;
 		}
-		
+
 		SigmetDirection(double dir) {
 			this.dir=dir;
 		}
@@ -232,22 +267,29 @@ public class Sigmet {
 	@Getter
 	public static class SigmetMovement {
 		private Integer speed;
+		private String speeduom;
 		private SigmetDirection dir;
 		private boolean stationary=true;
 		public SigmetMovement(){};
 		public SigmetMovement(boolean stationary) {
 			this.stationary=stationary;
 		}
-		public SigmetMovement(String dir, int speed) {
+		public SigmetMovement(String dir, int speed, String uoM) {
 			this.stationary=false;
 			this.speed=speed;
+			this.speeduom=uoM;
 			this.dir=SigmetDirection.getSigmetDirection(dir);
 		}
+
 		public String toTAC() {
 			if (this.stationary == true) {
 				return "STNR";	
 			} else {
-				return "MOV " + this.dir.toString() + " " + this.speed + "KT";
+				if (this.speeduom==null) {
+					return "MOV " + this.dir.toString() + " " + this.speed + "KT";
+				} else {
+					return "MOV " + this.dir.toString() + " " + this.speed + this.speeduom;
+				}
 			}
 		}
 	}
@@ -260,10 +302,10 @@ public class Sigmet {
 			this.description=desc;
 		}
 		public String toTAC() {
-	        return Arrays.stream(values())
-	                .filter(sc -> sc.description.equalsIgnoreCase(this.description))
-	                .findFirst()
-	                .orElse(null).toString();
+			return Arrays.stream(values())
+					.filter(sc -> sc.description.equalsIgnoreCase(this.description))
+					.findFirst()
+					.orElse(null).toString();
 		}
 	}
 
@@ -309,7 +351,7 @@ public class Sigmet {
 		this.phenomenon = otherSigmet.getPhenomenon();
 		this.change = otherSigmet.getChange();
 		this.geojson = otherSigmet.getGeojson();
-		this.level = otherSigmet.getLevel();
+		this.levelinfo = otherSigmet.getLevelinfo();
 		this.movement = otherSigmet.getMovement();
 		this.obs_or_forecast = otherSigmet.getObs_or_forecast();
 		this.forecast_position_time = otherSigmet.getForecast_position_time();
@@ -334,7 +376,7 @@ public class Sigmet {
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
 		Sigmet sm=om.readValue(f, Sigmet.class);
 		Debug.println("Sigmet from "+f.getName());
-//		Debug.println(sm.dumpSigmetGeometryInfo());
+		//		Debug.println(sm.dumpSigmetGeometryInfo());
 		return sm;
 	}
 
@@ -359,7 +401,7 @@ public class Sigmet {
 	public String serializeSigmetToString(ObjectMapper om) throws JsonProcessingException {
 		return om.writeValueAsString(this);
 	}
-	
+
 	public String convertLat(double lat) {
 		String latDM = "";
 		if (lat < 0) {
@@ -375,7 +417,7 @@ public class Sigmet {
 		latDM += String.format("%02d", minutes);
 		return latDM;
 	}
-	
+
 	public String convertLon(double lon) {
 		String lonDM = "";
 		if (lon < 0) {
@@ -391,18 +433,18 @@ public class Sigmet {
 		lonDM += String.format("%02d", minutesLon);
 		return lonDM;
 	}
-	
+
 	public String pointToDMSString(LngLatAlt lnglat) {
 		double lon = lnglat.getLongitude();
 		double lat = lnglat.getLatitude();
 
 		return this.convertLat(lat) + " " + this.convertLon(lon);
 	}
-	
+
 	public String latlonToDMS(List<LngLatAlt> coords) {
 		return coords.stream().map(lnglat -> this.pointToDMSString(lnglat)).collect(Collectors.joining(" - "));
 	}
-	
+
 	public String lineToTAC(LineString intersectionLine, org.locationtech.jts.geom.Geometry box) {
 		// TODO: Might only work if all points are in the same octant of earth?
 		double _minX = Double.MAX_VALUE, _maxX = Double.MIN_VALUE, _minY = Double.MAX_VALUE, _maxY = Double.MIN_VALUE;
@@ -435,7 +477,7 @@ public class Sigmet {
 		}
 		return "";
 	}
-	
+
 	public String featureToTAC(Feature f, Feature FIR) {
 		List<LngLatAlt> coords;
 		switch(f.getProperty("selectionType").toString().toLowerCase()) {
@@ -467,7 +509,7 @@ public class Sigmet {
 
 				// Intersect the box with the FIR
 				org.locationtech.jts.geom.Geometry intersection = jtsGeometry.getBoundary().intersection(geom_fir);
-				
+
 				// One line segment so encode that
 				if (intersection.getClass().equals(org.locationtech.jts.geom.LineString.class)) {
 					// single intersect
@@ -491,13 +533,16 @@ public class Sigmet {
 			return "";
 		}
 	}
-	
+
 	public List<String> createLocationTAC(FeatureCollection fc, Feature FIR) {
 		return fc.getFeatures().stream().map(feature -> this.featureToTAC(feature, FIR)).collect(Collectors.toList());
 	}
 
 	public String toTAC(Feature FIR) {
-		GeoJsonObject startGeometry = this.findStartGeometry();
+		GeoJsonObject startGeometry = this.findStartGeometry() ; //findStartGeometry();
+		if (!((Feature)startGeometry).getProperty("selectionType").equals("box")) {
+			startGeometry = this.extractSingleStartGeometry();
+		}
 		StringBuilder sb = new StringBuilder();
 		String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth()) + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
 		String validdateEndFormatted = String.format("%02d", this.validdate_end.getDayOfMonth()) + String.format("%02d", this.validdate_end.getHour()) + String.format("%02d", this.validdate_end.getMinute());
@@ -518,7 +563,7 @@ public class Sigmet {
 		sb.append('\n');
 		sb.append(this.featureToTAC((Feature)startGeometry, FIR));
 		sb.append('\n');
-		sb.append(this.level.toTAC());
+		sb.append(this.levelinfo.toTAC());
 		sb.append('\n');
 		if (this.movement != null && this.forecast_position_time == null) {
 			sb.append(this.movement.toTAC());
@@ -534,40 +579,40 @@ public class Sigmet {
 		return sb.toString();
 	}
 
-//	public static void main(String args[]) throws IOException {
-//		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
-//		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));
-//		sm.setValiddate(new Date(117,2,13,16,0));
-//		Debug.println(sm.getValiddate().toString());
-//		sm.setChange(SigmetChange.NC);
-//		sm.setGeoFromString(testGeoJson);
-//		Debug.println(sm.getPhenomenon().toString());
-//		
-//		SigmetStore store=new SigmetStore("/tmp");
-////		store.storeSigmet(sm);
-//		
-//		ObjectMapper objectMapper = new ObjectMapper();
-//		// DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-//		// objectMapper.setDateFormat(df);
-//		try{
-//			String v = objectMapper.writeValueAsString(sm);
-//			JSONObject j = (JSONObject) new JSONTokener(v).nextValue();
-//			Debug.println(j.get("issuedate").toString());
-//		}catch(JsonProcessingException e){
-//			e.printStackTrace();
-//		} catch (JSONException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
-//		
-////		System.err.println(sm);
-////		
-////		for (int i=0; i<1; i++) {
-////			sm=Sigmet.getRandomSigmet();
-////			store.storeSigmet(sm);
-////			System.err.println(i+": "+sm);
-////		}
-//	}
+	//	public static void main(String args[]) throws IOException {
+	//		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
+	//		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));
+	//		sm.setValiddate(new Date(117,2,13,16,0));
+	//		Debug.println(sm.getValiddate().toString());
+	//		sm.setChange(SigmetChange.NC);
+	//		sm.setGeoFromString(testGeoJson);
+	//		Debug.println(sm.getPhenomenon().toString());
+	//		
+	//		SigmetStore store=new SigmetStore("/tmp");
+	////		store.storeSigmet(sm);
+	//		
+	//		ObjectMapper objectMapper = new ObjectMapper();
+	//		// DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+	//		// objectMapper.setDateFormat(df);
+	//		try{
+	//			String v = objectMapper.writeValueAsString(sm);
+	//			JSONObject j = (JSONObject) new JSONTokener(v).nextValue();
+	//			Debug.println(j.get("issuedate").toString());
+	//		}catch(JsonProcessingException e){
+	//			e.printStackTrace();
+	//		} catch (JSONException e) {
+	//			// TODO Auto-generated catch block
+	//			e.printStackTrace();
+	//		}
+	//		
+	////		System.err.println(sm);
+	////		
+	////		for (int i=0; i<1; i++) {
+	////			sm=Sigmet.getRandomSigmet();
+	////			store.storeSigmet(sm);
+	////			System.err.println(i+": "+sm);
+	////		}
+	//	}
 	private static String START="start";
 	private static String END="end";
 	private static String INTERSECTION="intersection";
@@ -577,23 +622,23 @@ public class Sigmet {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
 			if ((f.getProperty("featureFunction")!=null)&&(f.getProperty("featureFunction").equals(START)||f.getProperty("featureFunction").equals(END))){
-                objs.add(f);
+				objs.add(f);
 			}
 		}
 		return objs;
 	}
-	
+
 	public List<GeoJsonObject> findEndGeometries() {
 		List<GeoJsonObject>objs=new ArrayList<GeoJsonObject>();
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
 			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
-                objs.add(f);
+				objs.add(f);
 			}
 		}
 		return objs;
 	}
-	
+
 	public GeoJsonObject findEndGeometry(String relatesTo) {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
@@ -605,7 +650,7 @@ public class Sigmet {
 		}
 		return null;
 	}
-	
+
 	public GeoJsonObject findStartGeometry() {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
@@ -616,46 +661,46 @@ public class Sigmet {
 		return null;
 	}
 
-	public GeoJsonObject getSingleStartGeometryORG() {
+	public GeoJsonObject extractSingleStartGeometryORG() {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
 			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
-              return f;
+				return f;
 			}
 		}
 		return null;
 	}
-	
-	public GeoJsonObject getSingleStartGeometry() {
+
+	public GeoJsonObject extractSingleStartGeometry() {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
 			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
-              for (Feature f2: fc.getFeatures()) {
-            	  if ((f2.getProperty("featureFunction")!=null)&&f2.getProperty("featureFunction").equals(INTERSECTION)&&f.getId().equals(f2.getProperty("relatesTo"))){
-            		  return f2;
-            	  }
-              }
-              return f;
+				for (Feature f2: fc.getFeatures()) {
+					if ((f2.getProperty("featureFunction")!=null)&&f2.getProperty("featureFunction").equals(INTERSECTION)&&f.getId().equals(f2.getProperty("relatesTo"))){
+						return f2;
+					}
+				}
+				return f;
 			}
 		}
 		return null;
 	}
-	
-	public GeoJsonObject getSingleEndGeometry() {
+
+	public GeoJsonObject extractSingleEndGeometry() {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 		for (Feature f: fc.getFeatures()) {
 			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(END)){
-              for (Feature f2: fc.getFeatures()) {
-            	  if ((f2.getProperty("featureFunction")!=null)&&f2.getProperty("featureFunction").equals(INTERSECTION)&&f.getId().equals(f2.getProperty("relatesTo"))){
-            		  return f2;
-            	  }
-              }
-              return f;
+				for (Feature f2: fc.getFeatures()) {
+					if ((f2.getProperty("featureFunction")!=null)&&f2.getProperty("featureFunction").equals(INTERSECTION)&&f.getId().equals(f2.getProperty("relatesTo"))){
+						return f2;
+					}
+				}
+				return f;
 			}
 		}
 		return null;
 	}
-	
+
 	public void putIntersectionGeometry(String relatesTo, Feature intersection) {
 		FeatureCollection fc=(FeatureCollection)this.geojson;
 
@@ -672,7 +717,7 @@ public class Sigmet {
 			fc.getFeatures().removeAll(toremove);
 		}
 		//Add intersection
-//		intersection.setId(UUID.randomUUID().toString());
+		//		intersection.setId(UUID.randomUUID().toString());
 		intersection.setId(relatesTo+"-i");
 		intersection.getProperties().put("relatesTo", relatesTo);
 		intersection.getProperties().put("featureFunction", INTERSECTION);
@@ -696,7 +741,7 @@ public class Sigmet {
 			fc.getFeatures().removeAll(toremove);
 		}
 		//Add intersection
-//		newFeature.setId(UUID.randomUUID().toString());
+		//		newFeature.setId(UUID.randomUUID().toString());
 		newFeature.getProperties().put("relatesTo", relatesTo);
 		newFeature.getProperties().put("featureFunction", END);
 		fc.getFeatures().add(newFeature);
