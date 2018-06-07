@@ -206,10 +206,10 @@ public class Sigmet {
 				break;
 			case BETW_SFC:
 				if (this.levels[0] != null) {
-					if (this.levels[0].unit == SigmetLevelUnit.M || this.levels[0].unit == SigmetLevelUnit.FT) {
-						return "SFC/"+this.levels[0].value + this.levels[0].unit.toString().toUpperCase();
-					} else 	if (this.levels[0].unit == SigmetLevelUnit.FL) {
-						return "SFC/FL" + this.levels[0].value;
+					if (this.levels[1].unit == SigmetLevelUnit.M || this.levels[1].unit == SigmetLevelUnit.FT) {
+						return "SFC/"+this.levels[1].value + this.levels[1].unit.toString().toUpperCase();
+					} else 	if (this.levels[1].unit == SigmetLevelUnit.FL) {
+						return "SFC/FL" + this.levels[1].value;
 					}
 				}
 				break;
