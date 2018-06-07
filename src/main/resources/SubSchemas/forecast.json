@@ -1,0 +1,90 @@
+{
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"definitions": {
+	     "forecast": {
+            "type": "object",
+            "allOf": [
+            {
+	            "anyOf": [
+	            	{"required": ["wind"]},
+	            	{"required": ["visibility"]},
+	            	{"required": ["weather"]},
+	            	{"required": ["clouds"]},
+	            	{"required": ["vertical_visibility"]},
+	            	{"required": ["temperature"]},
+	            	{"required": ["caVOK"]}
+	            ]
+	        }, {
+	            "anyOf": [
+	                {
+	                    "additionalProperties": false,
+	                    "properties": {
+	                        "wind": {"$ref": "wind.json#/definitions/wind"},
+	                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
+	                        "weather": {"$ref": "weather.json#/definitions/weather"},
+	                        "clouds": {"$ref": "clouds.json#/definitions/clouds"}
+	                    }
+	                },
+	                {
+	                    "additionalProperties": false,
+	                    "properties": {
+	                        "wind": {"$ref": "wind.json#/definitions/wind"},
+	                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
+	                        "weather": {"$ref": "weather.json#/definitions/weather"},
+	                        "vertical_visibility": {"$ref": "vertical_visibility.json#/definitions/vertical_visibility"}
+	                    }
+	                },
+	                {
+	                    "additionalProperties": false,
+	                    "properties": {
+	                        "wind": {"$ref": "wind.json#/definitions/wind"},
+	                        "caVOK": {"type": "boolean" }                    
+	                    }
+	                }
+	            ]
+	            }
+	        ]
+        },
+        "base_forecast": {
+            "type": "object",
+            "oneOf": [
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "wind": {"$ref": "wind.json#/definitions/wind"},
+                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
+                        "weather": {"$ref": "weather.json#/definitions/base_weather"},
+                        "clouds": {"$ref": "clouds.json#/definitions/clouds"},
+                        "temperature": {"$ref": "#/definitions/temperature"}
+                    },
+                    "required": ["wind", "visibility", "clouds"]
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "wind": {"$ref": "wind.json#/definitions/wind"},
+                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
+                        "weather": {"$ref": "weather.json#/definitions/base_weather"},
+                        "vertical_visibility": {"$ref": "vertical_visibility.json#/definitions/vertical_visibility"},
+                        "temperature": {"$ref": "#/definitions/temperature"}
+                    },
+                    "required": ["wind", "visibility", "vertical_visibility"]
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "wind": {"$ref": "wind.json#/definitions/wind"},
+                        "caVOK": {"type": "boolean" },
+                        "temperature": {"$ref": "#/definitions/temperature"}
+                    },
+                    "required": ["wind", "caVOK"],
+                    "$geoweb::messages": {
+                        "required": "Forecast is a wind group with visibilty, weather, either clouds or vertical visibility or CAVOK",
+                        "additionalProperties": "If CAVOK is given, no other properties than wind may be given."
+                    }
+                }
+            ]
+
+        }
+    }
+}
