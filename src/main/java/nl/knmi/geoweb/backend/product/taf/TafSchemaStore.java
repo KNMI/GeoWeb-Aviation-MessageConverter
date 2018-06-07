@@ -20,11 +20,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 
+import lombok.Getter;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 
 @Component
 public class TafSchemaStore {
+	@Getter
 	private String directory = null;
 	
 	TafSchemaStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
@@ -146,10 +148,50 @@ public class TafSchemaStore {
 			String s = Tools.readResource("TafValidatorSchema.json");
 			String fn=String.format("%s/taf_schema_%d.json",  this.directory, new Date().getTime()/1000);
 			Tools.writeFile(fn, s);
+			
+			// Copy subschemas
+			s = Tools.readResource("SubSchemas/clouds.json");
+			fn=String.format("%s/clouds.json",  this.directory);
+			Tools.writeFile(fn, s);
+			
+			s = Tools.readResource("SubSchemas/weathergroup.json");
+			fn=String.format("%s/weathergroup.json",  this.directory);
+			Tools.writeFile(fn, s);
+			
+			s = Tools.readResource("SubSchemas/visibility.json");
+			fn=String.format("%s/visibility.json",  this.directory);
+			Tools.writeFile(fn, s);
+
+			s = Tools.readResource("SubSchemas/wind.json");
+			fn=String.format("%s/wind.json",  this.directory);
+			Tools.writeFile(fn, s);
+			
+			s = Tools.readResource("SubSchemas/forecast.json");
+			fn=String.format("%s/forecast.json",  this.directory);
+			Tools.writeFile(fn, s);
+			
+			s = Tools.readResource("SubSchemas/weather.json");
+			fn=String.format("%s/weather.json",  this.directory);
+			Tools.writeFile(fn, s);
+
+			s = Tools.readResource("SubSchemas/metadata.json");
+			fn=String.format("%s/metadata.json",  this.directory);
+			Tools.writeFile(fn, s);
+
+			s = Tools.readResource("SubSchemas/vertical_visibility.json");
+			fn=String.format("%s/vertical_visibility.json",  this.directory);
+			Tools.writeFile(fn, s);
+
+			s = Tools.readResource("SubSchemas/changegroup.json");
+			fn=String.format("%s/changegroup.json",  this.directory);
+			Tools.writeFile(fn, s);
+
+			s = Tools.readResource("SubSchemas/temperature.json");
+			fn=String.format("%s/temperature.json",  this.directory);
+			Tools.writeFile(fn, s);
+			
 			return getLatestTafSchema();
 		}
 
 	}
-
-
 }

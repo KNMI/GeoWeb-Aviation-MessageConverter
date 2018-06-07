@@ -1,0 +1,17 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+
+	"definitions": {
+        
+        "vertical_visibility":
+        {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 999,
+            "$geoweb::messages": {
+                "minimum": "Vertical visibility must be greater than FL000",
+                "maximum": "Vertical visibility must be less than FL1000"
+            }
+        }
+    }
+}

@@ -217,14 +217,19 @@
                         "enum": "The current combination of weather group and visibility is invalid."
                  	}
                 },
-                "gustFastEnough": {
-                    "type": "boolean",
-                    "enum": [
-                        true
-                    ],
-                    "$geoweb::messages": {
-                        "enum": "Wind gusts must at least be 10 knots greater than the wind speed"
-                    }
+                "wind": {
+                	"type": "object",
+                	"properties": {
+						"gustFastEnough": {
+		                    "type": "boolean",
+		                    "enum": [
+		                        true
+		                    ],
+		                    "$geoweb::messages": {
+		                        "enum": "Wind gusts must at least be 10 knots greater than the wind speed"
+		                    }
+		                }
+                	}
                 }
     		},
             "additionalProperties": true

@@ -1,0 +1,21 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+
+	"definitions": {
+        "temperature": {
+            "type": "object",
+            "properties": {
+                "minimum": { 
+                    "type": "integer", "minimum": -30, "maximum": 40,
+                    "$geoweb::messages": {
+                        "minimum": "Temperature cannot be lower than -30 degrees Celsius",
+                        "maximum": "Temperature cannot be higher than 40 degrees Celsius"
+                    }
+                },
+                "maximum": { "type": "integer", "minimum": -30, "maximum": 40 }
+            },
+            "additionalProperties": false,
+            "required": ["minimum", "maximum"]
+        }
+    }
+}

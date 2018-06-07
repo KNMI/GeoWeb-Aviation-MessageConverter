@@ -1,0 +1,33 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+
+	"definitions": {
+        
+        "weather": {
+            "oneOf": [{
+
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 3,
+                "items":  {"$ref": "weathergroup.json#/definitions/weather_group"},
+                "uniqueItems": true,
+                "$geoweb::messages": {
+                	"uniqueItems": "Weather groups must be unique"
+                }
+            }, {
+                "type": "string", "enum": ["NSW"]
+            }]
+        },
+        "base_weather": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 3,
+            "items":  {"$ref": "weathergroup.json#/definitions/weather_group"},
+            "uniqueItems": true,
+            "$geoweb::messages": {
+            	"uniqueItems": "Weather groups must be unique",
+            	"type": "Base forecast cannot contain NSW"
+			}
+        }
+    }
+}

@@ -1,0 +1,37 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+
+	"definitions": {
+        
+        "base_metadata": {
+            "type": "object",
+            "oneOf": [{
+	            "properties": {
+	                "uuid": { "type": "string", "format": "uuid" },
+	                "validityStart": { "type": "string", "format": "date-time" },
+	                "validityEnd": { "type": "string", "format": "date-time" },
+	                "status": { "type": "string", "enum": ["concept"] },
+	                "type": { "type": "string", "enum": ["normal", "amendment", "correction", "canceled", "missing", "retarded"] },
+	                "location": { "type": "string" }
+	            },
+	            "additionalProperties": true,
+	            "required": ["validityStart", "validityEnd", "location"]
+	        }, {
+	        	"properties": {
+	                "uuid": { "type": "string", "format": "uuid" },
+	                "issueTime": { "type": "string", "format": "date-time" },
+	                "validityStart": { "type": "string", "format": "date-time" },
+	                "validityEnd": { "type": "string", "format": "date-time" },
+	                "status": { "type": "string", "enum": ["published", "expired", "inactive"] },
+	                "type": { "type": "string", "enum": ["normal", "amendment", "correction", "canceled", "missing", "retarded"] },
+	                "location": { "type": "string" }
+	            },
+	            "additionalProperties": true,
+	            "required": ["issueTime", "validityStart", "validityEnd", "location"]
+	        }],
+            "$geoweb::messages": {
+                "required": "Type, status, location, and validity times are required"
+            }
+        }
+    }
+}
