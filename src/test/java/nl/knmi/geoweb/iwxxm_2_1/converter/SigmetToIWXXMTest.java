@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import fi.fmi.avi.model.sigmet.SIGMET;
 import nl.knmi.adaguc.tools.Debug;
+import nl.knmi.geoweb.backend.aviation.FIRStore;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.converter.SigmetConverter;
 import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
@@ -45,7 +46,7 @@ public class SigmetToIWXXMTest {
 			+"{\"type\":\"FeatureCollection\",\"features\":"+"[{\"type\":\"Feature\",\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]}}]},"
 			+"\"phenomenon\":\"OBSC_TS\","
 			+"\"obs_or_forecast\":{\"obs\":true},"
-			+"\"level\":{\"lev1\":{\"value\":100.0,\"unit\":\"FL\"}},"
+			+"\"levelinfo\":{\"mode\": \"BETW\", \"levels\":[{\"value\":100.0,\"unit\":\"FL\"},{\\\"value\\\"300.0,\\\"unit\\\":\\\"FL\\\"}]},"
 			+"\"movement\":{\"stationary\":true},"
 			+"\"change\":\"NC\","
 			+"\"issuedate\":\"2017-03-24T15:56:16Z\","
@@ -130,14 +131,18 @@ public class SigmetToIWXXMTest {
 			"    \"obs\": true," + 
 			"    \"obsFcTime\": \"2017-08-07T11:45:00Z\""+
 			"  }," + 
-			"  \"level\": {" + 
-			"    \"lev1\": {" + 
-			"      \"value\": 100," + 
-			"      \"unit\": \"FL\"" + 
-			"    }" + 
+			"  \"levelinfo\": {" +
+			"    \"mode\": \"TOPS\","+
+			"    \"levels\": [" + 
+			"        {\"value\": 100, \"unit\": \"FL\"}" +
+//			"        ,{\"value\": 300, \"unit\": \"FL\"}" +
+			"      ]" + 
 			"  }," + 
 			"  \"movement\": {" + 
-			"    \"stationary\": false" + 
+			"    \"stationary\": false," +
+			"    \"speed\": 5.0,"+
+			"    \"speeduom\": \"KT\","+
+			"    \"dir\": \"SW\""+
 			"  }," + 
 			"  \"change\": \"NC\"," + 
 			"  \"issuedate\": \"2017-08-07T11:31:36Z\"," + 
@@ -167,6 +172,9 @@ public class SigmetToIWXXMTest {
 		sm.setGeojson(null);
 	}
 	
+	@Autowired
+	FIRStore firStore;
+	
 	@Test
 	public void TestConversion() throws Exception {
 		
@@ -179,6 +187,7 @@ public class SigmetToIWXXMTest {
 
 		String res=sigmetConverter.ToIWXXM_2_1(sm);
 		System.err.println(res);
+		System.err.println("TAC: "+sm.toTAC(firStore.lookup(sm.getFirname(), false)));
 		
 	}
 

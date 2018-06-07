@@ -26,6 +26,7 @@ import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
 
 @Getter
 @Setter
@@ -62,6 +63,7 @@ public class FIRStore implements Cloneable{
 			String FIRText=String.format("%s/%s", this.directory,  this.delegatedFile);
 			Tools.writeFile(FIRText, s);
 		}
+		
 		ObjectMapper om=new ObjectMapper();
 
 		try {
@@ -77,6 +79,21 @@ public class FIRStore implements Cloneable{
 			e.printStackTrace();
 		}
 		Debug.println("Found "+worldFIRInfos.size()+" records of FIRinfo");
+
+		try {
+			GeoJsonObject FIRInfo=om.readValue(fn, GeoJsonObject.class);
+			FeatureCollection fc=(FeatureCollection)FIRInfo;
+			for (Feature f:fc.getFeatures()) {
+				String FIRname=f.getProperty("FIRname");
+				String ICAOCode=f.getProperty("ICAOCODE");
+				worldFIRInfos.put(FIRname, f);
+				worldFIRInfos.put(ICAOCode, f);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		Debug.println("Found "+worldFIRInfos.size()+" records of FIRinfo");
+		
 		try {
 			GeoJsonObject DelegatedInfo=om.readValue(fn, GeoJsonObject.class);
 			FeatureCollection fc=(FeatureCollection)DelegatedInfo;
@@ -130,11 +147,21 @@ public class FIRStore implements Cloneable{
 		}
 		if (addDelegated) {
 			Debug.println("Should add delegated airspaces here for "+name);
+			
 		}
+		Feature feature=null;
 		if (worldFIRInfos.containsKey(name)) {
-				return cloneThroughSerialize(worldFIRInfos.get(name));
+				feature=cloneThroughSerialize(worldFIRInfos.get(name));
 		}
-		return null;
+		
+		if (delegatedAirspaces.containsKey(name)) {
+			for (Feature f: delegatedAirspaces.get(name)) {
+				//Merge f with feature
+				feature=GeoUtils.merge(feature, f);
+			}
+		}
+		
+		return feature;
 	}
 
 }
