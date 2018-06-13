@@ -84,11 +84,8 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 
 		retval.addIssue(updateBaseForecast(taf, input, hints));
 
-		Taf.Forecast previousForecast=input.getForecast();
-		previousForecast=updateForecast(previousForecast, previousForecast);
+		retval.addIssue(updateChangeForecasts(taf, input, hints));
 
-		retval.addIssue(updateChangeForecasts(taf, input, previousForecast, hints));
-		
 
 		return retval;
 	}
@@ -149,23 +146,18 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		if (gustSpeed!=null) {
 			wind.setWindGust(new NumericMeasureImpl(gustSpeed, windSpeedUnit));
 		}
-
+Debug.println("fc winds:"+meanSpeed+","+gustSpeed);
 		fct.setSurfaceWind(wind);
 
 		return retval;
 	}
 
-	private List<ConversionIssue> updateChangeForecastSurfaceWind(final TAFForecast fct, final Taf.ChangeForecast input, Forecast previousForecast, ConversionHints hints) {
+	private List<ConversionIssue> updateChangeForecastSurfaceWind(final TAFForecast fct, final Taf.ChangeForecast input, ConversionHints hints) {
 		List<ConversionIssue> retval = new ArrayList<>();
 		TAFSurfaceWind wind=new TAFSurfaceWindImpl();
 
 		TAFWind src=null;
-		if (input.getForecast().getWind()!=null) {
 			src=input.getForecast().getWind();
-		} else {
-			Debug.println("updateChangeForecastSurfaceWind() using previous wind");
-			src=previousForecast.getWind();
-		}
 		if (src!=null) {
 			Object dir=null;
 			dir=src.getDirection().toString();
@@ -197,10 +189,11 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 			if (gustSpeed!=null) {
 				wind.setWindGust(new NumericMeasureImpl(gustSpeed, windSpeedUnit));
 			}
+			Debug.println("winds:"+meanSpeed+","+gustSpeed);
+			fct.setSurfaceWind(wind);
 		} else {
 			Debug.println("updateChangeForecastSurfaceWind() found null wind");
 		}
-		fct.setSurfaceWind(wind);
 
 		return retval;
 	}
@@ -211,17 +204,20 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 			Integer dist=input.getForecast().getVisibility().getValue();
 			String unit=input.getForecast().getVisibility().getUnit();
 			if (unit==null) unit="m";
+			if (unit.equals("M")) unit="m";
 			if ((dist!=null)&&(unit!=null)) {
 				fct.setPrevailingVisibility(new NumericMeasureImpl(dist, unit));
 			} else {
 				retval.add(new ConversionIssue(ConversionIssue.Type.MISSING_DATA, "Missing visibility value or unit: "));
 			}
-			fct.setPrevailingVisibilityOperator(RelationalOperator.ABOVE);
+			if (dist>=9999) {
+				fct.setPrevailingVisibilityOperator(RelationalOperator.ABOVE);
+			}
 		}
 		return retval;
 	}
 
-	private List<ConversionIssue> updateChangeVisibility(final TAFForecast fct, final Taf.ChangeForecast input,/* Forecast previousForecast,*/ ConversionHints hints) {
+	private List<ConversionIssue> updateChangeVisibility(final TAFForecast fct, final Taf.ChangeForecast input, ConversionHints hints) {
 		List<ConversionIssue> retval = new ArrayList<>();
 		TAFVisibility src=null;
 		if (input.getForecast().getVisibility()!=null){
@@ -238,12 +234,15 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 			Debug.println("updateChangeVisibility() found null visibility");
 		}
 		if (unit==null) unit="m";
+		if (unit.equals("M")) unit="m";
 		if ((dist!=null)&&(unit!=null)) {
 			fct.setPrevailingVisibility(new NumericMeasureImpl(dist, unit));
 		} else {
 			retval.add(new ConversionIssue(ConversionIssue.Type.MISSING_DATA, "Missing visibility value or unit: "));
 		}
-		fct.setPrevailingVisibilityOperator(RelationalOperator.ABOVE);
+		if (dist>=9999) {
+			fct.setPrevailingVisibilityOperator(RelationalOperator.ABOVE);
+		}
 		return retval;
 	}
 
@@ -287,6 +286,9 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		List<ConversionIssue> retval = new ArrayList<>();
 		CloudForecast cloud=new CloudForecastImpl();
 		List<fi.fmi.avi.model.CloudLayer> layers = new ArrayList<>();
+		if (input.getForecast().getVertical_visibility()!=null) {
+			cloud.setVerticalVisibility(new NumericMeasureImpl(input.getForecast().getVertical_visibility()*100, "[ft_i]"));
+		}
 		if (input.getForecast().getClouds()!=null) {
 			for (Taf.Forecast. TAFCloudType cldType: input.getForecast().getClouds()) {
 				String cover=cldType.getAmount();
@@ -332,14 +334,15 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		return retval;
 	}
 
-	private List<ConversionIssue> updateChangeClouds(final TAFForecast fct, final Taf.ChangeForecast input, /*Taf.Forecast previousForecast,*/ ConversionHints hints) {
+	private List<ConversionIssue> updateChangeClouds(final TAFForecast fct, final Taf.ChangeForecast input, ConversionHints hints) {
 		List<ConversionIssue> retval = new ArrayList<>();
 		CloudForecast cloud=new CloudForecastImpl();
 		List<fi.fmi.avi.model.CloudLayer> layers = new ArrayList<>();
 		List<TAFCloudType>src=input.getForecast().getClouds();
-		//		if (src==null) {
-		//			src=previousForecast.getClouds();
-		//		}
+		
+		if (input.getForecast().getVertical_visibility()!=null) {
+			cloud.setVerticalVisibility(new NumericMeasureImpl(input.getForecast().getVertical_visibility()*100, "[ft_i]"));
+		}
 		if (src!=null) {
 			for (Taf.Forecast.TAFCloudType cldType: src) {
 				String cover=cldType.getAmount();
@@ -393,7 +396,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		return retval;
 	}
 
-	private List<ConversionIssue> updateChangeForecasts(final TAF fct, final Taf input, Taf.Forecast previousForecast, final ConversionHints hints) {
+	private List<ConversionIssue> updateChangeForecasts(final TAF fct, final Taf input, /*Taf.Forecast previousForecast,*/ final ConversionHints hints) {
 		List<ConversionIssue> retval = new ArrayList<>();
 		List<TAFChangeForecast> changeForecasts = new ArrayList<>();
 		for (Taf.ChangeForecast ch: input.getChangegroups()) {
@@ -402,33 +405,33 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 			switch (changeType) {
 			case "TEMPO":
 				changeFct.setChangeIndicator(TAFChangeIndicator.TEMPORARY_FLUCTUATIONS);
-				updateChangeForecastContents(changeFct, ch, previousForecast, false, hints);
+				updateChangeForecastContents(changeFct, ch, hints);
 				break;
 			case "BECMG":
 				changeFct.setChangeIndicator(TAFChangeIndicator.BECOMING);
-				updateChangeForecastContents(changeFct, ch, previousForecast, true, hints);
+				updateChangeForecastContents(changeFct, ch, hints);
 				break;
 			case "FM":
 				changeFct.setChangeIndicator(TAFChangeIndicator.FROM);
-                //changeFct.setPartialValidityStartTime(ch.getChangeStart().toString()); //TODO still needed??
-				updateChangeForecastContents(changeFct, ch, previousForecast, true, hints);
+				//changeFct.setPartialValidityStartTime(ch.getChangeStart().toString()); //TODO still needed??
+				updateChangeForecastContents(changeFct, ch, hints);
 				changeFct.setValidityEndTime(fct.getValidityEndTime());//TODO correct to put the endTime of baseForecast here?
 				break;
 			case "PROB30":
 				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_30);
-				updateChangeForecastContents(changeFct, ch , previousForecast, false, hints);
+				updateChangeForecastContents(changeFct, ch, hints);
 				break;
 			case "PROB40":
 				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_40);
-				updateChangeForecastContents(changeFct, ch, previousForecast, false, hints);
+				updateChangeForecastContents(changeFct, ch, hints);
 				break;
 			case "PROB30 TEMPO":
 				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_30_TEMPORARY_FLUCTUATIONS);
-				updateChangeForecastContents(changeFct, ch, previousForecast, false, hints);
+				updateChangeForecastContents(changeFct, ch, hints);
 				break;
 			case "PROB40 TEMPO":
 				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_40_TEMPORARY_FLUCTUATIONS);
-				updateChangeForecastContents(changeFct, ch, previousForecast, false, hints);
+				updateChangeForecastContents(changeFct, ch, hints);
 				break;
 			case "AT":
 			case "UNTIL":
@@ -447,7 +450,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		return retval;
 	}
 
-	private List<ConversionIssue> updateChangeForecastContents(final TAFChangeForecast fct, final Taf.ChangeForecast input, Taf.Forecast previousForecast, boolean updatePrevious, final ConversionHints hints) {
+	private List<ConversionIssue> updateChangeForecastContents(final TAFChangeForecast fct, final Taf.ChangeForecast input, final ConversionHints hints) {
 		List<ConversionIssue> retval = new ArrayList<>();
 		if (fct.getChangeIndicator()!=TAFChangeIndicator.FROM) {
 			fct.setValidityStartTime(ZonedDateTime.from(input.getChangeStart()));
@@ -457,59 +460,14 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		}
 		if ((input.getForecast().getCaVOK()!=null)&&input.getForecast().getCaVOK()) {
 			fct.setCeilingAndVisibilityOk(input.getForecast().getCaVOK());
-			retval.addAll(updateChangeForecastSurfaceWind(fct, input, previousForecast, hints));
+			retval.addAll(updateChangeForecastSurfaceWind(fct, input, hints));
 		} else if ((input.getForecast().getCaVOK()==null)||(!input.getForecast().getCaVOK())) {
-			retval.addAll(updateChangeForecastSurfaceWind(fct, input, previousForecast, hints));
+			retval.addAll(updateChangeForecastSurfaceWind(fct, input, hints));
 			retval.addAll(updateChangeVisibility(fct, input, hints));
 			retval.addAll(updateChangeWeather(fct, input, hints));
 			retval.addAll(updateChangeClouds(fct, input, hints));
 		}
 
-		if (updatePrevious) {
-			previousForecast=updateForecast(previousForecast, input.getForecast());
-		}
 		return retval;
 	}
-
-	//TODO fix cases for CAVOK and NSW
-	private Taf.Forecast updateForecast(Taf.Forecast previousForecast, Taf.Forecast forecast) {
-		Debug.println("updateForecast: "+previousForecast.getWind().getSpeed());
-		//		if (forecast.getVisibility()!=null) {
-		//			TAFVisibility vis=new TAFVisibility();
-		//			vis.setUnit(forecast.getVisibility().getUnit());
-		//			vis.setValue(forecast.getVisibility().getValue());
-		//			previousForecast.setVisibility(vis);
-		//		}	
-		//		forecast.getCaVOK();//TODO
-		//		if (forecast.getClouds()!=null) {
-		//			List<TAFCloudType>clouds=new ArrayList<TAFCloudType>();
-		//			for (TAFCloudType cld: forecast.getClouds()){
-		//				clouds.add(new TAFCloudType(cld));
-		//			}
-		//			previousForecast.setClouds(clouds);
-		//		}
-		//
-		//		forecast.getTemperature();//TODO
-		//		forecast.getVertical_visibility();
-		//		forecast.getWeather();
-		//		if (forecast.getWeather()!=null) {
-		//			List<TAFWeather>weather=new ArrayList<TAFWeather>();
-		//            for (TAFWeather w:forecast.getWeather()) {
-		//            	weather.add(new TAFWeather(w));
-		//            }
-		//            previousForecast.setWeather(weather);
-		//		}
-		Debug.println("wind:"+forecast.getWind()+" "+previousForecast.getWind());
-		if (forecast.getWind()!=null) {
-			TAFWind wind=new TAFWind();
-			wind.setDirection(forecast.getWind().getDirection());
-			wind.setSpeed(forecast.getWind().getSpeed());
-			wind.setUnit(forecast.getWind().getUnit());
-			wind.setGusts(forecast.getWind().getGusts());
-			previousForecast.setWind(wind);
-		}
-		Debug.println("updatedForecast: "+previousForecast.getWind().getSpeed());
-		return previousForecast;
-	}
-
 }
