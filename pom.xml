@@ -155,6 +155,18 @@
 		</dependency>
 	</dependencies>
 	<repositories>
+	
+		<repository>
+			<id>knmi-mvn-snapshot-repo</id>
+			<url>https://raw.githubusercontent.com/ernstdevreede/knmi-mvn-snapshot-repo/master</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+			</releases>
+		</repository>
 		<repository>
 			<id>fmi-os-mvn-release-repo</id>
 			<url>https://raw.githubusercontent.com/fmidev/fmi-os-mvn-repo/master</url>
