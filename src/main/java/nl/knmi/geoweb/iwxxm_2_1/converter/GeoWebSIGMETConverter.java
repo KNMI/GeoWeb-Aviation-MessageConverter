@@ -66,16 +66,23 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 		if (input.getMovement()!=null) {
 			if (!input.getMovement().isStationary()) {
 				if ((input.getMovement().getDir()!=null) && (input.getMovement().getSpeed()!=null)) {
-					NumericMeasure numDir=new NumericMeasureImpl(input.getMovement().getDir().getDir(), "deg");//TODO make new constructor 
-					sa.setSingleMovingDirection(numDir);
-					NumericMeasure numSpd=new NumericMeasureImpl(input.getMovement().getSpeed(), input.getMovement().getSpeeduom());//TODO make new constructor 
-					sa.setSingleMovingSpeed(numSpd);
+					NumericMeasure numDir=new NumericMeasureImpl(input.getMovement().getDir().getDir(), "deg");
+					sa.setMovingDirection(numDir);
+					String uom=input.getMovement().getSpeeduom();
+					if ("KMH".equals(uom)) {
+						uom="km/h";
+					}
+					if ("KT".equals(uom)) {
+						uom="[kn_i]";
+					}
+					NumericMeasure numSpd=new NumericMeasureImpl(input.getMovement().getSpeed(), uom); 
+					sa.setMovingSpeed(numSpd);
 					fpaRequired=false;
 				}
 			} else {
 				fpaRequired=false;
-				sa.setSingleMovingDirection(null);
-				sa.setSingleMovingSpeed(null);
+				sa.setMovingDirection(null);
+				sa.setMovingSpeed(null);
 			}
 		}
 
@@ -85,40 +92,40 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 			switch (input.getLevelinfo().getMode()) {
 			case BETW:
 				NumericMeasure nmLower=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[0].getValue(), input.getLevelinfo().getLevels()[0].getUnit().toString());
-				sa.setSingleLowerLimit(nmLower);
+				sa.setLowerLimit(nmLower);
 				NumericMeasure nmUpper=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[1].getValue(), input.getLevelinfo().getLevels()[1].getUnit().toString());
-				sa.setSingleUpperLimit(nmUpper);
+				sa.setUpperLimit(nmUpper);
 				break;
 			case BETW_SFC:
 				nmLower=new NumericMeasureImpl((Double)null, "SFC");
-				sa.setSingleLowerLimit(nmLower);
+				sa.setLowerLimit(nmLower);
 				nmUpper=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[1].getValue(), input.getLevelinfo().getLevels()[1].getUnit().toString());
-				sa.setSingleUpperLimit(nmUpper);
+				sa.setUpperLimit(nmUpper);
 				break;
 			case AT:
 				nmLower=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[0].getValue(), input.getLevelinfo().getLevels()[0].getUnit().toString());
-				sa.setSingleLowerLimit(nmLower);
-				sa.setSingleUpperLimit(nmLower);
+				sa.setLowerLimit(nmLower);
+				sa.setUpperLimit(nmLower);
 				break;
 			case ABV:
 				nmLower=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[0].getValue(), input.getLevelinfo().getLevels()[0].getUnit().toString());
-				sa.setSingleLowerLimit(nmLower);
-				sa.setSingleUpperLimit(nmLower);
-				sa.setSingleLowerLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
+				sa.setLowerLimit(nmLower);
+				sa.setUpperLimit(nmLower);
+				sa.setLowerLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
 				break;
 			case TOPS:
 				nmUpper=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[0].getValue(), input.getLevelinfo().getLevels()[0].getUnit().toString());
-				sa.setSingleUpperLimit(nmUpper);
+				sa.setUpperLimit(nmUpper);
 				break;
 			case TOPS_ABV:
 				nmUpper=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[0].getValue(), input.getLevelinfo().getLevels()[0].getUnit().toString());
-				sa.setSingleUpperLimit(nmUpper);
-				sa.setSingleLowerLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
+				sa.setUpperLimit(nmUpper);
+				sa.setLowerLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
 				break;
 			case TOPS_BLW:
 				nmLower=new NumericMeasureImpl((double)input.getLevelinfo().getLevels()[0].getValue(), input.getLevelinfo().getLevels()[0].getUnit().toString());
-				sa.setSingleLowerLimit(nmLower);
-				sa.setSingleLowerLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
+				sa.setLowerLimit(nmLower);
+				sa.setLowerLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
 				break;
 			}
 		}
