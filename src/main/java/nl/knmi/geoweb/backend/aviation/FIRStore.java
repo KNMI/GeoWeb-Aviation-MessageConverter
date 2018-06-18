@@ -81,21 +81,7 @@ public class FIRStore implements Cloneable{
 		Debug.println("Found "+worldFIRInfos.size()+" records of FIRinfo");
 
 		try {
-			GeoJsonObject FIRInfo=om.readValue(fn, GeoJsonObject.class);
-			FeatureCollection fc=(FeatureCollection)FIRInfo;
-			for (Feature f:fc.getFeatures()) {
-				String FIRname=f.getProperty("FIRname");
-				String ICAOCode=f.getProperty("ICAOCODE");
-				worldFIRInfos.put(FIRname, f);
-				worldFIRInfos.put(ICAOCode, f);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Debug.println("Found "+worldFIRInfos.size()+" records of FIRinfo");
-		
-		try {
-			GeoJsonObject DelegatedInfo=om.readValue(fn, GeoJsonObject.class);
+			GeoJsonObject DelegatedInfo=om.readValue(delegatedFn, GeoJsonObject.class);
 			FeatureCollection fc=(FeatureCollection)DelegatedInfo;
 			for (Feature f:fc.getFeatures()) {
 				String FIRname=f.getProperty("FIRname");
@@ -153,6 +139,7 @@ public class FIRStore implements Cloneable{
 		if (worldFIRInfos.containsKey(name)) {
 				feature=cloneThroughSerialize(worldFIRInfos.get(name));
 		}
+		Debug.println("Feature lookup("+name+") "+feature);
 		
 		if (delegatedAirspaces.containsKey(name)) {
 			for (Feature f: delegatedAirspaces.get(name)) {

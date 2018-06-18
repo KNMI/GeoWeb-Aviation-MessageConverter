@@ -3,9 +3,14 @@ package nl.knmi.geoweb.backend.product.sigmet.geo;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.geojson.Feature;
+import org.locationtech.jts.algorithm.CGAlgorithms;
+import org.locationtech.jts.algorithm.Orientation;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -82,19 +87,16 @@ public class GeoUtils {
 		return f;
 	}
 
-
 	public static Feature merge(Feature f1, Feature f2) {
-		Debug.println("Merging...");
 		Geometry g1=jsonFeature2jtsGeometry(f1);
 		Geometry g2=jsonFeature2jtsGeometry(f2);
-		List<Geometry> geoms=new ArrayList<>();
-		geoms.add(g1);
-		geoms.add(g2);
-		GeometryFactory factory = new GeometryFactory();
-		GeometryCollection geometryCollection = (GeometryCollection)factory.buildGeometry(geoms);
-		Debug.println(geometryCollection.union().toString());
-		Feature f=jtsGeometry2jsonFeature(geometryCollection.union());
-		Debug.println("F:"+f);
+
+        Geometry gNew=g1.union(g2);
+		Coordinate[] coords=gNew.getCoordinates();
+		if (!Orientation.isCCW(coords)) {
+			gNew=gNew.reverse();
+		}
+		Feature f=jtsGeometry2jsonFeature(gNew);
 		return f;  
 	}
 
