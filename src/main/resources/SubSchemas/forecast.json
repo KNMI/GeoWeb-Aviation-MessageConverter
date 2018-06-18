@@ -1,90 +1,175 @@
 {
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"definitions": {
-	     "forecast": {
-            "type": "object",
-            "allOf": [
-            {
-	            "anyOf": [
-	            	{"required": ["wind"]},
-	            	{"required": ["visibility"]},
-	            	{"required": ["weather"]},
-	            	{"required": ["clouds"]},
-	            	{"required": ["vertical_visibility"]},
-	            	{"required": ["temperature"]},
-	            	{"required": ["caVOK"]}
-	            ]
-	        }, {
-	            "anyOf": [
-	                {
-	                    "additionalProperties": false,
-	                    "properties": {
-	                        "wind": {"$ref": "wind.json#/definitions/wind"},
-	                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
-	                        "weather": {"$ref": "weather.json#/definitions/weather"},
-	                        "clouds": {"$ref": "clouds.json#/definitions/clouds"}
-	                    }
-	                },
-	                {
-	                    "additionalProperties": false,
-	                    "properties": {
-	                        "wind": {"$ref": "wind.json#/definitions/wind"},
-	                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
-	                        "weather": {"$ref": "weather.json#/definitions/weather"},
-	                        "vertical_visibility": {"$ref": "vertical_visibility.json#/definitions/vertical_visibility"}
-	                    }
-	                },
-	                {
-	                    "additionalProperties": false,
-	                    "properties": {
-	                        "wind": {"$ref": "wind.json#/definitions/wind"},
-	                        "caVOK": {"type": "boolean" }                    
-	                    }
-	                }
-	            ]
-	            }
-	        ]
-        },
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "definitions": {
         "base_forecast": {
-            "type": "object",
             "oneOf": [
                 {
                     "additionalProperties": false,
                     "properties": {
-                        "wind": {"$ref": "wind.json#/definitions/wind"},
-                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
-                        "weather": {"$ref": "weather.json#/definitions/base_weather"},
-                        "clouds": {"$ref": "clouds.json#/definitions/clouds"},
-                        "temperature": {"$ref": "#/definitions/temperature"}
+                        "clouds": {
+                            "$ref": "clouds.json#/definitions/clouds"
+                        },
+                        "temperature": {
+                            "$ref": "#/definitions/temperature"
+                        },
+                        "visibility": {
+                            "$ref": "visibility.json#/definitions/visibility"
+                        },
+                        "weather": {
+                            "$ref": "weather.json#/definitions/base_weather"
+                        },
+                        "wind": {
+                            "$ref": "wind.json#/definitions/wind"
+                        }
                     },
-                    "required": ["wind", "visibility", "clouds"]
+                    "required": [
+                        "wind",
+                        "visibility",
+                        "clouds"
+                    ]
                 },
                 {
                     "additionalProperties": false,
                     "properties": {
-                        "wind": {"$ref": "wind.json#/definitions/wind"},
-                        "visibility": {"$ref": "visibility.json#/definitions/visibility"},
-                        "weather": {"$ref": "weather.json#/definitions/base_weather"},
-                        "vertical_visibility": {"$ref": "vertical_visibility.json#/definitions/vertical_visibility"},
-                        "temperature": {"$ref": "#/definitions/temperature"}
+                        "temperature": {
+                            "$ref": "#/definitions/temperature"
+                        },
+                        "vertical_visibility": {
+                            "$ref": "vertical_visibility.json#/definitions/vertical_visibility"
+                        },
+                        "visibility": {
+                            "$ref": "visibility.json#/definitions/visibility"
+                        },
+                        "weather": {
+                            "$ref": "weather.json#/definitions/base_weather"
+                        },
+                        "wind": {
+                            "$ref": "wind.json#/definitions/wind"
+                        }
                     },
-                    "required": ["wind", "visibility", "vertical_visibility"]
+                    "required": [
+                        "wind",
+                        "visibility",
+                        "vertical_visibility"
+                    ]
                 },
                 {
-                    "additionalProperties": false,
-                    "properties": {
-                        "wind": {"$ref": "wind.json#/definitions/wind"},
-                        "caVOK": {"type": "boolean" },
-                        "temperature": {"$ref": "#/definitions/temperature"}
-                    },
-                    "required": ["wind", "caVOK"],
                     "$geoweb::messages": {
-                        "required": "Forecast is a wind group with visibilty, weather, either clouds or vertical visibility or CAVOK",
-                        "additionalProperties": "If CAVOK is given, no other properties than wind may be given."
-                    }
+                        "additionalProperties": "If CAVOK is given, no other properties than wind may be given.",
+                        "required": "Forecast is a wind group with visibilty, weather, either clouds or vertical visibility or CAVOK"
+                    },
+                    "additionalProperties": false,
+                    "properties": {
+                        "caVOK": {
+                            "type": "boolean"
+                        },
+                        "temperature": {
+                            "$ref": "#/definitions/temperature"
+                        },
+                        "wind": {
+                            "$ref": "wind.json#/definitions/wind"
+                        }
+                    },
+                    "required": [
+                        "wind",
+                        "caVOK"
+                    ]
                 }
-            ]
-
+            ],
+            "type": "object"
+        },
+        "forecast": {
+            "allOf": [
+                {
+                    "anyOf": [
+                        {
+                            "required": [
+                                "wind"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "visibility"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "weather"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "clouds"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "vertical_visibility"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "temperature"
+                            ]
+                        },
+                        {
+                            "required": [
+                                "caVOK"
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "anyOf": [
+                        {
+                            "additionalProperties": false,
+                            "properties": {
+                                "clouds": {
+                                    "$ref": "clouds.json#/definitions/clouds"
+                                },
+                                "visibility": {
+                                    "$ref": "visibility.json#/definitions/visibility"
+                                },
+                                "weather": {
+                                    "$ref": "weather.json#/definitions/weather"
+                                },
+                                "wind": {
+                                    "$ref": "wind.json#/definitions/wind"
+                                }
+                            }
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {
+                                "vertical_visibility": {
+                                    "$ref": "vertical_visibility.json#/definitions/vertical_visibility"
+                                },
+                                "visibility": {
+                                    "$ref": "visibility.json#/definitions/visibility"
+                                },
+                                "weather": {
+                                    "$ref": "weather.json#/definitions/weather"
+                                },
+                                "wind": {
+                                    "$ref": "wind.json#/definitions/wind"
+                                }
+                            }
+                        },
+                        {
+                            "additionalProperties": false,
+                            "properties": {
+                                "caVOK": {
+                                    "type": "boolean"
+                                },
+                                "wind": {
+                                    "$ref": "wind.json#/definitions/wind"
+                                }
+                            }
+                        }
+                    ]
+                }
+            ],
+            "type": "object"
         }
     }
 }

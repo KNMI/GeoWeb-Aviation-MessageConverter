@@ -1,207 +1,361 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-
     "definitions": {
+        "clouds": {
+            "oneOf": [
+                {
+                    "$geoweb::messages": {
+                        "maxItems": "Four cloud groups are only possible if the fourth cloud has CB or TCU and the former three cloud groups have no such qualifiers"
+                    },
+                    "items": [
+                        {
+                            "$ref": "#/definitions/first_cloud_mod"
+                        },
+                        {
+                            "$ref": "#/definitions/second_cloud_mod"
+                        },
+                        {
+                            "$ref": "#/definitions/third_cloud_mod"
+                        }
+                    ],
+                    "maxItems": 3,
+                    "minItems": 0,
+                    "type": "array"
+                },
+                {
+                    "items": [
+                        {
+                            "$ref": "#/definitions/first_cloud"
+                        },
+                        {
+                            "$ref": "#/definitions/second_cloud"
+                        },
+                        {
+                            "$ref": "#/definitions/third_cloud"
+                        },
+                        {
+                            "$ref": "#/definitions/fourth_cloud"
+                        }
+                    ],
+                    "maxItems": 4,
+                    "minItems": 4,
+                    "type": "array"
+                },
+                {
+                    "enum": [
+                        "NSC"
+                    ],
+                    "type": "string"
+                }
+            ]
+        },
         "first_cloud": {
-            "type": "object",
-            "required": ["amount", "height"],
+            "additionalProperties": false,
             "properties": {
-                "amount": { 
-                    "type": "string", "enum": ["FEW", "SCT", "BKN", "OVC"], 
+                "amount": {
                     "$geoweb::messages": {
                         "enum": "First cloud group can only be one of few, scattered, broken, or overcast"
-                    }
+                    },
+                    "enum": [
+                        "FEW",
+                        "SCT",
+                        "BKN",
+                        "OVC"
+                    ],
+                    "type": "string"
                 },
-                "height": { 
-                    "type": "integer", "minimum": 0, "maximum": 999, 
+                "height": {
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than FL000",
-                        "maximum": "Clouds cannot be higher than FL1000"
-                    }
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "minimum": "Clouds cannot be lower than FL000"
+                    },
+                    "maximum": 999,
+                    "minimum": 0,
+                    "type": "integer"
                 }
-            }, "additionalProperties": false
+            },
+            "required": [
+                "amount",
+                "height"
+            ],
+            "type": "object"
         },
         "first_cloud_mod": {
-            "type": "object",
-            "required": ["amount", "height"],
+            "additionalProperties": false,
             "properties": {
-                "amount": { 
-                    "type": "string", "enum": ["FEW", "SCT", "BKN", "OVC"],
+                "amount": {
                     "$geoweb::messages": {
                         "enum": "First cloud group can only be one of few, scattered, broken, or overcast"
-                    }
+                    },
+                    "enum": [
+                        "FEW",
+                        "SCT",
+                        "BKN",
+                        "OVC"
+                    ],
+                    "type": "string"
                 },
-                "height": { 
-                    "type": "integer", "minimum": 0, "maximum": 999,
+                "height": {
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than FL000",
-                        "maximum": "Clouds cannot be higher than FL1000"
-                    }
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "minimum": "Clouds cannot be lower than FL000"
+                    },
+                    "maximum": 999,
+                    "minimum": 0,
+                    "type": "integer"
                 },
-                "mod": { "type": "string", "enum": ["CB", "TCU"]}
-            }, "additionalProperties": false
-        }, 
-
-        "second_cloud": {
-            "type": "object",
-            "required": ["amount", "height"],
+                "mod": {
+                    "enum": [
+                        "CB",
+                        "TCU"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "amount",
+                "height"
+            ],
+            "type": "object"
+        },
+        "fourth_cloud": {
+            "additionalProperties": false,
             "properties": {
-                "amount": { 
-                    "type": "string", "enum": ["SCT", "BKN", "OVC"],
+                "amount": {
+                    "$geoweb::messages": {
+                        "enum": "Fourth cloud group can only be broken or overcast"
+                    },
+                    "enum": [
+                        "BKN",
+                        "OVC"
+                    ],
+                    "type": "string"
+                },
+                "height": {
+                    "$geoweb::messages": {
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "minimum": "Clouds cannot be lower than FL000"
+                    },
+                    "maximum": 999,
+                    "minimum": 0,
+                    "type": "integer"
+                },
+                "mod": {
+                    "enum": [
+                        "CB",
+                        "TCU"
+                    ],
+                    "type": "string"
+                }
+            },
+            "required": [
+                "mod",
+                "height",
+                "amount"
+            ],
+            "type": "object"
+        },
+        "second_cloud": {
+            "additionalProperties": false,
+            "properties": {
+                "amount": {
                     "$geoweb::messages": {
                         "enum": "Second cloud group can only be one of scattered, broken, or overcast"
-                    }
-                },                
-                "height": { 
-                    "type": "integer", "minimum": 0, "maximum": 999, 
+                    },
+                    "enum": [
+                        "SCT",
+                        "BKN",
+                        "OVC"
+                    ],
+                    "type": "string"
+                },
+                "height": {
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than FL000",
-                        "maximum": "Clouds cannot be higher than FL1000"
-                    }
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "minimum": "Clouds cannot be lower than FL000"
+                    },
+                    "maximum": 999,
+                    "minimum": 0,
+                    "type": "integer"
                 }
-            }, "additionalProperties": false
+            },
+            "required": [
+                "amount",
+                "height"
+            ],
+            "type": "object"
         },
         "second_cloud_mod": {
-            "type": "object",
-            "oneOf": [{
-	            "required": ["amount", "height"],
-	            "properties": {
-	                "amount": { 
-	                    "type": "string", "enum": ["SCT", "BKN", "OVC"],
-	                    "$geoweb::messages": {
-	                        "enum": "Second cloud group can only be one of scattered, broken, or overcast"
-	                    }
-	                },
-	                "height": { 
-	                    "type": "integer", "minimum": 0, "maximum": 999,
-	                    "$geoweb::messages": {
-	                        "minimum": "Clouds cannot be lower than FL000",
-	                        "maximum": "Clouds cannot be higher than FL1000"
-	                    }
-	                }
-	            }, "additionalProperties": false
-	        }, {
-	        	"required": ["amount", "height", "mod"],
-	        	"properties": {
-		        	"amount": { 
-	                    "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
-	                },
-	                "height": { 
-	                    "type": "integer", "minimum": 0, "maximum": 999,
-	                    "$geoweb::messages": {
-	                        "minimum": "Clouds cannot be lower than FL000",
-	                        "maximum": "Clouds cannot be higher than FL1000"
-	                    }
-	                },
-	                "mod": { "type": "string", "enum": ["CB", "TCU"]}
-	            },
-	            "additionalProperties": false
-	        }]
-        }, 
+            "oneOf": [
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "amount": {
+                            "$geoweb::messages": {
+                                "enum": "Second cloud group can only be one of scattered, broken, or overcast"
+                            },
+                            "enum": [
+                                "SCT",
+                                "BKN",
+                                "OVC"
+                            ],
+                            "type": "string"
+                        },
+                        "height": {
+                            "$geoweb::messages": {
+                                "maximum": "Clouds cannot be higher than FL1000",
+                                "minimum": "Clouds cannot be lower than FL000"
+                            },
+                            "maximum": 999,
+                            "minimum": 0,
+                            "type": "integer"
+                        }
+                    },
+                    "required": [
+                        "amount",
+                        "height"
+                    ]
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "amount": {
+                            "enum": [
+                                "SCT",
+                                "BKN",
+                                "OVC",
+                                "FEW"
+                            ],
+                            "type": "string"
+                        },
+                        "height": {
+                            "$geoweb::messages": {
+                                "maximum": "Clouds cannot be higher than FL1000",
+                                "minimum": "Clouds cannot be lower than FL000"
+                            },
+                            "maximum": 999,
+                            "minimum": 0,
+                            "type": "integer"
+                        },
+                        "mod": {
+                            "enum": [
+                                "CB",
+                                "TCU"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "amount",
+                        "height",
+                        "mod"
+                    ]
+                }
+            ],
+            "type": "object"
+        },
         "third_cloud": {
-            "type": "object",
-            "oneOf": [{
-	            "required": ["amount", "height"],
-	            "properties": {
-	                "amount": { 
-	                    "type": "string", "enum": ["BKN", "OVC"],
-	                    "$geoweb::messages": {
-	                        "enum": "Third cloud group can only be broken or overcast"
-	                    }
-	                },
-	                "height": { 
-	                    "type": "integer", "minimum": 0, "maximum": 999, 
-	                    "$geoweb::messages": {
-	                        "minimum": "Clouds cannot be lower than FL000",
-	                        "maximum": "Clouds cannot be higher than FL1000"
-	                    }
-	                }
-	            }, "additionalProperties": false
-	        }, {
-	        	"required": ["amount", "height", "mod"],
-	        	"properties": {
-		        	"amount": { 
-		                "type": "string", "enum": ["SCT", "BKN", "OVC", "FEW"]
-		            },
-		            "height": { 
-		                "type": "integer", "minimum": 0, "maximum": 999, 
-		                "$geoweb::messages": {
-		                    "minimum": "Clouds cannot be lower than FL000",
-		                    "maximum": "Clouds cannot be higher than FL1000"
-		                }
-		            },
-		            "mod": { "type": "string", "enum": ["CB"]}
-		        },
-	            "additionalProperties": false
-	        }]
+            "oneOf": [
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "amount": {
+                            "$geoweb::messages": {
+                                "enum": "Third cloud group can only be broken or overcast"
+                            },
+                            "enum": [
+                                "BKN",
+                                "OVC"
+                            ],
+                            "type": "string"
+                        },
+                        "height": {
+                            "$geoweb::messages": {
+                                "maximum": "Clouds cannot be higher than FL1000",
+                                "minimum": "Clouds cannot be lower than FL000"
+                            },
+                            "maximum": 999,
+                            "minimum": 0,
+                            "type": "integer"
+                        }
+                    },
+                    "required": [
+                        "amount",
+                        "height"
+                    ]
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "amount": {
+                            "enum": [
+                                "SCT",
+                                "BKN",
+                                "OVC",
+                                "FEW"
+                            ],
+                            "type": "string"
+                        },
+                        "height": {
+                            "$geoweb::messages": {
+                                "maximum": "Clouds cannot be higher than FL1000",
+                                "minimum": "Clouds cannot be lower than FL000"
+                            },
+                            "maximum": 999,
+                            "minimum": 0,
+                            "type": "integer"
+                        },
+                        "mod": {
+                            "enum": [
+                                "CB"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "amount",
+                        "height",
+                        "mod"
+                    ]
+                }
+            ],
+            "type": "object"
         },
         "third_cloud_mod": {
-            "type": "object",
-            "required": ["amount", "height"],
+            "additionalProperties": false,
             "properties": {
-                "amount": { 
-                    "type": "string", "enum": ["BKN", "OVC"],
+                "amount": {
                     "$geoweb::messages": {
                         "enum": "Third cloud group can only be broken or overcast"
-                    }
+                    },
+                    "enum": [
+                        "BKN",
+                        "OVC"
+                    ],
+                    "type": "string"
                 },
-                "height": { 
-                    "type": "integer", "minimum": 0, "maximum": 999,
+                "height": {
                     "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than FL000",
-                        "maximum": "Clouds cannot be higher than FL1000"
-                    }
+                        "maximum": "Clouds cannot be higher than FL1000",
+                        "minimum": "Clouds cannot be lower than FL000"
+                    },
+                    "maximum": 999,
+                    "minimum": 0,
+                    "type": "integer"
                 },
-                "mod": { "type": "string", "enum": ["CB", "TCU"]}
-            }, "additionalProperties": false
-        }, 
-        "fourth_cloud": {
-            "required": ["mod", "height", "amount"],
-            "type": "object",
-            "properties": {
-	            "amount": { 
-	                "type": "string", "enum": ["BKN", "OVC"],
-	                "$geoweb::messages": {
-	                    "enum": "Fourth cloud group can only be broken or overcast"
-	                }
-	            },
-                "mod": { "type": "string", "enum": ["CB", "TCU"]},
-                "height": { 
-                    "type": "integer", "minimum": 0, "maximum": 999,
-                    "$geoweb::messages": {
-                        "minimum": "Clouds cannot be lower than FL000",
-                        "maximum": "Clouds cannot be higher than FL1000"
-                    }
+                "mod": {
+                    "enum": [
+                        "CB",
+                        "TCU"
+                    ],
+                    "type": "string"
                 }
-            }, "additionalProperties": false
-        },
-
-        "clouds": {
-            "oneOf": [ {
-                "type": "array",
-                "minItems": 0,
-                "maxItems": 3,
-                "items": [
-                {"$ref": "#/definitions/first_cloud_mod"}, 
-                {"$ref": "#/definitions/second_cloud_mod"}, 
-                {"$ref": "#/definitions/third_cloud_mod"}
-            ], 
-                "$geoweb::messages": {
-                    "maxItems": "Four cloud groups are only possible if the fourth cloud has CB or TCU and the former three cloud groups have no such qualifiers"
-                }
-            }, {
-                "type": "array",
-                "minItems": 4,
-                "maxItems": 4,
-                "items":  [
-                    {"$ref": "#/definitions/first_cloud"}, 
-                    {"$ref": "#/definitions/second_cloud"}, 
-                    {"$ref": "#/definitions/third_cloud"}, 
-                    {"$ref": "#/definitions/fourth_cloud"}]
-
-            }, {
-                "type": "string", "enum": ["NSC"]
-            }]
+            },
+            "required": [
+                "amount",
+                "height"
+            ],
+            "type": "object"
         }
     }
 }
