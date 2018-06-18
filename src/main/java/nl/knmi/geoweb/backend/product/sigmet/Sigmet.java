@@ -569,8 +569,10 @@ public class Sigmet {
 			sb.append(this.movement.toTAC());
 			sb.append('\n');
 		}
-		sb.append(this.change.toTAC());
-		sb.append('\n');
+		if (this.change!=null) {
+			sb.append(this.change.toTAC());
+			sb.append('\n');
+		}
 		if (this.movement != null && this.movement.stationary == false && this.forecast_position_time != null) {
 			sb.append("FCST AT ").append(String.format("%02d", this.forecast_position_time.getHour())).append(String.format("%02d", this.forecast_position_time.getMinute())).append("Z");
 			sb.append('\n');
