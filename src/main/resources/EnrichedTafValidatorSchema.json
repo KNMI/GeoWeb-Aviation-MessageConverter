@@ -1,250 +1,349 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-
-	"definitions": {
+    "definitions": {
         "changegroup": {
-            "oneOf": [{
-                "additionalProperties": true,
-                "required": ["changegroupsAscending"],
-                "properties": {
-                    "forecast": {"$ref": "#/definitions/forecast"},
-	                "cloudsCBorTCUNeededAndPresent": {
-	    			    "type": "boolean",
-	                	"enum": [true],
-	                    "$geoweb::messages": {
-	                		"enum": "When there are showers, a CB or TCU cloud is required"
-	                    }
-	    			},
-	    			"cloudsCBNeededAndPresent": {
-	    			    "type": "boolean",
-	                	"enum": [true],
-	                    "$geoweb::messages": {
-	                		"enum": "When there are thunderstorms, a CB cloud is required"
-	                    }
-	    			},
-                    
-                    "changegroupsAscending": {
-                        "type": "boolean",
-                        "enum": [true],
-                        "$geoweb::messages": {
-                            "enum": "Changegroups must be equal to or ascending in starting time"
-                     	}
-                    },
-                    "repeatingChange": {
-                        "type": "boolean",
-                        "enum": [false],
-                        "$geoweb::messages": {
-                            "enum": "A change in a changegroup must be unique"
-                     	}
-                    },
-                    "changeType": {
-                    	"type": "string",
-                    	"enum": ["PROB30", "TEMPO", "FM", "PROB40", "PROB30 TEMPO", "PROB40 TEMPO"]
-                    },
-                    "changeDurationInHours": {
-                        "type": "integer", 
-                        "minimum": 1,
-                        "maximum": 30,
-						"$geoweb::messages": {
-                            "minimum": "Changegroup must last at least one hour",
-                            "maximum": "Changegroup can't last all day"
-                     	}
-                    },
-                    "cloudsNeededAndPresent":{
-                    	"type": "boolean",
-                    	"enum": [false],
-                        "$geoweb::messages": {
-                    		"enum": "Clouds are necessary for rain"
+            "oneOf": [
+                {
+                    "additionalProperties": true,
+                    "properties": {
+                        "changeDurationInHours": {
+                            "$geoweb::messages": {
+                                "maximum": "Changegroup can't last all day",
+                                "minimum": "Changegroup must last at least one hour"
+                            },
+                            "maximum": 30,
+                            "minimum": 1,
+                            "type": "integer"
+                        },
+                        "changeType": {
+                            "enum": [
+                                "PROB30",
+                                "TEMPO",
+                                "FM",
+                                "PROB40",
+                                "PROB30 TEMPO",
+                                "PROB40 TEMPO"
+                            ],
+                            "type": "string"
+                        },
+                        "changegroupsAscending": {
+                            "$geoweb::messages": {
+                                "enum": "Changegroups must be equal to or ascending in starting time"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "cloudsCBNeededAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "When there are thunderstorms, a CB cloud is required"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "cloudsCBorTCUNeededAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "When there are showers, a CB or TCU cloud is required"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "cloudsNeededAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "Clouds are necessary for rain"
+                            },
+                            "enum": [
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "endAfterStart": {
+                            "$geoweb::messages": {
+                                "enum": "The end of the change must be after the start"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "forecast": {
+                            "$ref": "#/definitions/forecast"
+                        },
+                        "repeatingChange": {
+                            "$geoweb::messages": {
+                                "enum": "A change in a changegroup must be unique"
+                            },
+                            "enum": [
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "visibilityWeatherRequiredAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "If the visibility is less than 5000 meters weather groups are required"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "windEnoughDifference": {
+                            "$geoweb::messages": {
+                                "enum": "Change in wind must be at least 30 degrees or 5 knots"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
                         }
                     },
-                    "endAfterStart": {
-                    	"type": "boolean",
-                    	"enum": [true],
-                    	"$geoweb::messages": {
-                    		"enum": "The end of the change must be after the start"
-                    	}
-                    },
-                    "visibilityWeatherRequiredAndPresent": {
-                    	"type": "boolean",
-                    	"enum": [true],
-                    	"$geoweb::messages": {
-                    		"enum": "If the visibility is less than 5000 meters weather groups are required"
-                    	}
-                    },
-                    "windEnoughDifference": {
-                    	"type": "boolean",
-                    	"enum": [true],
-                    	"$geoweb::messages": {
-                    		"enum": "Change in wind must be at least 30 degrees or 5 knots"
-                    	}
-                    }
-                }  
-            }, {
-                "additionalProperties": true,
-                "required": ["changegroupsAscending", "changegroupBecomingOverlaps", "changeType", "changeDurationInHours"],
-                "properties": {
-                    "forecast": {"$ref": "#/definitions/forecast"},
-	    			"cloudsCBorTCUNeededAndPresent": {
-	    			    "type": "boolean",
-	                	"enum": [true],
-	                    "$geoweb::messages": {
-	                		"enum": "When there are showers, a CB or TCU cloud is required"
-	                    }
-	    			},
-	    			"cloudsCBNeededAndPresent": {
-	    			    "type": "boolean",
-	                	"enum": [true],
-	                    "$geoweb::messages": {
-	                		"enum": "When there are thunderstorms, a CB cloud is required"
-	                    }
-	    			},
-
-                    "changegroupsAscending": {
-                        "type": "boolean",
-                        "enum": [true],
-                        "$geoweb::messages": {
-                            "enum": "Changegroups must be equal to or ascending in starting time"
-                     	}
-                    },
-					"repeatingChange": {
-                        "type": "boolean",
-                        "enum": [false],
-                        "$geoweb::messages": {
-                            "enum": "A change in a changegroup must be unique"
-                     	}
-                    },
-                    "cloudsNeededAndPresent":{
-                    	"type": "boolean",
-                    	"enum": [true],
-                        "$geoweb::messages": {
-                    		"enum": "Clouds are necessary for rain"
+                    "required": [
+                        "changegroupsAscending"
+                    ]
+                },
+                {
+                    "additionalProperties": true,
+                    "properties": {
+                        "changeDurationInHours": {
+                            "$geoweb::messages": {
+                                "maximum": "BECMG changegroups should be shorter than 2 hours, but strictly shorter than 4 hours",
+                                "minimum": "Changegroups must be at least one hour"
+                            },
+                            "maximum": 4,
+                            "minimum": 1,
+                            "type": "integer"
+                        },
+                        "changeType": {
+                            "enum": [
+                                "BECMG"
+                            ],
+                            "type": "string"
+                        },
+                        "changegroupBecomingOverlaps": {
+                            "$geoweb::messages": {
+                                "enum": "BECMG changegroups cannot overlap"
+                            },
+                            "enum": [
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "changegroupsAscending": {
+                            "$geoweb::messages": {
+                                "enum": "Changegroups must be equal to or ascending in starting time"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "cloudsCBNeededAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "When there are thunderstorms, a CB cloud is required"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "cloudsCBorTCUNeededAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "When there are showers, a CB or TCU cloud is required"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "cloudsNeededAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "Clouds are necessary for rain"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "endAfterStart": {
+                            "$geoweb::messages": {
+                                "enum": "The end of the change must be after the start"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "forecast": {
+                            "$ref": "#/definitions/forecast"
+                        },
+                        "repeatingChange": {
+                            "$geoweb::messages": {
+                                "enum": "A change in a changegroup must be unique"
+                            },
+                            "enum": [
+                                false
+                            ],
+                            "type": "boolean"
+                        },
+                        "visibilityWeatherRequiredAndPresent": {
+                            "$geoweb::messages": {
+                                "enum": "If the visibility is less than 5000 meters weather groups are required"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "windEnoughDifference": {
+                            "$geoweb::messages": {
+                                "enum": "Change in wind must be at least 30 degrees or 5 knots"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
                         }
                     },
-                    "changegroupBecomingOverlaps": {
-                        "type": "boolean",
-                        "enum": [false],
-                        "$geoweb::messages": {
-                            "enum": "BECMG changegroups cannot overlap"
-                     	}
-                    },
-                    "changeType": {
-                        "type": "string", 
-                        "enum": ["BECMG"]
-                    },
-                    "changeDurationInHours": {
-                        "type": "integer", 
-                        "minimum": 1,
-                        "maximum": 4,
-                        "$geoweb::messages": {
-                            "minimum": "Changegroups must be at least one hour",
-                            "maximum": "BECMG changegroups should be shorter than 2 hours, but strictly shorter than 4 hours"
-                     	}
-                    },
-                    "endAfterStart": {
-                    	"type": "boolean",
-                    	"enum": [true],
-                    	"$geoweb::messages": {
-                    		"enum": "The end of the change must be after the start"
-                    	}
-                    },
-                    "visibilityWeatherRequiredAndPresent": {
-                    	"type": "boolean",
-                    	"enum": [true],
-                    	"$geoweb::messages": {
-                    		"enum": "If the visibility is less than 5000 meters weather groups are required"
-                    	}
-                    },
-                    "windEnoughDifference": {
-                    	"type": "boolean",
-                    	"enum": [true],
-                    	"$geoweb::messages": {
-                    		"enum": "Change in wind must be at least 30 degrees or 5 knots"
-                    	}
-                    }
+                    "required": [
+                        "changegroupsAscending",
+                        "changegroupBecomingOverlaps",
+                        "changeType",
+                        "changeDurationInHours"
+                    ]
                 }
-			}
             ]
         },
-		"forecast": {
-    		"type": "object",
-    		"properties": {
-    			"cloudsCBorTCUNeededAndPresent": {
-    			    "type": "boolean",
-                	"enum": [true],
-                    "$geoweb::messages": {
-                		"enum": "When there are showers, a CB or TCU cloud is required"
-                    }
-    			},
-    			"cloudsCBNeededAndPresent": {
-    			    "type": "boolean",
-                	"enum": [true],
-                    "$geoweb::messages": {
-                		"enum": "When there are thunderstorms, a CB cloud is required"
-                    }
-    			},
-    			"visibilityWeatherRequiredAndPresent": {
-                	"type": "boolean",
-                	"enum": [true],
-                	"$geoweb::messages": {
-                		"enum": "If the visibility is less than 5000 meters weather groups are required"
-                	}
-                },
-                "cloudsModifierHasWeatherPresent": {
-                    "type": "boolean",
-                	"enum": [true],
-                    "$geoweb::messages": {
-                		"enum": "In the presence of CB or TCU a weather group with SH or TS is required"
-                    }
-                },
-                "cloudsNeededAndPresent":{
-                	"type": "boolean",
-                	"enum": [true],
-                    "$geoweb::messages": {
-                		"enum": "Clouds are necessary for rain"
-                    }
-                },
+        "forecast": {
+            "additionalProperties": true,
+            "properties": {
                 "cloudsAscending": {
-                    "type": "boolean",
-                    "enum": [true],
                     "$geoweb::messages": {
                         "enum": "Cloud groups must be ascending in height"
-                 	}
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "cloudsCBNeededAndPresent": {
+                    "$geoweb::messages": {
+                        "enum": "When there are thunderstorms, a CB cloud is required"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "cloudsCBorTCUNeededAndPresent": {
+                    "$geoweb::messages": {
+                        "enum": "When there are showers, a CB or TCU cloud is required"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "cloudsModifierHasWeatherPresent": {
+                    "$geoweb::messages": {
+                        "enum": "In the presence of CB or TCU a weather group with SH or TS is required"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "cloudsNeededAndPresent": {
+                    "$geoweb::messages": {
+                        "enum": "Clouds are necessary for rain"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "visibilityWeatherRequiredAndPresent": {
+                    "$geoweb::messages": {
+                        "enum": "If the visibility is less than 5000 meters weather groups are required"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
                 },
                 "visibilityWithinLimit": {
-                    "type": "boolean",
-                    "enum": [true],
                     "$geoweb::messages": {
                         "enum": "The current combination of weather group and visibility is invalid."
-                 	}
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
                 },
                 "wind": {
-                	"type": "object",
-                	"properties": {
-						"gustFastEnough": {
-		                    "type": "boolean",
-		                    "enum": [
-		                        true
-		                    ],
-		                    "$geoweb::messages": {
-		                        "enum": "Wind gusts must at least be 10 knots greater than the wind speed"
-		                    }
-		                }
-                	}
+                    "properties": {
+                        "gustFastEnough": {
+                            "$geoweb::messages": {
+                                "enum": "Wind gusts must at least be 10 knots greater than the wind speed"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        }
+                    },
+                    "type": "object"
                 }
-    		},
-            "additionalProperties": true
-    	}
-	},
-    "type": "object",
-    "properties":
-    {
-    	"forecast": {"$ref": "#/definitions/forecast"},
-        "changegroups": {
-            "type": "array",
-            "minItems": 0,
-            "maxItems": 10,
-            "items": [{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"},{"$ref": "#/definitions/changegroup"}],
-            "additionalProperties": false
+            },
+            "type": "object"
         }
-	}
+    },
+    "properties": {
+        "changegroups": {
+            "additionalProperties": false,
+            "items": [
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                }
+            ],
+            "maxItems": 10,
+            "minItems": 0,
+            "type": "array"
+        },
+        "forecast": {
+            "$ref": "#/definitions/forecast"
+        }
+    },
+    "type": "object"
 }
