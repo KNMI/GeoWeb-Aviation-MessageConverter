@@ -391,7 +391,7 @@ public class TafValidator {
 		augmentCloudNeededRainOrModifierNecessary(input);
 		augmentMaxVisibility(input);
 		augmentNonRepeatingChanges(input);
-		Debug.println(input.toString());
+//		Debug.println(input.toString());
 	}
 
 	private static void augmentNonRepeatingChanges(JsonNode input) throws JsonProcessingException, IOException {
@@ -1112,7 +1112,7 @@ public class TafValidator {
 					(ObjectNode) om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
 		
-		Debug.println(messagesMap.toString());
+//		Debug.println(messagesMap.toString());
 		
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);
 		JsonNode errorJson = new ObjectMapper().readTree("{}");

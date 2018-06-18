@@ -44,6 +44,10 @@ public class Taf implements IExportable {
 	public enum TAFReportPublishedConcept {
 		concept, published, inactive
 	}
+	
+	public enum TAFWindSpeedOperator {
+		above, below
+	}
 
 	@Getter
 	@Setter
@@ -194,6 +198,8 @@ public class Taf implements IExportable {
 			Integer speed;
 			Integer gusts;
 			String unit;
+			TAFWindSpeedOperator speedOperator;
+			TAFWindSpeedOperator gustsOperator;
 
 			public String toTAC() {
 				StringBuilder sb = new StringBuilder();
@@ -202,9 +208,26 @@ public class Taf implements IExportable {
 				} else {
 					sb.append(String.format("%03d", Integer.parseInt(direction.toString())));
 				}
+				if (speedOperator != null) {
+					if (speedOperator.equals(TAFWindSpeedOperator.above)) {
+						sb.append("P");
+					}
+					if (speedOperator.equals(TAFWindSpeedOperator.below)) {
+						sb.append("M"); // TODO: Is this possible?
+					}
+				}
 				sb.append(String.format("%02d", speed));
 				if (gusts != null) {
-					sb.append(String.format("G%02d", gusts));
+					sb.append(String.format("G"));
+					if (gustsOperator != null) {
+						if (gustsOperator.equals(TAFWindSpeedOperator.above)) {
+							sb.append("P");
+						}
+						if (gustsOperator.equals(TAFWindSpeedOperator.below)) {
+							sb.append("M"); // TODO: Is this possible?
+						}
+					}
+					sb.append(String.format("%02d", gusts));
 				}
 				sb.append(unit.toString());
 				return sb.toString();
@@ -312,7 +335,7 @@ public class Taf implements IExportable {
 	public String toTAC() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TAF ");
-		switch (this.metadata.type) {
+		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case amendment:
 			sb.append("AMD ");
 			break;
@@ -329,7 +352,7 @@ public class Taf implements IExportable {
 
 		sb.append(this.metadata.location);
 		sb.append(" " + TAFtoTACMaps.toDDHHMM(this.metadata.issueTime));
-		switch (this.metadata.type) {
+		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case missing:
 			// If missing, we're done here
 			sb.append(" NIL");
@@ -340,7 +363,7 @@ public class Taf implements IExportable {
 		}
 		sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.validityStart) + "/"
 				+ TAFtoTACMaps.toDDHH(this.metadata.validityEnd));
-		switch (this.metadata.type) {
+		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case canceled:
 			// In case of a cancel there are no change groups so we're done here
 			sb.append(" CNL");
