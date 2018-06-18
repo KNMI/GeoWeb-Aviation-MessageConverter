@@ -383,16 +383,16 @@ public class TafValidator {
 	public static void enrich(JsonNode input) throws ParseException, JsonProcessingException, IOException {
 		augmentChangegroupsIncreasingInTime(input);
 		augmentOverlappingBecomingChangegroups(input);
-		augmentChangegroupDuration(input);
-		augmentWindGust(input);
-		augmentAscendingClouds(input);
+		augmentChangegroupDuration(input);					
+		augmentWindGust(input);								
+		augmentAscendingClouds(input);						//Done
 		augmentEndTimes(input);
 		augmentVisibilityWeatherRequired(input);
-		augmentEnoughWindChange(input);
+		augmentEnoughWindChange(input);						//Done
 		augmentCloudNeededRainOrModifierNecessary(input);
 		augmentMaxVisibility(input);
 		augmentNonRepeatingChanges(input);
-//		Debug.println(input.toString());
+		Debug.println(input.toString());
 	}
 
 	private static void augmentNonRepeatingChanges(JsonNode input) throws JsonProcessingException, IOException {
@@ -807,7 +807,8 @@ public class TafValidator {
 			if (weather == null) {
 				weather = forecastWeather;
 			}
-			if (visibility <= 5000) {
+			// TODO: Check visibility <=5000 or 5000
+			if (visibility < 5000) {
 				changegroupForecast.put("visibilityWeatherRequiredAndPresent", weather != null && weather.isArray());
 			}
 			JsonNode changeType = changegroup.get("changeType");
@@ -852,42 +853,32 @@ public class TafValidator {
 	}
 
 	private static void augmentAscendingClouds(JsonNode input) throws ParseException {
-		
-
-		
 		List<JsonNode> forecasts = input.findParents("clouds");
 		for (JsonNode forecast : forecasts) {
 			if (forecast == null || forecast.isNull() || forecast.isMissingNode())
 				continue;
-			ObjectNode editableForecast = (ObjectNode) forecast;
 			int prevHeight = 0;
-			JsonNode node = forecast.findValue("clouds");
+			ArrayNode node = (ArrayNode) forecast.findValue("clouds");
 			if (node.getClass().equals(String.class) || node.getClass().equals(TextNode.class)) {
-				editableForecast.put("cloudsAscending", true);
 				continue;
 			}
-			;
-			boolean ascending = true;
-			for (JsonNode cloud : node) {
-				if (cloud == null || cloud.isNull() || cloud.isMissingNode())
-					continue;
-				ObjectNode cloudNode = (ObjectNode) cloud;
+			
+			for (Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
+				JsonNode nextNode = it.next(); 
+				if (nextNode == null || nextNode == NullNode.getInstance()) continue;
+				ObjectNode cloudNode = (ObjectNode) nextNode;				
+				
 				JsonNode cloudHeight = cloudNode.findValue("height");
 				if (cloudHeight == null || cloudHeight.asText().equals("null"))
 					continue;
 				int height = Integer.parseInt(cloudHeight.asText());
-
-				// If ascending hadn't been previously set to false and the height is greater
-				// than the previously seen height
-				// we keep it at true, otherwise we set it at false
-				if (ascending) {
-					if (height < prevHeight) {
-						ascending = false;
-					}
+				if (height < prevHeight) {
+					cloudNode.put("cloudsAscending", false);
+				}else{
+					cloudNode.put("cloudsAscending", true);
 				}
 				prevHeight = height;
 			}
-			editableForecast.put("cloudsAscending", ascending);
 		}
 	}
 
@@ -1126,7 +1117,7 @@ public class TafValidator {
 
 	public TafValidationResult validate(String tafStr)
 			throws ProcessingException, JSONException, IOException, ParseException {
-		Debug.println("Validate");
+		Debug.println("Validate\n" + tafStr);
 //		System.out.println(discoverSchemata(this.tafSchemaStore.getDirectory()));
 
 		String schemaFile = tafSchemaStore.getLatestTafSchema();

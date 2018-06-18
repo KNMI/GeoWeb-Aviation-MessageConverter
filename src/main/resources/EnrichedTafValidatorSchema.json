@@ -189,15 +189,6 @@
                                 true
                             ],
                             "type": "boolean"
-                        },
-                        "windEnoughDifference": {
-                            "$geoweb::messages": {
-                                "enum": "Change in wind must be at least 30 degrees or 5 knots"
-                            },
-                            "enum": [
-                                true
-                            ],
-                            "type": "boolean"
                         }
                     },
                     "required": [
@@ -209,17 +200,38 @@
                 }
             ]
         },
-        "forecast": {
-            "additionalProperties": true,
+        "cloudsAscending": {
             "properties": {
                 "cloudsAscending": {
                     "$geoweb::messages": {
-                        "enum": "Cloud groups must be ascending in height"
+                        "enum": "Clouds not ascending"
                     },
                     "enum": [
                         true
                     ],
                     "type": "boolean"
+                }
+            }
+        },
+        "forecast": {
+            "additionalProperties": true,
+            "properties": {
+                "clouds": {
+                    "items": [
+                        {
+                            "$ref": "#/definitions/cloudsAscending"
+                        },
+                        {
+                            "$ref": "#/definitions/cloudsAscending"
+                        },
+                        {
+                            "$ref": "#/definitions/cloudsAscending"
+                        },
+                        {
+                            "$ref": "#/definitions/cloudsAscending"
+                        }
+                    ],
+                    "type": "array"
                 },
                 "cloudsCBNeededAndPresent": {
                     "$geoweb::messages": {
