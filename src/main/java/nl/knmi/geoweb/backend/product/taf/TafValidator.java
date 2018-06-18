@@ -391,6 +391,7 @@ public class TafValidator {
 		augmentCloudNeededRainOrModifierNecessary(input);
 		augmentMaxVisibility(input);
 		augmentNonRepeatingChanges(input);
+		Debug.println(input.toString());
 	}
 
 	private static void augmentNonRepeatingChanges(JsonNode input) throws JsonProcessingException, IOException {
@@ -707,9 +708,9 @@ public class TafValidator {
 			ObjectNode changegroup = (ObjectNode) change.next();
 			if (!changegroup.has("forecast"))
 				continue;
-			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
+			JsonNode changeForecast =  changegroup.get("forecast");
 			if (changeForecast.has("wind")) {
-				JsonNode wind = changeForecast.get("wind");
+				ObjectNode wind = (ObjectNode) changeForecast.get("wind");
 				if (!wind.has("direction") || !wind.has("speed"))
 					continue;
 				becomesGusty = !forecastGust && wind.has("gusts") && wind.get("gusts").asInt() > 0;
@@ -732,11 +733,11 @@ public class TafValidator {
 
 				long directionDifference = Math.min(subtract(changeWindDirection, forecastWindDirection, 360),
 						subtract(forecastWindDirection, changeWindDirection, 360));
-				changegroup.put("directionDiff", directionDifference);
-				changegroup.put("speedDiff", speedDifference);
+				wind.put("directionDiff", directionDifference);
+				wind.put("speedDiff", speedDifference);
 				// Wind speed difference should be more than 5 knots or 2 meters per second.
 				int limitSpeedDifference = unit.equals("KT") ? 5 : 2;
-				changegroup.put("windEnoughDifference",
+				wind.put("windEnoughDifference",
 						directionDifference >= 30 || speedDifference >= limitSpeedDifference || becomesGusty);
 				JsonNode changeType = changegroup.get("changeType");
 				if (changeType != null && !changeType.isNull() && !changeType.isMissingNode()
@@ -828,6 +829,9 @@ public class TafValidator {
 	}
 
 	private static void augmentAscendingClouds(JsonNode input) throws ParseException {
+		
+
+		
 		List<JsonNode> forecasts = input.findParents("clouds");
 		for (JsonNode forecast : forecasts) {
 			if (forecast == null || forecast.isNull() || forecast.isMissingNode())
@@ -1107,6 +1111,9 @@ public class TafValidator {
 			return new TafValidationResult(false,
 					(ObjectNode) om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
 		}
+		
+		Debug.println(messagesMap.toString());
+		
 		Map<String, Set<String>> errorMessages = convertReportInHumanReadableErrors(validationReport, messagesMap);
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 		if (!validationReport.isSuccess()) {

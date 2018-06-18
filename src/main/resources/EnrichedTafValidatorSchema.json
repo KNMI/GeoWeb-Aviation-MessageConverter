@@ -91,15 +91,6 @@
                                 true
                             ],
                             "type": "boolean"
-                        },
-                        "windEnoughDifference": {
-                            "$geoweb::messages": {
-                                "enum": "Change in wind must be at least 30 degrees or 5 knots"
-                            },
-                            "enum": [
-                                true
-                            ],
-                            "type": "boolean"
                         }
                     },
                     "required": [
@@ -289,6 +280,15 @@
                         "gustFastEnough": {
                             "$geoweb::messages": {
                                 "enum": "Wind gusts must at least be 10 knots greater than the wind speed"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
+                        "windEnoughDifference": {
+                            "$geoweb::messages": {
+                                "enum": "Change in wind must be at least 30 degrees or 5 knots"
                             },
                             "enum": [
                                 true
