@@ -1,6 +1,31 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
     "definitions": {
+        "speedOperator":{
+          "enum": [
+            "above", "below"
+          ],
+          "type": "string"
+        },
+        "winddirectionvrb":{
+          "$geoweb::messages": {
+              "oneOf": "Direction must be variable or one of (10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable!"
+          },
+          "oneOf": [
+              {
+                  "enum": [
+                      "VRB"
+                  ],
+                  "type": "string"
+              },
+              {
+                  "maximum": 360,
+                  "minimum": 0,
+                  "multipleOf": 10,
+                  "type": "integer"
+              }
+          ]                        
+        },
         "wind": {
             "oneOf": [
                 {
@@ -56,6 +81,10 @@
                             ]
                         },
                         "speed": {
+                            "$geoweb::messages": {
+                                "maximum": "79",
+                                "minimum": "80"
+                            },
                             "maximum": 2,
                             "minimum": 0,
                             "type": "integer"
@@ -75,23 +104,13 @@
                     "additionalProperties": false,
                     "properties": {
                         "direction": {
-                            "$geoweb::messages": {
-                                "oneOf": "Direction must be variable or one of (10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
-                            },
-                            "oneOf": [
-                                {
-                                    "enum": [
-                                        "VRB"
-                                    ],
-                                    "type": "string"
-                                },
-                                {
-                                    "maximum": 360,
-                                    "minimum": 1,
-                                    "multipleOf": 10,
-                                    "type": "integer"
-                                }
-                            ]
+                          "$ref": "#/definitions/winddirectionvrb"
+                        },
+                        "speedOperator":{
+                          "$ref": "#/definitions/speedOperator"
+                        },
+                        "gustsOperator":{
+                          "$ref": "#/definitions/speedOperator"
                         },
                         "gusts": {
                             "oneOf": [
@@ -111,10 +130,10 @@
                         "speed": {
                             "$geoweb::messages": {
                                 "maximum": "Wind speed must be less than 100 knots or 50 meters per second",
-                                "minimum": "If the wind speed is less than 3 knots, the direction has to be variable."
+                                "minimum": "If the wind speed is less than 0 knots, the direction has to be variable."
                             },
                             "maximum": 99,
-                            "minimum": 3,
+                            "minimum": 0,
                             "type": "integer"
                         },
                         "unit": {
@@ -129,23 +148,13 @@
                     "additionalProperties": false,
                     "properties": {
                         "direction": {
-                            "$geoweb::messages": {
-                                "oneOf": "Direction must be variable or one of (10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
-                            },
-                            "oneOf": [
-                                {
-                                    "enum": [
-                                        "VRB"
-                                    ],
-                                    "type": "string"
-                                },
-                                {
-                                    "maximum": 360,
-                                    "minimum": 1,
-                                    "multipleOf": 10,
-                                    "type": "integer"
-                                }
-                            ]
+                          "$ref": "#/definitions/winddirectionvrb"
+                        },
+                        "speedOperator":{
+                          "$ref": "#/definitions/speedOperator"
+                        },
+                        "gustsOperator":{
+                          "$ref": "#/definitions/speedOperator"
                         },
                         "gusts": {
                             "enum": [
@@ -171,23 +180,13 @@
                     "additionalProperties": false,
                     "properties": {
                         "direction": {
-                            "$geoweb::messages": {
-                                "oneOf": "Direction must be variable or one of (10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
-                            },
-                            "oneOf": [
-                                {
-                                    "enum": [
-                                        "VRB"
-                                    ],
-                                    "type": "string"
-                                },
-                                {
-                                    "maximum": 360,
-                                    "minimum": 1,
-                                    "multipleOf": 10,
-                                    "type": "integer"
-                                }
-                            ]
+                          "$ref": "#/definitions/winddirectionvrb"
+                        },
+                        "speedOperator":{
+                          "$ref": "#/definitions/speedOperator"
+                        },
+                        "gustsOperator":{
+                          "$ref": "#/definitions/speedOperator"
                         },
                         "gusts": {
                             "enum": [
@@ -213,23 +212,13 @@
                     "additionalProperties": false,
                     "properties": {
                         "direction": {
-                            "$geoweb::messages": {
-                                "oneOf": "Direction must be variable or one of (10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
-                            },
-                            "oneOf": [
-                                {
-                                    "enum": [
-                                        "VRB"
-                                    ],
-                                    "type": "string"
-                                },
-                                {
-                                    "maximum": 360,
-                                    "minimum": 1,
-                                    "multipleOf": 10,
-                                    "type": "integer"
-                                }
-                            ]
+                          "$ref": "#/definitions/winddirectionvrb"
+                        },
+                        "speedOperator":{
+                          "$ref": "#/definitions/speedOperator"
+                        },
+                        "gustsOperator":{
+                          "$ref": "#/definitions/speedOperator"
                         },
                         "gusts": {
                             "oneOf": [
@@ -247,6 +236,10 @@
                             ]
                         },
                         "speed": {
+                          "$geoweb::messages": {
+                                "maximum": "210",
+                                "minimum": "211"
+                            },
                             "maximum": 49,
                             "minimum": 2,
                             "type": "integer"

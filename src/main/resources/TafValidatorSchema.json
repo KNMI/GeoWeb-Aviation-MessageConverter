@@ -1,14 +1,21 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-
-    "type": "object",
-    "properties":
-    {
-        "metadata": {"$ref": "metadata.json#/definitions/base_metadata"},
-        "forecast": {"$ref": "forecast.json#/definitions/base_forecast"},
-        "changegroups": {"$ref": "changegroup.json#/definitions/changegroups"}
-
-    },
     "additionalProperties": false,
-    "required": ["metadata", "forecast", "changegroups"]
+    "properties": {
+        "changegroups": {
+            "$ref": "changegroup.json#/definitions/changegroups"
+        },
+        "forecast": {
+            "$ref": "forecast.json#/definitions/base_forecast"
+        },
+        "metadata": {
+            "$ref": "metadata.json#/definitions/base_metadata"
+        }
+    },
+    "required": [
+        "metadata",
+        "forecast",
+        "changegroups"
+    ],
+    "type": "object"
 }
