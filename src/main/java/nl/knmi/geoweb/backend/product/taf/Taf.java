@@ -44,7 +44,7 @@ public class Taf implements IExportable {
 	public enum TAFReportPublishedConcept {
 		concept, published, inactive
 	}
-	
+
 	public enum TAFWindSpeedOperator {
 		above, below
 	}
@@ -62,7 +62,7 @@ public class Taf implements IExportable {
 		OffsetDateTime validityEnd;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime baseTime;
-		
+
 		ObjectNode extraInfo;
 
 		String location;
@@ -252,7 +252,7 @@ public class Taf implements IExportable {
 		TAFTemperature temperature;
 
 		Boolean CaVOK;
-		
+
 		/**
 		 * Converts Forecast to TAC
 		 * 
@@ -303,7 +303,7 @@ public class Taf implements IExportable {
 			sb.append(changeType.toString());
 			sb.append(" " + TAFtoTACMaps.toDDHH(changeStart));
 			if (changeEnd!=null) { 
-			  sb.append("/" + TAFtoTACMaps.toDDHH(changeEnd));
+				sb.append("/" + TAFtoTACMaps.toDDHH(changeEnd));
 			}
 			sb.append(" " + forecast.toTAC());
 			return sb.toString();
@@ -316,7 +316,7 @@ public class Taf implements IExportable {
 		ObjectMapper om = getTafObjectMapperBean();
 		return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
 	}
-	
+
 	public static Taf fromJSONString(String tafJson) throws JsonParseException, JsonMappingException, IOException{
 		ObjectMapper om = getTafObjectMapperBean();
 		Taf taf = om.readValue(tafJson, Taf.class);
@@ -327,11 +327,11 @@ public class Taf implements IExportable {
 		return fromJSONString(Tools.readFile(f.getAbsolutePath()));
 	}
 
-	
+
 	public String toIWWXM(TafConverter tafConverter) {
-	  return tafConverter.ToIWXXM_2_1(this);	
+		return tafConverter.ToIWXXM_2_1(this);	
 	}
-	
+
 	public String toTAC() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("TAF ");
@@ -382,7 +382,7 @@ public class Taf implements IExportable {
 
 		return sb.toString();
 	}
-	
+
 	// Same as TAC, but maximum line with 69 chars where words (e.g. "BKN040") are not splitted
 	// Also has a header and footer to the message
 	private String getPublishableTAC() {
@@ -427,10 +427,10 @@ public class Taf implements IExportable {
 		default:
 			// Append nothing here
 			break;
-			
+
 		}
 
-		
+
 		String header = "FTNL99 " + this.metadata.location + " " + time + status +'\n';
 		String footer = "=";
 		return header + publishTAC + footer;
@@ -465,13 +465,30 @@ public class Taf implements IExportable {
 
 	@Override
 	public void export(File path, TafConverter converter) {
+		//TODO Make LTNL99 configurable 
 		try {
-			String time = this.metadata.validityStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
+			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+            String validTime = this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
+			String name = "TAF_" + this.metadata.getLocation() + "_" + validTime + "_" + time;
+			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.getPublishableTAC());
+			Tools.writeFile(path.getPath() + "/" + name + ".json", this.toJSON());
+			String iwxxmName="A_"+"LTNL99"+this.metadata.getLocation()+this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("ddHHmm"));
+			switch (this.metadata.type) {
+			case amendment:
+				iwxxmName+="AMD";
+				break;
+			case correction:
+				iwxxmName+="COR";
+				break;
+			case canceled:
+				iwxxmName+="CNL";
+				break;
+			default:
+				break;
+			}
 
-			String name = "TAF_" + this.metadata.getLocation() + "_" + time;
-			Tools.writeFile(path.getPath() + "/" + name + "_" + this.metadata.uuid + ".tac", this.getPublishableTAC());
-			Tools.writeFile(path.getPath() + "/" + name + "_" + this.metadata.uuid + ".json", this.toJSON());
-			Tools.writeFile(path.getPath() + "/" + name + "_" + this.metadata.uuid + ".xml", converter.ToIWXXM_2_1(this));
+			iwxxmName+="_C_"+this.metadata.getLocation()+"_"+time;
+			Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", converter.ToIWXXM_2_1(this));
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
