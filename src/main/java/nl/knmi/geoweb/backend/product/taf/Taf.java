@@ -337,6 +337,7 @@ public class Taf implements IExportable {
 		sb.append("TAF ");
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case amendment:
+		case canceled: //cancellation is also an AMD
 			sb.append("AMD ");
 			break;
 		case correction:
