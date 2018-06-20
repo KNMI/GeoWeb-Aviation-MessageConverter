@@ -204,7 +204,7 @@
             "properties": {
                 "cloudsAscending": {
                     "$geoweb::messages": {
-                        "enum": "Clouds not ascending"
+                       	"enum": "Cloud groups must be ascending in height"
                     },
                     "enum": [
                         true
