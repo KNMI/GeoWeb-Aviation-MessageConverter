@@ -858,10 +858,11 @@ public class TafValidator {
 			if (forecast == null || forecast.isNull() || forecast.isMissingNode())
 				continue;
 			int prevHeight = 0;
-			ArrayNode node = (ArrayNode) forecast.findValue("clouds");
-			if (node.getClass().equals(String.class) || node.getClass().equals(TextNode.class)) {
+			JsonNode cloudsNode=forecast.findValue("clouds");
+			if (cloudsNode.getClass().equals(String.class) || cloudsNode.getClass().equals(TextNode.class)) {
 				continue;
 			}
+			ArrayNode node = (ArrayNode) cloudsNode;
 			
 			for (Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
 				JsonNode nextNode = it.next(); 

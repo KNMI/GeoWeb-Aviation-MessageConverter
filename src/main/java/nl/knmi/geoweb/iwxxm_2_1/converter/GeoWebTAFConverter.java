@@ -8,6 +8,7 @@ import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionIssue;
 import fi.fmi.avi.converter.ConversionResult;
 import fi.fmi.avi.model.Aerodrome;
+import fi.fmi.avi.model.AviationCodeListUser;
 import fi.fmi.avi.model.AviationCodeListUser.CloudAmount;
 import fi.fmi.avi.model.AviationCodeListUser.CloudType;
 import fi.fmi.avi.model.AviationCodeListUser.RelationalOperator;
@@ -38,6 +39,7 @@ import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFCloudType;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFVisibility;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWeather;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWind;
+import nl.knmi.geoweb.backend.product.taf.Taf.TAFWindSpeedOperator;
 
 public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 
@@ -138,15 +140,26 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		Integer meanSpeed=input.getForecast().getWind().getSpeed();
 		if (meanSpeed!=null) {
 			wind.setMeanWindSpeed(new NumericMeasureImpl(meanSpeed, windSpeedUnit));
+			if (input.getForecast().getWind().getSpeedOperator()!=null) {
+				if (input.getForecast().getWind().getSpeedOperator().equals(TAFWindSpeedOperator.above)) {
+					wind.setMeanWindSpeedOperator(AviationCodeListUser.RelationalOperator.ABOVE);
+				}
+			}
 		} else {
 			retval.add(new ConversionIssue(ConversionIssue.Type.MISSING_DATA, "Surface wind mean speed is missing: "));
 		}
 
+
 		Integer gustSpeed=input.getForecast().getWind().getGusts();
 		if (gustSpeed!=null) {
 			wind.setWindGust(new NumericMeasureImpl(gustSpeed, windSpeedUnit));
+			if (input.getForecast().getWind().getGustsOperator()!=null) {
+				if (input.getForecast().getWind().getSpeedOperator().equals(TAFWindSpeedOperator.above)) {
+					wind.setGustOperator(AviationCodeListUser.RelationalOperator.ABOVE);
+				}
+			}
 		}
-Debug.println("fc winds:"+meanSpeed+","+gustSpeed);
+		Debug.println("fc winds:"+meanSpeed+","+gustSpeed);
 		fct.setSurfaceWind(wind);
 
 		return retval;
@@ -157,7 +170,7 @@ Debug.println("fc winds:"+meanSpeed+","+gustSpeed);
 		TAFSurfaceWind wind=new TAFSurfaceWindImpl();
 
 		TAFWind src=null;
-			src=input.getForecast().getWind();
+		src=input.getForecast().getWind();
 		if (src!=null) {
 			Object dir=null;
 			dir=src.getDirection().toString();
@@ -339,7 +352,7 @@ Debug.println("fc winds:"+meanSpeed+","+gustSpeed);
 		CloudForecast cloud=new CloudForecastImpl();
 		List<fi.fmi.avi.model.CloudLayer> layers = new ArrayList<>();
 		List<TAFCloudType>src=input.getForecast().getClouds();
-		
+
 		if (input.getForecast().getVertical_visibility()!=null) {
 			cloud.setVerticalVisibility(new NumericMeasureImpl(input.getForecast().getVertical_visibility()*100, "[ft_i]"));
 		}
