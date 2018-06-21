@@ -204,7 +204,7 @@
             "properties": {
                 "cloudsAscending": {
                     "$geoweb::messages": {
-                       	"enum": "Cloud groups must be ascending in height"
+                        "enum": "Cloud groups must be ascending in height"
                     },
                     "enum": [
                         true
@@ -217,21 +217,25 @@
             "additionalProperties": true,
             "properties": {
                 "clouds": {
-                    "items": [
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        },
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        },
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        },
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        }
-                    ],
-                    "type": "array"
+                    "oneOf": [{
+                      "items": [
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          },
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          },
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          },
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          }
+                      ],
+                      "type": "array"
+                    },{
+                      "type": "string"
+                    }]
                 },
                 "cloudsCBNeededAndPresent": {
                     "$geoweb::messages": {
