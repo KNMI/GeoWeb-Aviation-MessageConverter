@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +29,9 @@ import nl.knmi.adaguc.tools.Tools;
 public class TafSchemaStore {
 	@Getter
 	private String directory = null;
+	
+	@Autowired
+	private TafValidator tafValidator;
 	
 	TafSchemaStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
 	
@@ -58,10 +62,9 @@ public class TafSchemaStore {
 		return s;
 	}
 
-	public void storeTafSchema(String schema) throws JsonProcessingException, IOException, ProcessingException {
-		ObjectMapper mapper = new ObjectMapper();
+	public void storeTafSchema(String schema, ObjectMapper mapper) throws JsonProcessingException, IOException, ProcessingException {
 		JsonNode asJson = mapper.readTree(schema);
-		if (new TafValidator(this).validateSchema(asJson)) {
+		if (tafValidator.validateSchema(asJson)) {
 			long unixTime = System.currentTimeMillis() / 1000L;
 			String fn=String.format("%s/taf_schema_%s.json", this.directory, unixTime);
 			Tools.writeFile(fn, asJson.toString());

@@ -27,6 +27,7 @@ import fi.fmi.avi.model.taf.TAF;
 import fi.fmi.avi.model.taf.TAFBaseForecast;
 import fi.fmi.avi.model.taf.TAFChangeForecast;
 import fi.fmi.avi.model.taf.TAFForecast;
+import fi.fmi.avi.model.taf.TAFReference;
 import fi.fmi.avi.model.taf.TAFSurfaceWind;
 import fi.fmi.avi.model.taf.impl.TAFBaseForecastImpl;
 import fi.fmi.avi.model.taf.impl.TAFChangeForecastImpl;
@@ -39,6 +40,7 @@ import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFCloudType;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFVisibility;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWeather;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWind;
+import nl.knmi.geoweb.backend.product.taf.Taf.TAFReportType;
 import nl.knmi.geoweb.backend.product.taf.Taf.TAFWindSpeedOperator;
 
 public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
@@ -83,6 +85,14 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		taf.setValidityStartTime(ZonedDateTime.from(input.getMetadata().getValidityStart()));
 		taf.setValidityEndTime(ZonedDateTime.from(input.getMetadata().getValidityEnd()));
 		taf.setIssueTime(ZonedDateTime.from(input.getMetadata().getIssueTime()));
+		
+		if (input.getMetadata().getType()==TAFReportType.canceled) {
+			taf.getReferredReport().setAerodrome(taf.getAerodrome());
+			taf.getReferredReport().setIssueTime(taf.getIssueTime());
+			taf.getReferredReport().setValidityStartTime(taf.getValidityStartTime());
+			taf.getReferredReport().setValidityEndTime(taf.getValidityEndTime());
+			taf.getReferredReport().setStatus(taf.getStatus());
+		}
 
 		retval.addIssue(updateBaseForecast(taf, input, hints));
 

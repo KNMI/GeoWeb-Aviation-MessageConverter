@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import nl.knmi.adaguc.tools.Debug;
@@ -19,6 +21,10 @@ import lombok.Setter;
 @Getter
 @Component
 public class AirportStore {
+	@Autowired
+	@Qualifier("geoWebObjectMapper")
+	private ObjectMapper om;
+	
 	private String airportFile;
 	private String directory;
 	private Map<String, AirportInfo> airportInfos;
