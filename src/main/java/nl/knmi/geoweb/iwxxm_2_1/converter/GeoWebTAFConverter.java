@@ -64,6 +64,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 			break;
 		case canceled:
 			st=TAFStatus.CANCELLATION;
+			break;
 		case retarded:
 			st=TAFStatus.MISSING;
 			break;
@@ -85,13 +86,15 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		taf.setValidityStartTime(ZonedDateTime.from(input.getMetadata().getValidityStart()));
 		taf.setValidityEndTime(ZonedDateTime.from(input.getMetadata().getValidityEnd()));
 		taf.setIssueTime(ZonedDateTime.from(input.getMetadata().getIssueTime()));
-		
+
 		if (input.getMetadata().getType()==TAFReportType.canceled) {
-			taf.getReferredReport().setAerodrome(taf.getAerodrome());
-			taf.getReferredReport().setIssueTime(taf.getIssueTime());
-			taf.getReferredReport().setValidityStartTime(taf.getValidityStartTime());
-			taf.getReferredReport().setValidityEndTime(taf.getValidityEndTime());
-			taf.getReferredReport().setStatus(taf.getStatus());
+			if (taf.getReferredReport()!=null) {
+				taf.getReferredReport().setAerodrome(taf.getAerodrome());
+				taf.getReferredReport().setIssueTime(taf.getIssueTime());
+				taf.getReferredReport().setValidityStartTime(taf.getValidityStartTime());
+				taf.getReferredReport().setValidityEndTime(taf.getValidityEndTime());
+				taf.getReferredReport().setStatus(taf.getStatus());
+			}
 		}
 
 		retval.addIssue(updateBaseForecast(taf, input, hints));
@@ -105,19 +108,21 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 	private List<ConversionIssue> updateBaseForecast(final TAF fct, final Taf input, ConversionHints hints) {
 		List<ConversionIssue> retval = new ArrayList<>();
 		TAFBaseForecast baseFct = new TAFBaseForecastImpl();
-		retval.addAll(updateForecastSurfaceWind(baseFct, input, hints));
+		if (input.getForecast()!=null) {
+			retval.addAll(updateForecastSurfaceWind(baseFct, input, hints));
 
-		retval.addAll(updateVisibility(baseFct, input, hints));
-		retval.addAll(updateClouds(baseFct, input, hints));
-		if (input.getForecast().getCaVOK()!=null) {
-			baseFct.setCeilingAndVisibilityOk(input.getForecast().getCaVOK());
+			retval.addAll(updateVisibility(baseFct, input, hints));
+			retval.addAll(updateClouds(baseFct, input, hints));
+			if (input.getForecast().getCaVOK()!=null) {
+				baseFct.setCeilingAndVisibilityOk(input.getForecast().getCaVOK());
 
-			if (!input.getForecast().getCaVOK()) {
+				if (!input.getForecast().getCaVOK()) {
 
-				retval.addAll(updateWeather(baseFct, input, hints));
+					retval.addAll(updateWeather(baseFct, input, hints));
 
 
-				retval.addAll(updateTemperatures(baseFct, input, hints));
+					retval.addAll(updateTemperatures(baseFct, input, hints));
+				}
 			}
 		}
 
@@ -422,50 +427,52 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 	private List<ConversionIssue> updateChangeForecasts(final TAF fct, final Taf input, /*Taf.Forecast previousForecast,*/ final ConversionHints hints) {
 		List<ConversionIssue> retval = new ArrayList<>();
 		List<TAFChangeForecast> changeForecasts = new ArrayList<>();
-		for (Taf.ChangeForecast ch: input.getChangegroups()) {
-			TAFChangeForecast changeFct = new TAFChangeForecastImpl();
-			String changeType=ch.getChangeType();
-			switch (changeType) {
-			case "TEMPO":
-				changeFct.setChangeIndicator(TAFChangeIndicator.TEMPORARY_FLUCTUATIONS);
-				updateChangeForecastContents(changeFct, ch, hints);
-				break;
-			case "BECMG":
-				changeFct.setChangeIndicator(TAFChangeIndicator.BECOMING);
-				updateChangeForecastContents(changeFct, ch, hints);
-				break;
-			case "FM":
-				changeFct.setChangeIndicator(TAFChangeIndicator.FROM);
-				//changeFct.setPartialValidityStartTime(ch.getChangeStart().toString()); //TODO still needed??
-				updateChangeForecastContents(changeFct, ch, hints);
-				changeFct.setValidityEndTime(fct.getValidityEndTime());//TODO correct to put the endTime of baseForecast here?
-				break;
-			case "PROB30":
-				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_30);
-				updateChangeForecastContents(changeFct, ch, hints);
-				break;
-			case "PROB40":
-				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_40);
-				updateChangeForecastContents(changeFct, ch, hints);
-				break;
-			case "PROB30 TEMPO":
-				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_30_TEMPORARY_FLUCTUATIONS);
-				updateChangeForecastContents(changeFct, ch, hints);
-				break;
-			case "PROB40 TEMPO":
-				changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_40_TEMPORARY_FLUCTUATIONS);
-				updateChangeForecastContents(changeFct, ch, hints);
-				break;
-			case "AT":
-			case "UNTIL":
-				retval.add(new ConversionIssue(ConversionIssue.Type.SYNTAX_ERROR, "Change group " + ch.getChangeType() + " is not allowed in TAF"));
-				break;
-			default:
-				retval.add(new ConversionIssue(ConversionIssue.Type.SYNTAX_ERROR, "Change group " + ch.getChangeType() + " is not allowed in TAF"));
-				break;            	
+		if (input.getChangegroups()!=null) {
+			for (Taf.ChangeForecast ch: input.getChangegroups()) {
+				TAFChangeForecast changeFct = new TAFChangeForecastImpl();
+				String changeType=ch.getChangeType();
+				switch (changeType) {
+				case "TEMPO":
+					changeFct.setChangeIndicator(TAFChangeIndicator.TEMPORARY_FLUCTUATIONS);
+					updateChangeForecastContents(changeFct, ch, hints);
+					break;
+				case "BECMG":
+					changeFct.setChangeIndicator(TAFChangeIndicator.BECOMING);
+					updateChangeForecastContents(changeFct, ch, hints);
+					break;
+				case "FM":
+					changeFct.setChangeIndicator(TAFChangeIndicator.FROM);
+					//changeFct.setPartialValidityStartTime(ch.getChangeStart().toString()); //TODO still needed??
+					updateChangeForecastContents(changeFct, ch, hints);
+					changeFct.setValidityEndTime(fct.getValidityEndTime());//TODO correct to put the endTime of baseForecast here?
+					break;
+				case "PROB30":
+					changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_30);
+					updateChangeForecastContents(changeFct, ch, hints);
+					break;
+				case "PROB40":
+					changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_40);
+					updateChangeForecastContents(changeFct, ch, hints);
+					break;
+				case "PROB30 TEMPO":
+					changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_30_TEMPORARY_FLUCTUATIONS);
+					updateChangeForecastContents(changeFct, ch, hints);
+					break;
+				case "PROB40 TEMPO":
+					changeFct.setChangeIndicator(TAFChangeIndicator.PROBABILITY_40_TEMPORARY_FLUCTUATIONS);
+					updateChangeForecastContents(changeFct, ch, hints);
+					break;
+				case "AT":
+				case "UNTIL":
+					retval.add(new ConversionIssue(ConversionIssue.Type.SYNTAX_ERROR, "Change group " + ch.getChangeType() + " is not allowed in TAF"));
+					break;
+				default:
+					retval.add(new ConversionIssue(ConversionIssue.Type.SYNTAX_ERROR, "Change group " + ch.getChangeType() + " is not allowed in TAF"));
+					break;            	
+				}
+				Debug.println("Adding change for "+changeType);
+				changeForecasts.add(changeFct);
 			}
-			Debug.println("Adding change for "+changeType);
-			changeForecasts.add(changeFct);
 		}
 		if (!changeForecasts.isEmpty()) {
 			fct.setChangeForecasts(changeForecasts);
