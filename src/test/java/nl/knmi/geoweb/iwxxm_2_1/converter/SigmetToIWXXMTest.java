@@ -152,7 +152,7 @@ public class SigmetToIWXXMTest {
 			"  \"location_indicator_icao\": \"EHAA\"," + 
 			"  \"location_indicator_mwo\": \"EHDB\"," + 
 			"  \"uuid\": \"5372bd90-e17d-4824-bc18-7fee25413161\"," + 
-			"  \"status\": \"PRODUCTION\"," + 
+			"  \"status\": \"concept\"," + 
 			"  \"sequence\": 0" + 
 			"}";
 	

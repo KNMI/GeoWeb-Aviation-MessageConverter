@@ -72,6 +72,7 @@ public class Sigmet {
 	@JsonInclude(Include.NON_NULL)
 	private Integer cancels;
 	@JsonInclude(Include.NON_NULL)
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	private OffsetDateTime cancelsStart;
 
 	@Getter
@@ -311,7 +312,7 @@ public class Sigmet {
 
 	@Getter
 	public enum SigmetStatus {
-		PRODUCTION("Production"), CANCELLED("Cancelled"), PUBLISHED("Published"), TEST("Test"); 
+		concept("concept"), canceled("canceled"), published("published"), test("test"); 
 		private String status;
 		private SigmetStatus (String status) {
 			this.status = status;
@@ -368,7 +369,7 @@ public class Sigmet {
 		this.sequence=-1;
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
-		this.status=SigmetStatus.PRODUCTION;
+		this.status=SigmetStatus.concept;
 	}
 
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
@@ -386,7 +387,7 @@ public class Sigmet {
 		}
 		// .... value from constructor is lost here, set it explicitly. (Why?)
 		if(this.status == null) {
-			this.status = SigmetStatus.PRODUCTION;
+			this.status = SigmetStatus.concept;
 		}
 		try {
 			om.writeValue(new File(fn), this);
