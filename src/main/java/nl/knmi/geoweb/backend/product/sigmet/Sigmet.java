@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 
 import org.geojson.Feature;
@@ -20,15 +21,18 @@ import org.geojson.GeoJsonObject;
 import org.geojson.Geometry;
 import org.geojson.LngLatAlt;
 import org.geojson.Polygon;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.impl.CoordinateArraySequenceFactory;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.geojson.GeoJsonReader;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -39,11 +43,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
+import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.aviation.FIRStore;
+import nl.knmi.geoweb.backend.product.GeoWebProduct;
+import nl.knmi.geoweb.backend.product.IExportable;
+import nl.knmi.geoweb.backend.product.ProductConverter;
 @JsonInclude(Include.NON_NULL)
 @Getter
 @Setter
-public class Sigmet {
+public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	public static final Duration WSVALIDTIME = Duration.ofHours(4); //4*3600*1000;
 	public static final Duration WVVALIDTIME = Duration.ofHours(6); //6*3600*1000;
 
@@ -72,7 +80,11 @@ public class Sigmet {
 	@JsonInclude(Include.NON_NULL)
 	private Integer cancels;
 	@JsonInclude(Include.NON_NULL)
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	private OffsetDateTime cancelsStart;
+
+	@JsonIgnore
+	private Feature firFeature;
 
 	@Getter
 	public enum Phenomenon {
@@ -311,7 +323,7 @@ public class Sigmet {
 
 	@Getter
 	public enum SigmetStatus {
-		PRODUCTION("Production"), CANCELLED("Cancelled"), PUBLISHED("Published"), TEST("Test"); 
+		concept("concept"), canceled("canceled"), published("published"), test("test"); 
 		private String status;
 		private SigmetStatus (String status) {
 			this.status = status;
@@ -368,10 +380,8 @@ public class Sigmet {
 		this.sequence=-1;
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
-		this.status=SigmetStatus.PRODUCTION;
+		this.status=SigmetStatus.concept;
 	}
-
-	static String testGeoJson="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]},\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}}}]}";
 
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
 		Sigmet sm=om.readValue(f, Sigmet.class);
@@ -388,7 +398,7 @@ public class Sigmet {
 		}
 		// .... value from constructor is lost here, set it explicitly. (Why?)
 		if(this.status == null) {
-			this.status = SigmetStatus.PRODUCTION;
+			this.status = SigmetStatus.concept;
 		}
 		try {
 			om.writeValue(new File(fn), this);
@@ -508,7 +518,15 @@ public class Sigmet {
 				org.locationtech.jts.geom.Geometry geom_fir=reader.read(FIRs);
 
 				// Intersect the box with the FIR
-				org.locationtech.jts.geom.Geometry intersection = jtsGeometry.getBoundary().intersection(geom_fir);
+				org.locationtech.jts.geom.Geometry intersection = jtsGeometry.intersection(geom_fir);
+				CoordinateArraySequenceFactory caf=CoordinateArraySequenceFactory.instance();
+				for (int i=0; i<4; i++) {
+					LineString side=new LineString(caf.create(Arrays.copyOfRange(jtsGeometry.getCoordinates(), i, i+2)), gf);
+					if (geom_fir.intersects(side)) {
+						Debug.println("Intersecting on side "+i);
+						Debug.println("I:"+side.intersection(geom_fir));
+					}
+				}
 
 				// One line segment so encode that
 				if (intersection.getClass().equals(org.locationtech.jts.geom.LineString.class)) {
@@ -581,40 +599,6 @@ public class Sigmet {
 		return sb.toString();
 	}
 
-	//	public static void main(String args[]) throws IOException {
-	//		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
-	//		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));
-	//		sm.setValiddate(new Date(117,2,13,16,0));
-	//		Debug.println(sm.getValiddate().toString());
-	//		sm.setChange(SigmetChange.NC);
-	//		sm.setGeoFromString(testGeoJson);
-	//		Debug.println(sm.getPhenomenon().toString());
-	//		
-	//		SigmetStore store=new SigmetStore("/tmp");
-	////		store.storeSigmet(sm);
-	//		
-	//		ObjectMapper objectMapper = new ObjectMapper();
-	//		// DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-	//		// objectMapper.setDateFormat(df);
-	//		try{
-	//			String v = objectMapper.writeValueAsString(sm);
-	//			JSONObject j = (JSONObject) new JSONTokener(v).nextValue();
-	//			Debug.println(j.get("issuedate").toString());
-	//		}catch(JsonProcessingException e){
-	//			e.printStackTrace();
-	//		} catch (JSONException e) {
-	//			// TODO Auto-generated catch block
-	//			e.printStackTrace();
-	//		}
-	//		
-	////		System.err.println(sm);
-	////		
-	////		for (int i=0; i<1; i++) {
-	////			sm=Sigmet.getRandomSigmet();
-	////			store.storeSigmet(sm);
-	////			System.err.println(i+": "+sm);
-	////		}
-	//	}
 	private static String START="start";
 	private static String END="end";
 	private static String INTERSECTION="intersection";
@@ -786,5 +770,26 @@ public class Sigmet {
 			pw.println();
 		}
 		return sw.toString();
+	}
+
+	public String toJSON(ObjectMapper om) throws JsonProcessingException {
+		return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+	}
+
+	@Override
+	public void export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
+//		String s=converter.ToIWXXM_2_1(this);
+		try {
+			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+			String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
+			String name = "SIGMET_" + this.getLocation_indicator_icao() + "_" + validTime + "_" + time;
+			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.toTAC(this.getFirFeature()));
+			Tools.writeFile(path.getPath() + "/" + name + ".json", this.toJSON(om));
+			String iwxxmName="A_"+"WSNL99"+this.getLocation_indicator_icao()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
+			iwxxmName+="_C_"+this.getLocation_indicator_icao()+"_"+time;
+			String s=converter.ToIWXXM_2_1(this);
+			Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
+		} catch (IOException e) {
+		}
 	}
 }

@@ -14,18 +14,17 @@ import fi.fmi.avi.converter.ConversionResult;
 import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.Aerodrome;
 import fi.fmi.avi.model.GeoPosition;
-import fi.fmi.avi.model.sigmet.SIGMET;
 import fi.fmi.avi.model.taf.TAF;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.aviation.AirportInfo;
 import nl.knmi.geoweb.backend.aviation.AirportStore;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
+import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.taf.Taf;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
 @Configuration
 @Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTAFConverter.class})
-public class TafConverter {
+public class TafConverter implements ProductConverter<Taf>{
 	@Autowired
 	private AviMessageSpecificConverter<TAF, Document> tafIWXXMDOMSerializer;
 

@@ -2,39 +2,68 @@ package nl.knmi.geoweb.backend.product.taf;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.TimeZone;
-
-import org.springframework.context.annotation.Bean;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.backend.product.GeoWebProduct;
 import nl.knmi.geoweb.backend.product.IExportable;
-import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWeather;
+import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
 import nl.knmi.geoweb.backend.product.taf.serializers.CloudsSerializer;
 import nl.knmi.geoweb.backend.product.taf.serializers.WeathersSerializer;
 
 @Getter
 @Setter
-public class Taf implements IExportable {
+public class Taf implements GeoWebProduct, IExportable<Taf> {
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((changegroups == null) ? 0 : changegroups.hashCode());
+		result = prime * result + ((forecast == null) ? 0 : forecast.hashCode());
+		result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Taf other = (Taf) obj;
+		if (changegroups == null) {
+			if (other.changegroups != null)
+				return false;
+		} else if (!changegroups.equals(other.changegroups))
+			return false;
+		if (forecast == null) {
+			if (other.forecast != null)
+				return false;
+		} else if (!forecast.equals(other.forecast))
+			return false;
+		if (metadata == null) {
+			if (other.metadata != null)
+				return false;
+		} else if (!metadata.equals(other.metadata))
+			return false;
+		return true;
+	}
+
 	public static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 	public enum TAFReportType {
@@ -52,6 +81,77 @@ public class Taf implements IExportable {
 	@Getter
 	@Setter
 	public static class Metadata {
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((baseTime == null) ? 0 : baseTime.hashCode());
+			result = prime * result + ((extraInfo == null) ? 0 : extraInfo.hashCode());
+			result = prime * result + ((issueTime == null) ? 0 : issueTime.hashCode());
+			result = prime * result + ((location == null) ? 0 : location.hashCode());
+			result = prime * result + ((previousUuid == null) ? 0 : previousUuid.hashCode());
+			result = prime * result + ((status == null) ? 0 : status.hashCode());
+			result = prime * result + ((type == null) ? 0 : type.hashCode());
+			result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
+			result = prime * result + ((validityEnd == null) ? 0 : validityEnd.hashCode());
+			result = prime * result + ((validityStart == null) ? 0 : validityStart.hashCode());
+			return result;
+		}
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Metadata other = (Metadata) obj;
+			if (baseTime == null) {
+				if (other.baseTime != null)
+					return false;
+			} else if (!baseTime.equals(other.baseTime))
+				return false;
+			if (extraInfo == null) {
+				if (other.extraInfo != null)
+					return false;
+			} else if (!extraInfo.equals(other.extraInfo))
+				return false;
+			if (issueTime == null) {
+				if (other.issueTime != null)
+					return false;
+			} else if (!issueTime.equals(other.issueTime))
+				return false;
+			if (location == null) {
+				if (other.location != null)
+					return false;
+			} else if (!location.equals(other.location))
+				return false;
+			if (previousUuid == null) {
+				if (other.previousUuid != null)
+					return false;
+			} else if (!previousUuid.equals(other.previousUuid))
+				return false;
+			if (status != other.status)
+				return false;
+			if (type != other.type)
+				return false;
+			if (uuid == null) {
+				if (other.uuid != null)
+					return false;
+			} else if (!uuid.equals(other.uuid))
+				return false;
+			if (validityEnd == null) {
+				if (other.validityEnd != null)
+					return false;
+			} else if (!validityEnd.equals(other.validityEnd))
+				return false;
+			if (validityStart == null) {
+				if (other.validityStart != null)
+					return false;
+			} else if (!validityStart.equals(other.validityStart))
+				return false;
+			return true;
+		}
 		private String previousUuid = null;
 		private String uuid = null;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -75,9 +175,113 @@ public class Taf implements IExportable {
 	@Setter
 	@Getter
 	public static class Forecast {
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((CaVOK == null) ? 0 : CaVOK.hashCode());
+			result = prime * result + ((clouds == null) ? 0 : clouds.hashCode());
+			result = prime * result + ((temperature == null) ? 0 : temperature.hashCode());
+			result = prime * result + ((vertical_visibility == null) ? 0 : vertical_visibility.hashCode());
+			result = prime * result + ((visibility == null) ? 0 : visibility.hashCode());
+			result = prime * result + ((weather == null) ? 0 : weather.hashCode());
+			result = prime * result + ((wind == null) ? 0 : wind.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			Forecast other = (Forecast) obj;
+			if (CaVOK == null) {
+				if (other.CaVOK != null)
+					return false;
+			} else if (!CaVOK.equals(other.CaVOK))
+				return false;
+			if (clouds == null) {
+				if (other.clouds != null)
+					return false;
+			} else if (!clouds.equals(other.clouds))
+				return false;
+			if (temperature == null) {
+				if (other.temperature != null)
+					return false;
+			} else if (!temperature.equals(other.temperature))
+				return false;
+			if (vertical_visibility == null) {
+				if (other.vertical_visibility != null)
+					return false;
+			} else if (!vertical_visibility.equals(other.vertical_visibility))
+				return false;
+			if (visibility == null) {
+				if (other.visibility != null)
+					return false;
+			} else if (!visibility.equals(other.visibility))
+				return false;
+			if (weather == null) {
+				if (other.weather != null)
+					return false;
+			} else if (!weather.equals(other.weather))
+				return false;
+			if (wind == null) {
+				if (other.wind != null)
+					return false;
+			} else if (!wind.equals(other.wind))
+				return false;
+			return true;
+		}
+
 		@Getter
 		@Setter
 		public static class TAFCloudType {
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+				result = prime * result + ((height == null) ? 0 : height.hashCode());
+				result = prime * result + ((isNSC == null) ? 0 : isNSC.hashCode());
+				result = prime * result + ((mod == null) ? 0 : mod.hashCode());
+				return result;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
+				TAFCloudType other = (TAFCloudType) obj;
+				if (amount == null) {
+					if (other.amount != null)
+						return false;
+				} else if (!amount.equals(other.amount))
+					return false;
+				if (height == null) {
+					if (other.height != null)
+						return false;
+				} else if (!height.equals(other.height))
+					return false;
+				if (isNSC == null) {
+					if (other.isNSC != null)
+						return false;
+				} else if (!isNSC.equals(other.isNSC))
+					return false;
+				if (mod == null) {
+					if (other.mod != null)
+						return false;
+				} else if (!mod.equals(other.mod))
+					return false;
+				return true;
+			}
+
 			@JsonInclude(JsonInclude.Include.NON_NULL)
 			Boolean isNSC = null;
 			String amount;
@@ -126,6 +330,49 @@ public class Taf implements IExportable {
 		@Getter
 		@Setter
 		public static class TAFWeather {
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + ((descriptor == null) ? 0 : descriptor.hashCode());
+				result = prime * result + ((isNSW == null) ? 0 : isNSW.hashCode());
+				result = prime * result + ((phenomena == null) ? 0 : phenomena.hashCode());
+				result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
+				return result;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
+				TAFWeather other = (TAFWeather) obj;
+				if (descriptor == null) {
+					if (other.descriptor != null)
+						return false;
+				} else if (!descriptor.equals(other.descriptor))
+					return false;
+				if (isNSW == null) {
+					if (other.isNSW != null)
+						return false;
+				} else if (!isNSW.equals(other.isNSW))
+					return false;
+				if (phenomena == null) {
+					if (other.phenomena != null)
+						return false;
+				} else if (!phenomena.equals(other.phenomena))
+					return false;
+				if (qualifier == null) {
+					if (other.qualifier != null)
+						return false;
+				} else if (!qualifier.equals(other.qualifier))
+					return false;
+				return true;
+			}
+
 			@JsonInclude(JsonInclude.Include.NON_NULL)
 			Boolean isNSW = null;
 			String qualifier;
@@ -175,6 +422,37 @@ public class Taf implements IExportable {
 		@Setter
 		@Getter
 		public static class TAFVisibility {
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + ((unit == null) ? 0 : unit.hashCode());
+				result = prime * result + ((value == null) ? 0 : value.hashCode());
+				return result;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
+				TAFVisibility other = (TAFVisibility) obj;
+				if (unit == null) {
+					if (other.unit != null)
+						return false;
+				} else if (!unit.equals(other.unit))
+					return false;
+				if (value == null) {
+					if (other.value != null)
+						return false;
+				} else if (!value.equals(other.value))
+					return false;
+				return true;
+			}
+
 			Integer value;
 			String unit;
 
@@ -194,6 +472,55 @@ public class Taf implements IExportable {
 		@Getter
 		@Setter
 		public static class TAFWind {
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + ((direction == null) ? 0 : direction.hashCode());
+				result = prime * result + ((gusts == null) ? 0 : gusts.hashCode());
+				result = prime * result + ((gustsOperator == null) ? 0 : gustsOperator.hashCode());
+				result = prime * result + ((speed == null) ? 0 : speed.hashCode());
+				result = prime * result + ((speedOperator == null) ? 0 : speedOperator.hashCode());
+				result = prime * result + ((unit == null) ? 0 : unit.hashCode());
+				return result;
+			}
+
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
+				TAFWind other = (TAFWind) obj;
+				if (direction == null) {
+					if (other.direction != null)
+						return false;
+				} else if (!direction.equals(other.direction))
+					return false;
+				if (gusts == null) {
+					if (other.gusts != null)
+						return false;
+				} else if (!gusts.equals(other.gusts))
+					return false;
+				if (gustsOperator != other.gustsOperator)
+					return false;
+				if (speed == null) {
+					if (other.speed != null)
+						return false;
+				} else if (!speed.equals(other.speed))
+					return false;
+				if (speedOperator != other.speedOperator)
+					return false;
+				if (unit == null) {
+					if (other.unit != null)
+						return false;
+				} else if (!unit.equals(other.unit))
+					return false;
+				return true;
+			}
+
 			Object direction;
 			Integer speed;
 			Integer gusts;
@@ -239,6 +566,50 @@ public class Taf implements IExportable {
 		@Getter
 		@Setter
 		public class TAFTemperature {
+			@Override
+			public int hashCode() {
+				final int prime = 31;
+				int result = 1;
+				result = prime * result + getOuterType().hashCode();
+				result = prime * result + ((maxTime == null) ? 0 : maxTime.hashCode());
+				result = prime * result + ((maximum == null) ? 0 : maximum.hashCode());
+				result = prime * result + ((minTime == null) ? 0 : minTime.hashCode());
+				result = prime * result + ((minimum == null) ? 0 : minimum.hashCode());
+				return result;
+			}
+			@Override
+			public boolean equals(Object obj) {
+				if (this == obj)
+					return true;
+				if (obj == null)
+					return false;
+				if (getClass() != obj.getClass())
+					return false;
+				TAFTemperature other = (TAFTemperature) obj;
+				if (!getOuterType().equals(other.getOuterType()))
+					return false;
+				if (maxTime == null) {
+					if (other.maxTime != null)
+						return false;
+				} else if (!maxTime.equals(other.maxTime))
+					return false;
+				if (maximum == null) {
+					if (other.maximum != null)
+						return false;
+				} else if (!maximum.equals(other.maximum))
+					return false;
+				if (minTime == null) {
+					if (other.minTime != null)
+						return false;
+				} else if (!minTime.equals(other.minTime))
+					return false;
+				if (minimum == null) {
+					if (other.minimum != null)
+						return false;
+				} else if (!minimum.equals(other.minimum))
+					return false;
+				return true;
+			}
 			Float maximum;
 			@JsonFormat(shape = JsonFormat.Shape.STRING)
 			@JsonInclude(JsonInclude.Include.NON_NULL)
@@ -247,6 +618,9 @@ public class Taf implements IExportable {
 			@JsonFormat(shape = JsonFormat.Shape.STRING)
 			@JsonInclude(JsonInclude.Include.NON_NULL)
 			OffsetDateTime minTime;
+			private Forecast getOuterType() {
+				return Forecast.this;
+			}
 		}
 
 		TAFTemperature temperature;
@@ -291,6 +665,49 @@ public class Taf implements IExportable {
 	@Getter
 	@Setter
 	public static class ChangeForecast {
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((changeEnd == null) ? 0 : changeEnd.hashCode());
+			result = prime * result + ((changeStart == null) ? 0 : changeStart.hashCode());
+			result = prime * result + ((changeType == null) ? 0 : changeType.hashCode());
+			result = prime * result + ((forecast == null) ? 0 : forecast.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ChangeForecast other = (ChangeForecast) obj;
+			if (changeEnd == null) {
+				if (other.changeEnd != null)
+					return false;
+			} else if (!changeEnd.equals(other.changeEnd))
+				return false;
+			if (changeStart == null) {
+				if (other.changeStart != null)
+					return false;
+			} else if (!changeStart.equals(other.changeStart))
+				return false;
+			if (changeType == null) {
+				if (other.changeType != null)
+					return false;
+			} else if (!changeType.equals(other.changeType))
+				return false;
+			if (forecast == null) {
+				if (other.forecast != null)
+					return false;
+			} else if (!forecast.equals(other.forecast))
+				return false;
+			return true;
+		}
+
 		String changeType;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime changeStart;
@@ -312,19 +729,17 @@ public class Taf implements IExportable {
 
 	List<ChangeForecast> changegroups;
 
-	public String toJSON() throws JsonProcessingException {
-		ObjectMapper om = getTafObjectMapperBean();
+	public String toJSON(ObjectMapper om) throws JsonProcessingException {
 		return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
 	}
 
-	public static Taf fromJSONString(String tafJson) throws JsonParseException, JsonMappingException, IOException{
-		ObjectMapper om = getTafObjectMapperBean();
+	public static Taf fromJSONString(String tafJson, ObjectMapper om) throws JsonParseException, JsonMappingException, IOException{
 		Taf taf = om.readValue(tafJson, Taf.class);
 		return taf;
 	}
 
-	public static Taf fromFile(File f) throws JsonParseException, JsonMappingException, IOException {
-		return fromJSONString(Tools.readFile(f.getAbsolutePath()));
+	public static Taf fromFile(File f, ObjectMapper om) throws JsonParseException, JsonMappingException, IOException {
+		return fromJSONString(Tools.readFile(f.getAbsolutePath()), om);
 	}
 
 
@@ -396,7 +811,7 @@ public class Taf implements IExportable {
 				line += TACwords[i];
 			} else {
 				publishTAC += line + '\n';
-				line = "";
+				line = TACwords[i];
 			}
 		}
 		publishTAC += line;
@@ -437,42 +852,15 @@ public class Taf implements IExportable {
 		return header + publishTAC + footer;
 	}
 
-	// TODO use BEAN in proper way (Ask WvM)
-	@Bean(name = "objectMapper")
-	public static ObjectMapper getTafObjectMapperBean() {
-		ObjectMapper om = new ObjectMapper();
-		om.registerModule(new JavaTimeModule());
-		om.setTimeZone(TimeZone.getTimeZone("UTC"));
-		om.setDateFormat(new SimpleDateFormat(DATEFORMAT_ISO8601));
-		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-		return om;
-
-	}
-
-	@Bean(name = "objectMapper")
-	public static ObjectMapper getObjectMapperBean() {
-		ObjectMapper om = new ObjectMapper();
-		om.registerModule(new JavaTimeModule());
-		om.setTimeZone(TimeZone.getTimeZone("UTC"));
-		om.setDateFormat(new SimpleDateFormat(DATEFORMAT_ISO8601));
-		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		return om;
-
-	}
-
 	@Override
-	public void export(File path, TafConverter converter) {
+	public void export(File path, ProductConverter<Taf> converter, ObjectMapper om) {
 		//TODO Make LTNL99 configurable 
 		try {
 			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             String validTime = this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 			String name = "TAF_" + this.metadata.getLocation() + "_" + validTime + "_" + time;
 			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.getPublishableTAC());
-			Tools.writeFile(path.getPath() + "/" + name + ".json", this.toJSON());
+			Tools.writeFile(path.getPath() + "/" + name + ".json", this.toJSON(om));
 			String iwxxmName="A_"+"LTNL99"+this.metadata.getLocation()+this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("ddHHmm"));
 			switch (this.metadata.type) {
 			case amendment:

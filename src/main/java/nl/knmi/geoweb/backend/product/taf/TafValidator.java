@@ -13,10 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -36,35 +35,36 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
-import com.github.fge.jsonschema.cfg.ValidationConfiguration;
-import com.github.fge.jsonschema.cfg.ValidationConfigurationBuilder;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import com.github.fge.jsonschema.core.report.ConsoleProcessingReport;
+import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
+import com.github.fge.jsonschema.core.load.uri.URITranslatorConfiguration;
 import com.github.fge.jsonschema.core.report.ListReportProvider;
 import com.github.fge.jsonschema.core.report.LogLevel;
 import com.github.fge.jsonschema.core.report.ProcessingReport;
 import com.github.fge.jsonschema.main.JsonSchema;
 import com.github.fge.jsonschema.main.JsonSchemaFactory;
-import com.github.fge.jsonschema.core.load.RefResolver;
-import com.github.fge.jsonschema.core.load.SchemaLoader;
-import com.github.fge.jsonschema.core.load.uri.URITranslatorConfiguration;
-import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
+
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
 
 @Component
 public class TafValidator {
+	
+//	@Autowired
+//	@Qualifier("tafObjectMapperBean")
+	private ObjectMapper objectMapper;
 
 	TafSchemaStore tafSchemaStore;
 
-	public TafValidator(final TafSchemaStore tafSchemaStore) throws IOException {
+	public TafValidator(final TafSchemaStore tafSchemaStore, ObjectMapper om) throws IOException {
 		this.tafSchemaStore = tafSchemaStore;
+		this.objectMapper=om;
 	}
 
 	public TafValidationResult validate(Taf taf)
 			throws IOException, ProcessingException, JSONException, ParseException {
-		return validate(taf.toJSON());
+		return validate(taf.toJSON(objectMapper));
 	}
 
 	static Map<JsonPointer, String> customMessages;

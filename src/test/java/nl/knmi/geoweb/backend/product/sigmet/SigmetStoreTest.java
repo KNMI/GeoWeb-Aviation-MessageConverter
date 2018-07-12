@@ -101,7 +101,7 @@ public class SigmetStoreTest {
 		Tools.rmdir(sigmetStoreLocation);
 		Tools.mksubdirs(sigmetStoreLocation);
 		testSigmetStore.setLocation(sigmetStoreLocation);
-		Sigmet[] sigmets=testSigmetStore.getSigmets(false, SigmetStatus.PRODUCTION);
+		Sigmet[] sigmets=testSigmetStore.getSigmets(false, SigmetStatus.concept);
 		assertThat(sigmets.length, is(0));
 		return testSigmetStore;
 	}
@@ -113,7 +113,7 @@ public class SigmetStoreTest {
 		assertThat(store.getOM(),notNullValue());
 		
 		store.storeSigmet(sm);
-		assertThat(store.getSigmets(false, SigmetStatus.PRODUCTION).length, is(1));
+		assertThat(store.getSigmets(false, SigmetStatus.concept).length, is(1));
 	}
 	
 	@Test
@@ -123,7 +123,7 @@ public class SigmetStoreTest {
 		assertThat(store.getOM(),notNullValue());
 		store.storeSigmet(sm);
 		
-		Sigmet[] sigmets=store.getSigmets(false, SigmetStatus.PRODUCTION);
+		Sigmet[] sigmets=store.getSigmets(false, SigmetStatus.concept);
 		assertThat(sigmets.length, is(1));
 		validateSigmet(sigmets[0]);
 	}

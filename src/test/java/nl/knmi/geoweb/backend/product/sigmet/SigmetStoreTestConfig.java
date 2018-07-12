@@ -21,7 +21,7 @@ public class SigmetStoreTestConfig {
 	public static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 	@Bean("sigmetObjectMapper")
 	public static ObjectMapper getSigmetObjectMapperBean() {
-		Debug.println("Init SigmetObjectMapperBean");
+		Debug.println("Init SigmetObjectMapperBean (SigmetStoreTest)");
 		ObjectMapper om = new ObjectMapper();
 		om.registerModule(new JavaTimeModule());
 		om.setTimeZone(TimeZone.getTimeZone("UTC"));
