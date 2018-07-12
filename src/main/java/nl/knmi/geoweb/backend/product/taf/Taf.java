@@ -17,14 +17,16 @@ import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.backend.product.GeoWebProduct;
 import nl.knmi.geoweb.backend.product.IExportable;
+import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
 import nl.knmi.geoweb.backend.product.taf.serializers.CloudsSerializer;
 import nl.knmi.geoweb.backend.product.taf.serializers.WeathersSerializer;
 
 @Getter
 @Setter
-public class Taf implements IExportable {
+public class Taf implements GeoWebProduct, IExportable<Taf> {
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -809,7 +811,7 @@ public class Taf implements IExportable {
 				line += TACwords[i];
 			} else {
 				publishTAC += line + '\n';
-				line = "";
+				line = TACwords[i];
 			}
 		}
 		publishTAC += line;
@@ -851,7 +853,7 @@ public class Taf implements IExportable {
 	}
 
 	@Override
-	public void export(File path, TafConverter converter, ObjectMapper om) {
+	public void export(File path, ProductConverter<Taf> converter, ObjectMapper om) {
 		//TODO Make LTNL99 configurable 
 		try {
 			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
