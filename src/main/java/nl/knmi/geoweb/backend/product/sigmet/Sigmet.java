@@ -370,6 +370,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		this.validdate = otherSigmet.getValiddate();
 		this.validdate_end = otherSigmet.getValiddate_end();
 		this.issuedate = otherSigmet.getIssuedate();
+		this.firFeature = otherSigmet.firFeature;
 	}
 
 	public Sigmet(String firname, String location, String issuing_mwo, String uuid) {
@@ -571,7 +572,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		if (this.cancels != null && this.cancelsStart != null) {
 			String validdateCancelled = String.format("%02d", this.cancelsStart.getDayOfMonth()) + String.format("%02d", this.cancelsStart.getHour()) + String.format("%02d", this.cancelsStart.getMinute());
 
-			sb.append("CNL SIGMET ").append(this.cancels).append(" ").append(validdateCancelled).append('/').append(validdateEndFormatted);
+			sb.append(' ').append("CNL SIGMET ").append(this.cancels).append(" ").append(validdateCancelled).append('/').append(validdateEndFormatted);
 			return sb.toString();	
 		}
 		sb.append('\n');
