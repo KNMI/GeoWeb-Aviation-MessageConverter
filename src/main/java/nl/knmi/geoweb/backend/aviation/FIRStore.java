@@ -40,6 +40,11 @@ public class FIRStore implements Cloneable{
 
 	public FIRStore(@Value(value = "${productstorelocation}") String productstorelocation){
 		this.directory=productstorelocation+"/admin/config";
+		try {
+			Tools.mksubdirs(productstorelocation+"/admin/config");
+		} catch (IOException e) {
+			Debug.println("Creation of "+productstorelocation+"/admin/config"+" failed");
+		}
 		this.worldFIRFile="world_firs.json";
 		this.delegatedFile="delegated.json";
 	}
