@@ -518,17 +518,55 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				org.locationtech.jts.geom.Geometry jtsGeometry = reader.read(om.writeValueAsString(f.getGeometry()));
 				org.locationtech.jts.geom.Geometry geom_fir=reader.read(FIRs);
 
-				// Intersect the box with the FIR
-				org.locationtech.jts.geom.Geometry intersection = jtsGeometry.intersection(geom_fir);
+				//Find intersections with box's sides
 				CoordinateArraySequenceFactory caf=CoordinateArraySequenceFactory.instance();
+				boolean[] boxSidesIntersecting=new boolean[4];
+				int boxSidesIntersectingCount=0;
 				for (int i=0; i<4; i++) {
 					LineString side=new LineString(caf.create(Arrays.copyOfRange(jtsGeometry.getCoordinates(), i, i+2)), gf);
 					if (geom_fir.intersects(side)) {
+						boxSidesIntersecting[i]=true;
+						boxSidesIntersectingCount++;
 						Debug.println("Intersecting on side "+i);
 						Debug.println("I:"+side.intersection(geom_fir));
+					} else {
+						boxSidesIntersecting[i]=false;
 					}
 				}
 
+				if (boxSidesIntersectingCount==1) {
+					Debug.println("Intersecting box on 1 side");
+					if (boxSidesIntersecting[0]==true) {
+						//N of
+						return "N OF N52";
+					} else if (boxSidesIntersecting[1]) {
+						//W of
+					}else if (boxSidesIntersecting[2]) {
+						//S of
+					}else if (boxSidesIntersecting[3]) {
+						//E of
+					}
+				} else if (boxSidesIntersectingCount==2) {
+					Debug.println("Intersecting box on 2 sides");
+					if (boxSidesIntersecting[0]&&boxSidesIntersecting[1]) {
+						//N of and W of
+					} else if (boxSidesIntersecting[1]&&boxSidesIntersecting[2]) {
+						//S of and W of
+					} else if (boxSidesIntersecting[2]&&boxSidesIntersecting[3]) {
+						//S of and E of
+					}else if (boxSidesIntersecting[3]&&boxSidesIntersecting[4]) {
+						//N of and E of
+					}else if (boxSidesIntersecting[0]&&boxSidesIntersecting[2]) {
+						return "N OF N52 AND S OF N55";
+					}else if (boxSidesIntersecting[1]&&boxSidesIntersecting[3]) {
+						return "E OF E02 AND W OF E10";
+					}
+				}
+
+				// Intersect the box with the FIR
+				org.locationtech.jts.geom.Geometry intersection = jtsGeometry.intersection(geom_fir);
+
+				Debug.println("intersection: "+intersection);
 				// One line segment so encode that
 				if (intersection.getClass().equals(org.locationtech.jts.geom.LineString.class)) {
 					// single intersect
@@ -578,8 +616,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		sb.append('\n');
 		sb.append(this.phenomenon.getShortDescription());
 		sb.append('\n');
-		sb.append(this.obs_or_forecast.toTAC());
-		sb.append('\n');
+		if (this.getObs_or_forecast()!=null) {
+			sb.append(this.obs_or_forecast.toTAC());
+			sb.append('\n');
+		}
 		sb.append(this.featureToTAC((Feature)startGeometry, FIR));
 		sb.append('\n');
 		sb.append(this.levelinfo.toTAC());
@@ -779,7 +819,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 	@Override
 	public void export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
-//		String s=converter.ToIWXXM_2_1(this);
+		//		String s=converter.ToIWXXM_2_1(this);
 		try {
 			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 			String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
