@@ -265,11 +265,12 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		if (unit.equals("M")) unit="m";
 		if ((dist!=null)&&(unit!=null)) {
 			fct.setPrevailingVisibility(new NumericMeasureImpl(dist, unit));
+			if (dist>=9999) {
+				fct.setPrevailingVisibilityOperator(RelationalOperator.ABOVE);
+			}
 		} else {
 			retval.add(new ConversionIssue(ConversionIssue.Type.MISSING_DATA, "Missing visibility value or unit: "));
-		}
-		if (dist>=9999) {
-			fct.setPrevailingVisibilityOperator(RelationalOperator.ABOVE);
+			fct.setPrevailingVisibility(null);
 		}
 		return retval;
 	}

@@ -149,4 +149,9 @@ public class SigmetStore {
 		}
 		return null;
 	}
+
+	public boolean deleteSigmetByUuid(String uuid) {
+		String fn=String.format("%s/sigmet_%s.json", this.directory, uuid);
+		return Tools.rm(fn);
+	}
 }
