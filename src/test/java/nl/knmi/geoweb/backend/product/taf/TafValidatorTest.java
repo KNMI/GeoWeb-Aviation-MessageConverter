@@ -11,10 +11,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 
 import nl.knmi.adaguc.tools.Tools;
@@ -27,10 +29,13 @@ public class TafValidatorTest {
 	@Value(value = "${productstorelocation}")
 	String productstorelocation;
 	
+	@Autowired
+	private ObjectMapper objectMapper;
+	
 	@Test
 	public void testValidateOK () throws Exception {
 		TafSchemaStore tafSchemaStore =  new TafSchemaStore(productstorelocation);
-		TafValidator tafValidator = new TafValidator(tafSchemaStore);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, objectMapper);
 
 		String taf = Tools.readResource( "Taf_valid.json");
 		
@@ -42,7 +47,7 @@ public class TafValidatorTest {
 	@Test
 	public void testValidateFails () throws IOException, JSONException, ProcessingException, ParseException  {
 		TafSchemaStore tafSchemaStore =  new TafSchemaStore(productstorelocation);
-		TafValidator tafValidator = new TafValidator(tafSchemaStore);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, objectMapper);
 
 		String taf = Tools.readResource( "./Taf_invalid.json");
 		JSONObject tafAsJSON = new JSONObject(taf);

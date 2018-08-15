@@ -77,7 +77,7 @@ public class SigmetStore {
 	}
 	
 	public Sigmet[] getPublishedSigmetsSinceDay (int daysOffset) {
-		Sigmet[] sigmets = getSigmets(false, SigmetStatus.PUBLISHED);
+		Sigmet[] sigmets = getSigmets(false, SigmetStatus.published);
 		OffsetDateTime offset = OffsetDateTime.now(ZoneId.of("Z")).minusDays(daysOffset);
 		OffsetDateTime offsetSinceMidnight = offset.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
@@ -114,7 +114,7 @@ public class SigmetStore {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
 						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
-						if ((sm.getStatus()==SigmetStatus.PUBLISHED)&&(sm.getValiddate().isBefore(now)) && (sm.getValiddate_end().isAfter(now))) {
+						if ((sm.getStatus()==SigmetStatus.published)&&(sm.getValiddate().isBefore(now)) && (sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);
 						}
 					}else if (selectStatus != null) {
@@ -138,7 +138,7 @@ public class SigmetStore {
 			sigmets.sort(comp);
 			return sigmets.toArray(new Sigmet[0]);
 		}
-		return null;
+		return new Sigmet[0];
 	}
 
 	public Sigmet getByUuid(String uuid) {
@@ -148,5 +148,10 @@ public class SigmetStore {
 			}
 		}
 		return null;
+	}
+
+	public boolean deleteSigmetByUuid(String uuid) {
+		String fn=String.format("%s/sigmet_%s.json", this.directory, uuid);
+		return Tools.rm(fn);
 	}
 }

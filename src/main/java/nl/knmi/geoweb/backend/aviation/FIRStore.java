@@ -40,6 +40,11 @@ public class FIRStore implements Cloneable{
 
 	public FIRStore(@Value(value = "${productstorelocation}") String productstorelocation){
 		this.directory=productstorelocation+"/admin/config";
+		try {
+			Tools.mksubdirs(productstorelocation+"/admin/config");
+		} catch (IOException e) {
+			Debug.println("Creation of "+productstorelocation+"/admin/config"+" failed");
+		}
 		this.worldFIRFile="world_firs.json";
 		this.delegatedFile="delegated.json";
 	}
@@ -85,7 +90,7 @@ public class FIRStore implements Cloneable{
 			FeatureCollection fc=(FeatureCollection)DelegatedInfo;
 			for (Feature f:fc.getFeatures()) {
 				String FIRname=f.getProperty("FIRname");
-				String ICAOCode=f.getProperty("ICAOCODE");
+				String ICAOCode=f.getProperty("ICAONAME");
 				if (!delegatedAirspaces.containsKey(FIRname)) {
 					List<Feature>delegated=new ArrayList<Feature>();
 					delegatedAirspaces.put(FIRname, delegated);
@@ -139,11 +144,12 @@ public class FIRStore implements Cloneable{
 		if (worldFIRInfos.containsKey(name)) {
 				feature=cloneThroughSerialize(worldFIRInfos.get(name));
 		}
-		Debug.println("Feature lookup("+name+") "+feature);
+		Debug.println("Feature lookup("+name+") "+feature+" ["+delegatedAirspaces.containsKey(name)+"]");
 		
 		if (delegatedAirspaces.containsKey(name)) {
 			for (Feature f: delegatedAirspaces.get(name)) {
 				//Merge f with feature
+				Debug.println("Adding delegated area for "+name);
 				feature=GeoUtils.merge(feature, f);
 			}
 		}

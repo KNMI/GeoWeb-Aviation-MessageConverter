@@ -23,21 +23,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.backend.aviation.FIRStore;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetChange;
+import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetLevelMode;
+import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetLevelUnit;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @ContextConfiguration(classes = {SigmetStoreTestConfig.class})
-public class SigmetStoreTest {
+public class SigmetToTACTest {
 	@Autowired
 	@Qualifier("sigmetObjectMapper")
 	private ObjectMapper sigmetObjectMapper;
 	
+	private FIRStore firStore;
+	
 	public final String sigmetStoreLocation = "/tmp/junit/geowebbackendstore/";
 	
 	static String testGeoJson="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]},\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}}}]}";
+
+	static String testGeoJson1="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0,52],[10,52],[10,60],[0,60],[0,52]]]}, \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"box\"} }]}";
 
 	static String testSigmet="{\"geojson\":"
 			+"{\"type\":\"FeatureCollection\",\"features\":"+"[{\"type\":\"Feature\",\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]}}]},"
@@ -61,8 +68,10 @@ public class SigmetStoreTest {
 		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
 		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));
 		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")).minusHours(1));
+		sm.setValiddate_end(OffsetDateTime.now(ZoneId.of("Z")).plusHours(3));
 		sm.setChange(SigmetChange.NC);
-		setGeoFromString(sm, testGeoJson);
+		sm.setLevelinfo(new Sigmet.SigmetLevel(new Sigmet.SigmetLevelPart(SigmetLevelUnit.FL, 300), SigmetLevelMode.TOPS_ABV));
+		setGeoFromString(sm, testGeoJson1);
 		return sm;
 	}
 	
@@ -126,6 +135,9 @@ public class SigmetStoreTest {
 		Sigmet[] sigmets=store.getSigmets(false, SigmetStatus.concept);
 		assertThat(sigmets.length, is(1));
 		validateSigmet(sigmets[0]);
+		Debug.println("SIGMET: "+sigmets[0].toString());
+		FIRStore firStore=new FIRStore("/tmp/FIRSTORE");
+		Debug.println("  TAC:"+sigmets[0].toTAC(firStore.lookup("EHAA", true)));
 	}
 	
 }
