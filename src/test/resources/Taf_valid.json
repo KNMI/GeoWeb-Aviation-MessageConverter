@@ -26,11 +26,11 @@
             "clouds":[
                {
                   "amount":"FEW",
-                  "height":90
+                  "height":9
                },
                {
                   "amount":"SCT",
-                  "height":150
+                  "height":15
                },
                {
                   "amount":"OVC",
@@ -74,11 +74,11 @@
             "clouds":[
                {
                   "amount":"FEW",
-                  "height":90
+                  "height":9
                },
                {
                   "amount":"OVC",
-                  "height":150,
+                  "height":15,
                   "mod": "CB"
                }
             ],

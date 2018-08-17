@@ -200,11 +200,20 @@
                 }
             ]
         },
-        "cloudsAscending": {
+        "cloudsAscending": {"oneOf":[{
             "properties": {
-                "cloudsAscending": {
+                "cloudsHeightAscending": {
                     "$geoweb::messages": {
-                        "enum": "Clouds not ascending"
+                        "enum": "Cloud groups must be ascending in height"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "cloudsAmountAscending":{
+                    "$geoweb::messages": {
+                        "enum": "Cloud groups must be ascending in coverage (FEW -> SCT -> BKN -> OVC)"
                     },
                     "enum": [
                         true
@@ -212,26 +221,30 @@
                     "type": "boolean"
                 }
             }
-        },
+        }]},
         "forecast": {
             "additionalProperties": true,
             "properties": {
                 "clouds": {
-                    "items": [
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        },
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        },
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        },
-                        {
-                            "$ref": "#/definitions/cloudsAscending"
-                        }
-                    ],
-                    "type": "array"
+                    "oneOf": [{
+                      "items": [
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          },
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          },
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          },
+                          {
+                              "$ref": "#/definitions/cloudsAscending"
+                          }
+                      ],
+                      "type": "array"
+                    },{
+                      "type": "string"
+                    }]
                 },
                 "cloudsCBNeededAndPresent": {
                     "$geoweb::messages": {
@@ -281,6 +294,15 @@
                 "visibilityWithinLimit": {
                     "$geoweb::messages": {
                         "enum": "The current combination of weather group and visibility is invalid."
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "visibilityAndFogWithoutDescriptorWithinLimit": {
+                    "$geoweb::messages": {
+                        "enum": "Fog requirers a visibility of 1000 meters or less"
                     },
                     "enum": [
                         true

@@ -45,6 +45,15 @@
                 {
                     "additionalProperties": false,
                     "properties": {
+                        "qualifier" : {
+                          "$geoweb::messages": {
+                              "enum": "MI (shallow), BC (patches), PR (partial), DR (low drifting) can only be moderate"
+                          },
+                          "enum": [
+                                "moderate"
+                            ],
+                            "type": "string"
+                        },
                         "descriptor": {
                             "enum": [
                                 "shallow",
@@ -57,7 +66,7 @@
                         "phenomena": {
                             "items": {
                                 "$geoweb::messages": {
-                                    "enum": "Only fog can be shallow, patchy or partial"
+                                    "enum": "Descriptor MI (shallow), BC (patchy) or PR (partial) is only allowed with FG (fog)"
                                 },
                                 "enum": [
                                     "fog"
@@ -67,12 +76,41 @@
                             "minItems": 1,
                             "type": "array",
                             "uniqueItems": true
+                        }
+                       
+                    },
+                    "required": [
+                        "phenomena", "descriptor"
+                    ]
+                },
+                {
+                    "additionalProperties": false,
+                    "properties": {
+                        "phenomena": {
+                            "items": {
+                                "enum": [
+                                    "fog",
+                                    "mist",
+                                    "widespread dust",
+                                    "haze",
+                                    "smoke",
+                                    "volcanic ash",
+                                    "squall",
+                                    "dust"
+                                ],
+                                "type": "string"
+                            },
+                            "maxItems": 2,
+                            "minItems": 1,
+                            "type": "array",
+                            "uniqueItems": true
                         },
                         "qualifier": {
+                            "$geoweb::messages": {
+                                "enum": "FG, BR, DU, HZ, FU, VA, SQ, PO and TS can only be moderate"
+                            },
                             "enum": [
-                                "light",
-                                "moderate",
-                                "heavy"
+                                "moderate"
                             ],
                             "type": "string"
                         }
@@ -87,22 +125,44 @@
                         "phenomena": {
                             "items": {
                                 "enum": [
-                                    "rain",
+                                    "funnel clouds"
+                                ],
+                                "type": "string"
+                            },
+                            "maxItems": 2,
+                            "minItems": 1,
+                            "type": "array",
+                            "uniqueItems": true
+                        },
+                        "qualifier": {
+                          "$geoweb::messages": {
+                                "enum": "FC can only be moderate or heavy"
+                            },
+                            "enum": [
+                                "moderate",
+                                "heavy"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "phenomena"
+                    ]
+                },
+                {
+                    "additionalProperties": false,
+
+                    "properties": {
+                        "phenomena": {
+                            "items": {
+                                "enum": [
+                                    "rain", 
                                     "drizzle",
                                     "duststorm",
-                                    "funnel cloud",
-                                    "squall",
                                     "snow",
                                     "snow grains",
                                     "ice pellets",
-                                    "mist",
-                                    "smoke",
-                                    "volcanic ash",
-                                    "widespread dust",
                                     "sand",
-                                    "haze",
-                                    "dust",
-                                    "funnel clouds",
                                     "sandstorm"
                                 ],
                                 "type": "string"
@@ -194,9 +254,7 @@
                         },
                         "qualifier": {
                             "enum": [
-                                "light",
-                                "moderate",
-                                "heavy"
+                                "moderate"
                             ],
                             "type": "string"
                         }

@@ -55,7 +55,7 @@
                 },
                 {
                     "$geoweb::messages": {
-                        "additionalProperties": "When CAVOK is given, no other properties than wind may be given.",
+                        "additionalProperties": "Forecast is not valid.",
                         "required": "Forecast is a wind group with visibility, weather, either clouds or vertical visibility or CAVOK"
                     },
                     "additionalProperties": false,
