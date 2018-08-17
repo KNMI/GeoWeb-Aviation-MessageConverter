@@ -200,9 +200,9 @@
                 }
             ]
         },
-        "cloudsAscending": {
+        "cloudsAscending": {"oneOf":[{
             "properties": {
-                "cloudsAscending": {
+                "cloudsHeightAscending": {
                     "$geoweb::messages": {
                         "enum": "Cloud groups must be ascending in height"
                     },
@@ -210,9 +210,18 @@
                         true
                     ],
                     "type": "boolean"
+                },
+                "cloudsAmountAscending":{
+                    "$geoweb::messages": {
+                        "enum": "Cloud groups must be ascending in coverage (FEW -> SCT -> BKN -> OVC)"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
                 }
             }
-        },
+        }]},
         "forecast": {
             "additionalProperties": true,
             "properties": {
@@ -285,6 +294,15 @@
                 "visibilityWithinLimit": {
                     "$geoweb::messages": {
                         "enum": "The current combination of weather group and visibility is invalid."
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "visibilityAndFogWithoutDescriptorWithinLimit": {
+                    "$geoweb::messages": {
+                        "enum": "Fog requirers a visibility of 1000 meters or less"
                     },
                     "enum": [
                         true

@@ -9,6 +9,26 @@
             "maximum": 999,
             "minimum": 0,
             "type": "number"
+        },
+        "vertical_visibility_fog": {
+            "$geoweb::messages": {
+                "maximum": "Vertical visibility must be less than FL1000",
+                "minimum": "Vertical visibility must be greater than FL000"
+            },
+            "maximum": 50,
+            "minimum": 0,
+            "type": "number"
+        },
+        "vertical_visibility_precip": {
+            "$geoweb::messages": {
+                "maximum": "Vertical visibility must be less than FL1000",
+                "minimum": "Vertical visibility must be greater than FL000"
+            },
+            "maximum": 100,
+            "minimum": 0,
+            "type": "number"
         }
     }
 }
+
+
