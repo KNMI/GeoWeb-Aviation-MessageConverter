@@ -28,7 +28,7 @@
                         },
                         "changegroupsAscending": {
                             "$geoweb::messages": {
-                                "enum": "Changegroups must be equal to or ascending in starting time"
+                                "enum": "Changegroups with PROB or BECMG must be equal to or ascending in starting time, FM must be ascending in time"
                             },
                             "enum": [
                                 true
@@ -124,9 +124,18 @@
                             ],
                             "type": "boolean"
                         },
+                        "changegroupDateOutsideRange": {
+                            "$geoweb::messages": {
+                                "enum": "Change groups must be within range of the validity period"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
                         "changegroupsAscending": {
                             "$geoweb::messages": {
-                                "enum": "Changegroups must be equal to or ascending in starting time"
+                                "enum": "Changegroups with PROB or BECMG must be equal to or ascending in starting time, FM must be ascending in time"
                             },
                             "enum": [
                                 true
@@ -200,6 +209,7 @@
                 }
             ]
         },
+
         "cloudsAscending": {"oneOf":[{
             "properties": {
                 "cloudsHeightAscending": {
@@ -387,9 +397,24 @@
                 },
                 {
                     "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
+                },
+                {
+                    "$ref": "#/definitions/changegroup"
                 }
             ],
-            "maxItems": 10,
+            "maxItems": 15,
             "minItems": 0,
             "type": "array"
         },

@@ -422,6 +422,15 @@ public class TafValidator {
 			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
 			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode())
 				continue;
+
+			String changeGroupChangeAsText = "";
+			if (changegroup.get("changeType") != null ) {
+				changeGroupChangeAsText = changegroup.get("changeType").asText();
+			}
+			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
+				continue;
+			}
+
 			boolean nonRepeatingChange = false;
 
 			JsonNode forecastWind = currentForecast.get("wind");
@@ -507,7 +516,7 @@ public class TafValidator {
 			return;
 		}
 
-	
+
 		JsonNode forecastWeather = input.get("forecast").get("weather");
 		JsonNode forecastVisibility = input.get("forecast").get("visibility");
 		if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode()
@@ -520,7 +529,7 @@ public class TafValidator {
 				checkVisibilityWithinLimit (weatherGroup, forecast, visibility);
 			}
 		}
-	
+
 
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) 
@@ -530,6 +539,7 @@ public class TafValidator {
 			JsonNode nextNode = change.next(); 
 			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
 			ObjectNode changegroup = (ObjectNode) nextNode;
+
 
 			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
 			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode())
@@ -541,11 +551,18 @@ public class TafValidator {
 			if ((changeWeather == null || changeWeather.isNull() || changeWeather.isMissingNode())
 					&& (changeVisibility == null || changeVisibility.isNull() || changeVisibility.isMissingNode()))
 				return;
-			if (changeWeather == null || changeWeather.isNull() || changeWeather.isMissingNode()) {
-				changeWeather = forecastWeather;
+
+			String changeGroupChangeAsText = "";
+			if (changegroup.get("changeType") != null ) {
+				changeGroupChangeAsText = changegroup.get("changeType").asText();
 			}
-			if (changeVisibility == null || changeVisibility.isNull() || changeVisibility.isMissingNode()) {
-				changeVisibility = forecastVisibility;
+			if (changeGroupChangeAsText.equals("BECMG") || changeGroupChangeAsText.equals("TEMPO")) {
+				if (changeWeather == null || changeWeather.isNull() || changeWeather.isMissingNode()) {
+					changeWeather = forecastWeather;
+				}
+				if (changeVisibility == null || changeVisibility.isNull() || changeVisibility.isMissingNode()) {
+					changeVisibility = forecastVisibility;
+				}
 			}
 			if (changeWeather == null || changeVisibility == null)
 				continue;
@@ -774,6 +791,14 @@ public class TafValidator {
 
 			if (!changegroup.has("forecast"))
 				continue;
+
+			String changeGroupChangeAsText = "";
+			if (changegroup.get("changeType") != null ) {
+				changeGroupChangeAsText = changegroup.get("changeType").asText();
+			}
+			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
+				continue;
+			}
 			JsonNode changeForecast =  changegroup.get("forecast");
 			if (changeForecast.has("wind")) {
 				ObjectNode wind = (ObjectNode) changeForecast.get("wind");
@@ -1039,6 +1064,16 @@ public class TafValidator {
 		}
 	}
 
+	/**
+	 * Returns true if this node has a value
+	 * @param node
+	 * @return
+	 */
+	private static boolean checkIfNodeHasValue(JsonNode node){
+		if ( node == null || node.isMissingNode() || node.isNull())return false;
+		return true;		
+	}
+
 	private static void augmentOverlappingBecomingChangegroups(JsonNode input) throws ParseException {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
@@ -1059,9 +1094,40 @@ public class TafValidator {
 			if (changeStart == null || changeStart.isMissingNode() || changeStart.isNull())
 				continue;
 
+			/* Check if in range */
+			JsonNode changeEndNode = changegroup.findValue("changeEnd");
+			JsonNode validityStart = input.findValue("validityStart");
+			JsonNode validityEnd = input.findValue("validityEnd");
+
+			if (checkIfNodeHasValue(validityEnd) &&
+					checkIfNodeHasValue(validityStart) && 
+					checkIfNodeHasValue(changeStart) && 
+					checkIfNodeHasValue(changeEndNode)) {
+
+				Date validityStartDate = formatter.parse(input.findValue("validityStart").asText());
+				Date validityEndDate = formatter.parse(input.findValue("validityEnd").asText());
+				Date changeStartDate = formatter.parse(changegroup.findValue("changeStart").asText());
+				Date changeEndDate = formatter.parse(changegroup.findValue("changeEnd").asText());
+//				Debug.println(validityStartDate.toGMTString() + "," + validityEndDate.toGMTString() + "," + changeStartDate.toGMTString() + "," + changeEndDate.toGMTString());
+				if (changeStartDate.compareTo(validityStartDate) < 0 || changeStartDate.compareTo(validityEndDate) > 0 ||
+						changeEndDate.compareTo(validityStartDate) < 0 || changeEndDate.compareTo(validityEndDate) > 0){
+					changegroup.put("changegroupDateOutsideRange", false);
+				}		else {
+					changegroup.put("changegroupDateOutsideRange", true);
+				}
+
+
+			}
+
+
+
+
+
+
 			String type = changegroup.findValue("changeType").asText();
 			if (!"BECMG".equals(type))
 				continue;
+
 			Date becmgStart = formatter.parse(changegroup.findValue("changeStart").asText());
 			boolean overlap = false;
 			for (Date otherEnd : becmgEndTimes) {
@@ -1069,7 +1135,7 @@ public class TafValidator {
 					overlap = true;
 				}
 			}
-			JsonNode changeEndNode = changegroup.findValue("changeEnd");
+
 			if (changeEndNode != null && !changeEndNode.isNull() && !changeEndNode.isMissingNode()) {
 				becmgEndTimes.add(formatter.parse(changeEndNode.asText()));
 			}
@@ -1104,6 +1170,7 @@ public class TafValidator {
 			if (changeTypeNode == null)
 				continue;
 			String changeType = changeTypeNode.asText();
+			Debug.println("changeType" + changeType);
 			try {
 				Date parsedDate = formatter.parse(changeStart);
 				boolean comesAfter = parsedDate.compareTo(prevChangeStart) >= 0
@@ -1112,6 +1179,9 @@ public class TafValidator {
 								&& parsedDate.equals(tafStartTime))
 						|| (parsedDate.equals(prevChangeStart) && changeType.startsWith("TEMPO")
 								&& parsedDate.equals(tafStartTime));
+				if ("FM".equals(changeType) && parsedDate.compareTo(prevChangeStart) <= 0) {
+					comesAfter = false;
+				}
 				changegroup.put("changegroupsAscending", comesAfter);
 				prevChangeStart = parsedDate;
 			} catch (ParseException e) {
