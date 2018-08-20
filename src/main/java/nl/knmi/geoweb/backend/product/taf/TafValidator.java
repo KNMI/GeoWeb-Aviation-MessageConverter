@@ -395,7 +395,7 @@ public class TafValidator {
 		augmentCloudNeededRainOrModifierNecessary(input);
 		augmentMaxVisibility(input);
 		augmentNonRepeatingChanges(input);
-//		augmentMaxVerticalVisibility(input);
+		augmentMaxVerticalVisibility(input);
 		//		Debug.println(input.toString());
 	}
 
@@ -454,7 +454,7 @@ public class TafValidator {
 
 		}
 	}
-	
+
 	/**
 	 * Checks if visibility is in range for either a changegroup (weatherGroup) or forecast (weatherGroup)
 	 * @param weatherGroup
@@ -507,6 +507,7 @@ public class TafValidator {
 			return;
 		}
 
+	
 		JsonNode forecastWeather = input.get("forecast").get("weather");
 		JsonNode forecastVisibility = input.get("forecast").get("visibility");
 		if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode()
@@ -519,6 +520,7 @@ public class TafValidator {
 				checkVisibilityWithinLimit (weatherGroup, forecast, visibility);
 			}
 		}
+	
 
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) 
@@ -561,94 +563,64 @@ public class TafValidator {
 		}
 	}	
 
-//	private static void augmentMaxVerticalVisibility(JsonNode input) {
-//		
-//		Debug.println("augmentMaxVerticalVisibility");
-//		JsonNode changeGroups = input.get("changegroups");
-//		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-//		{
-//			Debug.println("ret");
-//			return;
-//		}
-//		Debug.println("OK");
-//		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-//			JsonNode nextNode = change.next(); 
-//			if (nextNode == null || nextNode == NullNode.getInstance()) {
-//				Debug.println("co");
-//				continue;
-//			}
-//			Debug.println("OK");
-//			ObjectNode changegroup = (ObjectNode) nextNode;
-//
-//			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
-//			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode()){
-//				Debug.println("ret");
-//				return;
-//			}
-//			Debug.println("OK");
-//			JsonNode weatherGroups = changeForecast.get("weather");
-//			JsonNode cloudGroups = changeForecast.get("clouds");
-//
-//			if ((weatherGroups == null || weatherGroups.isNull() || weatherGroups.isMissingNode())
-//					&& (cloudGroups == null || cloudGroups.isNull() || cloudGroups.isMissingNode())){
-//				Debug.println("co");
-//				continue;
-//			}
-//
-//			Debug.println("OK");
-//			for (Iterator<JsonNode> weatherNode = weatherGroups.elements(); weatherNode.hasNext();) {
-//				JsonNode weatherGroup = (ObjectNode) weatherNode.next();
-//				if (!weatherGroup.has("phenomena")){
-//					Debug.println("co");
-//					continue;
-//				}
-//					
-//				Debug.println("OK");
-//				ArrayNode phenomena = (ArrayNode) weatherGroup.get("phenomena");
-//
-//				for (Iterator<JsonNode> cloudNode = cloudGroups.elements(); cloudNode.hasNext();) {
-//					JsonNode cloudGroup = (ObjectNode) cloudNode.next();
-//					if (!cloudGroup.has("phenomena")) {
-//						Debug.println("co");
-//						continue;
-//					}
-//					Debug.println(cloudGroup.textValue());
-//					int verticalVisibility = cloudGroups.get("value").asInt();
-//
-//					boolean isFoggy = StreamSupport.stream(phenomena.spliterator(), false)
-//							.anyMatch(phenomenon -> phenomenon.asText().equals("fog"));
-//					if (isFoggy) {
-//						if (!weatherGroup.has("descriptor")) {
-//							changeForecast.put("visibilityWithinLimit", verticalVisibility < 1000);
-//						} else {
-//							String descriptor = weatherGroup.get("descriptor").asText();
-//							if (descriptor.equals("shallow")) {
-//								changeForecast.put("visibilityWithinLimit", verticalVisibility > 1000);
-//							} else {
-//								changeForecast.put("visibilityWithinLimit", true);
-//							}
-//						}
-//					}
-//					if (StreamSupport.stream(phenomena.spliterator(), false)
-//							.anyMatch(phenomenon -> phenomenon.asText().equals("smoke")
-//									|| phenomenon.asText().equals("dust") || phenomenon.asText().equals("sand")
-//									|| phenomenon.asText().equals("volcanic ash"))) {
-//						changeForecast.put("visibilityWithinLimit", verticalVisibility < 5000);
-//					}
-//
-//					if (StreamSupport.stream(phenomena.spliterator(), false)
-//							.anyMatch(phenomenon -> phenomenon.asText().equals("mist"))) {
-//						changeForecast.put("visibilityWithinLimit", verticalVisibility >= 1000 && verticalVisibility <= 5000);
-//					}
-//
-//					if (StreamSupport.stream(phenomena.spliterator(), false)
-//							.anyMatch(phenomenon -> phenomenon.asText().equals("haze"))) {
-//						changeForecast.put("visibilityWithinLimit", verticalVisibility <= 5000);
-//					}
-//				}
-//			}
-//		}
-//	}
+	private static void checkVerticalVisibilityWithinLimit (JsonNode weatherGroup, ObjectNode forecast, int visibility ){
+		if (!weatherGroup.has("phenomena"))
+			return;
+		ArrayNode phenomena = (ArrayNode) weatherGroup.get("phenomena");
+		boolean isFoggy = StreamSupport.stream(phenomena.spliterator(), false)
+				.anyMatch(phenomenon -> phenomenon.asText().equals("fog"));
+		boolean isPrecip = StreamSupport.stream(phenomena.spliterator(), false)
+				.anyMatch(phenomenon -> phenomenon.asText().equals("rain"));
+		if (isFoggy) {
+			forecast.put("verticalVisibilityAndFogWithinLimit", visibility <= 5);
+		} else if (isPrecip) {
+			forecast.put("verticalVisibilityAndPrecipitationWithinLimit", visibility <= 10);
+		}
+	}
+
+	private static void augmentMaxVerticalVisibility(JsonNode input) {
+		{
+			JsonNode forecastWeather = input.get("forecast").get("weather");
+			JsonNode forecastVerticalVisibility = input.get("forecast").get("vertical_visibility");
+			if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode()
+					&& forecastVerticalVisibility != null && !forecastVerticalVisibility.isNull() && !forecastVerticalVisibility.isMissingNode()) {
+				int visibility = forecastVerticalVisibility.asInt();
+				for (Iterator<JsonNode> weatherNode = forecastWeather.elements(); weatherNode.hasNext();) {
+					JsonNode nextNode = weatherNode.next();
+					if (nextNode == null || nextNode == NullNode.getInstance()) continue;
+					JsonNode weatherGroup = (ObjectNode) nextNode;
+					checkVerticalVisibilityWithinLimit(weatherGroup, (ObjectNode) input.get("forecast"), visibility);
+				}
+			}
+		}
+
+		JsonNode changeGroups = input.get("changegroups");
+		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) 
+			return;
+
+		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
+			JsonNode nextNode = change.next(); 
+			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
+			ObjectNode changegroup = (ObjectNode) nextNode;
+
+			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
+			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode())
+				return;
+
+			JsonNode changeWeather = changeForecast.get("weather");
+			JsonNode changeVisibility = changeForecast.get("visibility");
+			if (changeWeather != null && !changeWeather.isNull() && !changeWeather.isMissingNode()
+					&& changeVisibility != null && !changeVisibility.isNull() && !changeVisibility.isMissingNode()) {
+				int visibility = changeVisibility.asInt();
+				for (Iterator<JsonNode> weatherNode = changeWeather.elements(); weatherNode.hasNext();) {
+					JsonNode weatherGroup = (ObjectNode) weatherNode.next();
+					checkVerticalVisibilityWithinLimit (weatherGroup, changeForecast, visibility);
+				}
+			}
+
+
+		}
+	}
 
 	private static void augmentCloudNeededRainOrModifierNecessary(JsonNode input) {
 		ObjectNode forecast = (ObjectNode) input.get("forecast");
