@@ -427,9 +427,9 @@ public class TafValidator {
 			if (changegroup.get("changeType") != null ) {
 				changeGroupChangeAsText = changegroup.get("changeType").asText();
 			}
-			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
-				continue;
-			}
+//			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
+//				continue;
+//			}
 
 			boolean nonRepeatingChange = false;
 
@@ -796,9 +796,9 @@ public class TafValidator {
 			if (changegroup.get("changeType") != null ) {
 				changeGroupChangeAsText = changegroup.get("changeType").asText();
 			}
-			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
-				continue;
-			}
+//			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
+//				continue;
+//			}
 			JsonNode changeForecast =  changegroup.get("forecast");
 			if (changeForecast.has("wind")) {
 				ObjectNode wind = (ObjectNode) changeForecast.get("wind");
