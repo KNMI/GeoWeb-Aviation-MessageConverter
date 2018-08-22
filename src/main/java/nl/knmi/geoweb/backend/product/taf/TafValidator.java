@@ -1373,7 +1373,7 @@ public class TafValidator {
 		try{
 			objectMapper.readValue(tafStr, Taf.class).toTAC();
 		}catch(Exception e){
-			Debug.printStackTrace(e);
+//			Debug.printStackTrace(e);
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false,
 					(ObjectNode) om.readTree("{\"/forecast/message\": [\"Unable to generate TAC report\"]}"), validationReport,
