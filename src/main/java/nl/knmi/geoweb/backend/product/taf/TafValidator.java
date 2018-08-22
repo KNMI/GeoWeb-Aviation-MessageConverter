@@ -596,6 +596,8 @@ public class TafValidator {
 	}
 
 	private static void augmentMaxVerticalVisibility(JsonNode input) {
+		if (!checkIfNodeHasValue(input.get("forecast")) || 
+				!checkIfNodeHasValue(input.get("forecast").get("vertical_visibility")))return;
 		{
 			JsonNode forecastWeather = input.get("forecast").get("weather");
 			JsonNode forecastVerticalVisibility = input.get("forecast").get("vertical_visibility");
@@ -1170,7 +1172,6 @@ public class TafValidator {
 			if (changeTypeNode == null)
 				continue;
 			String changeType = changeTypeNode.asText();
-			Debug.println("changeType" + changeType);
 			try {
 				Date parsedDate = formatter.parse(changeStart);
 				boolean comesAfter = parsedDate.compareTo(prevChangeStart) >= 0

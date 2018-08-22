@@ -768,7 +768,14 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 		}
 
 		sb.append(this.metadata.location);
-		sb.append(" " + TAFtoTACMaps.toDDHHMM(this.metadata.issueTime));
+		
+		/* Add issuetime */
+		if (this.metadata.issueTime != null) {
+			sb.append(" " + TAFtoTACMaps.toDDHHMM(this.metadata.issueTime));
+		} else{
+			sb.append(" " + "<not yet issued>");
+		}
+		
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case missing:
 			// If missing, we're done here
@@ -778,8 +785,11 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			// do nothing
 			break;
 		}
+		
+		/* Add date */
 		sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.validityStart) + "/"
 				+ TAFtoTACMaps.toDDHH(this.metadata.validityEnd));
+		
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case canceled:
 			// In case of a cancel there are no change groups so we're done here
