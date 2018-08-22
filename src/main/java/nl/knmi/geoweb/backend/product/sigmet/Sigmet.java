@@ -16,13 +16,18 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 
+import org.geojson.Crs;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.GeoJsonObject;
 import org.geojson.Geometry;
 import org.geojson.LngLatAlt;
 import org.geojson.Polygon;
+import org.geojson.jackson.CrsType;
+import org.geojson.Point;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateFilter;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.PrecisionModel;
@@ -492,6 +497,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 	public String featureToTAC(Feature f, Feature FIR) {
 		List<LngLatAlt> coords;
+		
 		switch(f.getProperty("selectionType").toString().toLowerCase()) {
 		case "poly":
 			// This assumes that one feature contains one set of coordinates
@@ -500,8 +506,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		case "fir":
 			return "ENTIRE FIR";
 		case "point":
-			coords = ((Polygon)(f.getGeometry())).getCoordinates().get(0);
-			return this.pointToDMSString(coords.get(0));
+			Point p=(Point)f.getGeometry();
+			return this.pointToDMSString(p.getCoordinates());
 		case "box":
 			// A box is drawn which can mean multiple things whether how many intersections there are.
 			// If one line segment intersects, the phenomenon happens in the area opposite of the line intersection
@@ -516,16 +522,47 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				ObjectMapper om = new ObjectMapper();
 				String FIRs=om.writeValueAsString(FIR.getGeometry()); //FIR as String
 
-				org.locationtech.jts.geom.Geometry jtsGeometry = reader.read(om.writeValueAsString(f.getGeometry()));
+				org.locationtech.jts.geom.Geometry drawnGeometry = reader.read(om.writeValueAsString(f.getGeometry()));
+				
 				org.locationtech.jts.geom.Geometry geom_fir=reader.read(FIRs);
 
+				//Sort box's coordinates
+				Envelope env=drawnGeometry.getEnvelopeInternal();
+				double minX=env.getMinX();
+				double maxX=env.getMaxX();
+				double minY=env.getMinY();
+				double maxY=env.getMaxY();
+				Debug.println("BBOX (++);: "+minX+"-"+maxX+","+minY+"-"+maxY);
+				
+				org.locationtech.jts.geom.Geometry firBorder=geom_fir.getBoundary();
+				
 				//Find intersections with box's sides
 				CoordinateArraySequenceFactory caf=CoordinateArraySequenceFactory.instance();
 				boolean[] boxSidesIntersecting=new boolean[4];
 				int boxSidesIntersectingCount=0;
+
+				//Sort the rectangle points counterclockwise, starting at lower left
+				Coordinate[] drawnCoords=new Coordinate[5];
 				for (int i=0; i<4; i++) {
-					LineString side=new LineString(caf.create(Arrays.copyOfRange(jtsGeometry.getCoordinates(), i, i+2)), gf);
-					if (geom_fir.intersects(side)) {
+					if (drawnGeometry.getCoordinates()[i].x==minX) {
+						if (drawnGeometry.getCoordinates()[i].y==minY) {
+							drawnCoords[0]=drawnGeometry.getCoordinates()[i];
+						} else {
+							drawnCoords[3]=drawnGeometry.getCoordinates()[i];
+						}
+					} else {
+						if (drawnGeometry.getCoordinates()[i].y==minY) {
+							drawnCoords[1]=drawnGeometry.getCoordinates()[i];
+						} else {
+							drawnCoords[2]=drawnGeometry.getCoordinates()[i];
+						}
+					}
+				}
+				drawnCoords[4]=drawnCoords[0];
+				
+				for (int i=0; i<4; i++) {
+					LineString side=new LineString(caf.create(Arrays.copyOfRange(drawnCoords, i, i+2)), gf);
+					if (side.intersects(firBorder)) {
 						boxSidesIntersecting[i]=true;
 						boxSidesIntersectingCount++;
 						Debug.println("Intersecting on side "+i);
@@ -537,42 +574,60 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 				if (boxSidesIntersectingCount==1) {
 					Debug.println("Intersecting box on 1 side");
-					if (boxSidesIntersecting[0]==true) {
+					if (boxSidesIntersecting[0]) {
 						//N of
-						return "N OF N52";
+						return String.format("N OF %s", convertLat(minY));
 					} else if (boxSidesIntersecting[1]) {
 						//W of
+						return String.format("W OF %s", convertLon(maxX));
 					}else if (boxSidesIntersecting[2]) {
 						//S of
+						return String.format("S OF %s", convertLat(maxY));
 					}else if (boxSidesIntersecting[3]) {
 						//E of
+						return String.format("E OF %s", convertLon(minX));
 					}
 				} else if (boxSidesIntersectingCount==2) {
 					Debug.println("Intersecting box on 2 sides");
 					if (boxSidesIntersecting[0]&&boxSidesIntersecting[1]) {
 						//N of and W of
+						return String.format("N OF %s AND W OF %s", convertLat(minY), convertLon(maxX));
 					} else if (boxSidesIntersecting[1]&&boxSidesIntersecting[2]) {
 						//S of and W of
+						return String.format("S OF %s AND W OF %s", convertLat(maxY), convertLon(maxX));
 					} else if (boxSidesIntersecting[2]&&boxSidesIntersecting[3]) {
 						//S of and E of
-					}else if (boxSidesIntersecting[3]&&boxSidesIntersecting[4]) {
+						return String.format("S OF %s AND E OF %s", convertLat(maxY), convertLon(minX));
+					}else if (boxSidesIntersecting[3]&&boxSidesIntersecting[0]) {
 						//N of and E of
+						return String.format("N OF %s AND E OF %s", convertLat(minY), convertLon(minX));
 					}else if (boxSidesIntersecting[0]&&boxSidesIntersecting[2]) {
-						return "N OF N52 AND S OF N55";
+						//N of and S of
+						return String.format("N OF %s AND S OF %s", convertLat(minY), convertLat(maxY));
 					}else if (boxSidesIntersecting[1]&&boxSidesIntersecting[3]) {
-						return "E OF E02 AND W OF E10";
+						//E of  and W of
+						return String.format("E OF %s AND W OF %s", convertLon(minX), convertLon(maxX));
 					}
+				} else if (boxSidesIntersectingCount==3) {
+					Debug.println("Intersecting box on 3 sides");
+				} else if (boxSidesIntersectingCount==4) {
+					Debug.println("Intersecting box on 4 sides");
 				}
 
 				// Intersect the box with the FIR
-				org.locationtech.jts.geom.Geometry intersection = jtsGeometry.intersection(geom_fir);
+				org.locationtech.jts.geom.Geometry intersection = drawnGeometry.intersection(geom_fir);
 
 				Debug.println("intersection: "+intersection);
+				
+				if (intersection.equalsTopo(geom_fir)) {
+					return "ENTIRE FIR";
+				}
+				
 				// One line segment so encode that
 				if (intersection.getClass().equals(org.locationtech.jts.geom.LineString.class)) {
 					// single intersect
 					org.locationtech.jts.geom.LineString intersectionLine = (org.locationtech.jts.geom.LineString)intersection;
-					return this.lineToTAC(intersectionLine, jtsGeometry);
+					return this.lineToTAC(intersectionLine, drawnGeometry);
 				} else if (intersection.getClass().equals(org.locationtech.jts.geom.MultiLineString.class)) {
 					// Multiple intersects -- e.g. north east
 					// Assert that they are encoded in the <North/South> - <East/West> order
@@ -581,7 +636,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 					if (asList.get(0).getCoordinateN(0).y != asList.get(0).getCoordinateN(1).y) {
 						Collections.reverse(asList);
 					}
-					return asList.stream().map(line -> this.lineToTAC(line, jtsGeometry)).collect(Collectors.joining(" AND "));
+					return asList.stream().map(line -> this.lineToTAC(line, drawnGeometry)).collect(Collectors.joining(" AND "));
+				} else {
+					coords = ((Polygon)(f.getGeometry())).getCoordinates().get(0);
+					return "WI " + this.latlonToDMS(coords);
 				}
 			} catch (ParseException | JsonProcessingException e) {
 				// TODO Auto-generated catch block
@@ -592,14 +650,11 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		}
 	}
 
-	public List<String> createLocationTAC(FeatureCollection fc, Feature FIR) {
-		return fc.getFeatures().stream().map(feature -> this.featureToTAC(feature, FIR)).collect(Collectors.toList());
-	}
-
 	public String toTAC(Feature FIR) {
 		GeoJsonObject startGeometry = this.findStartGeometry() ; //findStartGeometry();
-		if (!((Feature)startGeometry).getProperty("selectionType").equals("box")) {
-			startGeometry = this.extractSingleStartGeometry();
+		if (!((Feature)startGeometry).getProperty("selectionType").equals("box")&&
+		  !((Feature)startGeometry).getProperty("selectionType").equals("fir"))	{
+			startGeometry = this.extractSingleStartGeometry(); // Use intersection result
 		}
 		StringBuilder sb = new StringBuilder();
 		String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth()) + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
