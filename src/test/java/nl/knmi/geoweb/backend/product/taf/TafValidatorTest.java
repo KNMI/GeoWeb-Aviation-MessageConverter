@@ -64,6 +64,7 @@ public class TafValidatorTest {
 		TafSchemaStore tafSchemaStore =  new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, objectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
+		System.out.println(report.getErrors());
 		assertThat(report.getErrors().toString(), is("{\"/changegroups/0/forecast/wind/windEnoughDifference\":"+
 				"[\"Change in wind must be at least 30 degrees or 5 knots\"]}"));
 		assertThat(report.isSucceeded(), is(false));
@@ -192,7 +193,7 @@ public class TafValidatorTest {
 		TafSchemaStore tafSchemaStore =  new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, objectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
-		assertThat(report.getErrors().toString(), is("{\"/forecast/visibilityAndFogWithoutDescriptorWithinLimit\":[\"Fog requirers a visibility of 1000 meters or less\"]}"));
+		assertThat(report.getErrors().toString(), is("{\"/forecast/visibilityAndFogWithoutDescriptorWithinLimit\":[\"Fog requires a visibility of 1000 meters or less\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 
 	}

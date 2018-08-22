@@ -3,6 +3,7 @@ package nl.knmi.geoweb.backend.product.taf;
 import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -767,7 +768,14 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 		}
 
 		sb.append(this.metadata.location);
-		sb.append(" " + TAFtoTACMaps.toDDHHMM(this.metadata.issueTime));
+		
+		/* Add issuetime */
+		if (this.metadata.issueTime != null) {
+			sb.append(" " + TAFtoTACMaps.toDDHHMM(this.metadata.issueTime));
+		} else{
+			sb.append(" " + "<not yet issued>");
+		}
+		
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case missing:
 			// If missing, we're done here
@@ -777,8 +785,11 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			// do nothing
 			break;
 		}
+		
+		/* Add date */
 		sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.validityStart) + "/"
 				+ TAFtoTACMaps.toDDHH(this.metadata.validityEnd));
+		
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case canceled:
 			// In case of a cancel there are no change groups so we're done here
@@ -856,7 +867,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 	public void export(File path, ProductConverter<Taf> converter, ObjectMapper om) {
 		//TODO Make LTNL99 configurable 
 		try {
-			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+			String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             String validTime = this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 			String name = "TAF_" + this.metadata.getLocation() + "_" + validTime + "_" + time;
 			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.getPublishableTAC());

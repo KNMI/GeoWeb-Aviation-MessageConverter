@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.Duration;
 
@@ -876,7 +877,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	public void export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
 		//		String s=converter.ToIWXXM_2_1(this);
 		try {
-			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+			String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 			String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 			String name = "SIGMET_" + this.getLocation_indicator_icao() + "_" + validTime + "_" + time;
 			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.toTAC(this.getFirFeature()));
