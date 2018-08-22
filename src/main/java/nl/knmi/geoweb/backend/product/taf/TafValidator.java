@@ -1310,7 +1310,7 @@ public class TafValidator {
 		if (validationReport == null) {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false,
-					(ObjectNode) om.readTree("{\"message\": \"Validation report was null\"}"), validationReport);
+					(ObjectNode) om.readTree("{\"/forecast/message\": [\"Validation report was null\"]}"), validationReport);
 		}
 
 		//		Debug.println(messagesMap.toString());
@@ -1319,7 +1319,7 @@ public class TafValidator {
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 
 		if (!validationReport.isSuccess()) {
-			//			Debug.println("Validation report failed: " + validationReport.toString());	
+			// Debug.println("Validation report failed: " + validationReport.toString());	
 
 			//			validationReport.forEach(report -> {
 			//				
@@ -1354,10 +1354,10 @@ public class TafValidator {
 		if (enrichedValidationReport == null) {
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false,
-					(ObjectNode) om.readTree("{\"message\": \"Validation report was null\"}"), validationReport,
+					(ObjectNode) om.readTree("{\"/forecast/message\": [\"Validation report was null\"]}"), validationReport,
 					enrichedValidationReport);
 		}
-		//		Debug.println("Second: " + enrichedValidationReport.toString());
+		// Debug.println("Second: " + enrichedValidationReport.toString());
 
 		if (!enrichedValidationReport.isSuccess()) {
 			// Try to find all possible errors and map them to the human-readable variants
@@ -1369,6 +1369,16 @@ public class TafValidator {
 			((ObjectNode) errorJson).setAll((ObjectNode) ValidationUtils.getJsonNode(errorsAsJson));
 		}
 
+		/* Check if we can make a TAC */
+		try{
+			objectMapper.readValue(tafStr, Taf.class).toTAC();
+		}catch(Exception e){
+			ObjectMapper om = new ObjectMapper();
+			return new TafValidationResult(false,
+					(ObjectNode) om.readTree("{\"/forecast/message\": [\"Unable to generate TAC report\"]}"), validationReport,
+					enrichedValidationReport);
+		}
+		
 		// If everything is okay, return true as succeeded with null as errors
 		if (enrichedValidationReport.isSuccess() && validationReport.isSuccess()) {
 			return new TafValidationResult(true);
