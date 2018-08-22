@@ -37,7 +37,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 		sigmet.setAirTrafficServicesUnit(unit)	;
 
 		if (input.getIssuedate()==null) {
-		  sigmet.setIssueTime(OffsetDateTime.now().atZoneSameInstant(ZoneId.of("UTC")));
+		  sigmet.setIssueTime(OffsetDateTime.now(ZoneId.of("Z")).atZoneSameInstant(ZoneId.of("UTC")));
 		} else {
 		  sigmet.setIssueTime(input.getIssuedate().atZoneSameInstant(ZoneId.of("UTC"))); //TODO
 		}

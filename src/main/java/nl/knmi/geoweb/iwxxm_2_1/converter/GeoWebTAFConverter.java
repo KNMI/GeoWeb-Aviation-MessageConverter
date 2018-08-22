@@ -1,5 +1,6 @@
 package nl.knmi.geoweb.iwxxm_2_1.converter;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		retval.setConvertedMessage(taf);
 
 		taf.setTranslatedTAC(input.toTAC());
-		taf.setTranslationTime(ZonedDateTime.now());
+		taf.setTranslationTime(ZonedDateTime.now(ZoneId.of("Z")));
 
 		TAFStatus st;
 		switch (input.getMetadata().getType()){

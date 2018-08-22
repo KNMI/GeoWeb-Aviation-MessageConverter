@@ -3,6 +3,7 @@ package nl.knmi.geoweb.backend.product.taf;
 import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -856,7 +857,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 	public void export(File path, ProductConverter<Taf> converter, ObjectMapper om) {
 		//TODO Make LTNL99 configurable 
 		try {
-			String time = OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+			String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             String validTime = this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 			String name = "TAF_" + this.metadata.getLocation() + "_" + validTime + "_" + time;
 			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.getPublishableTAC());
