@@ -1369,16 +1369,16 @@ public class TafValidator {
 			((ObjectNode) errorJson).setAll((ObjectNode) ValidationUtils.getJsonNode(errorsAsJson));
 		}
 
-//		/* Check if we can make a TAC */
-//		try{
-//			objectMapper.readValue(tafStr, Taf.class).toTAC();
-//		}catch(Exception e){
+		/* Check if we can make a TAC */
+		try{
+			objectMapper.readValue(tafStr, Taf.class).toTAC();
+		}catch(Exception e){
 //			Debug.printStackTrace(e);
-//			ObjectMapper om = new ObjectMapper();
-//			return new TafValidationResult(false,
-//					(ObjectNode) om.readTree("{\"/forecast/message\": [\"Unable to generate TAC report\"]}"), validationReport,
-//					enrichedValidationReport);
-//		}
+			ObjectMapper om = new ObjectMapper();
+			return new TafValidationResult(false,
+					(ObjectNode) om.readTree("{\"/forecast/message\": [\"Unable to generate TAC report\"]}"), validationReport,
+					enrichedValidationReport);
+		}
 		
 		// If everything is okay, return true as succeeded with null as errors
 		if (enrichedValidationReport.isSuccess() && validationReport.isSuccess()) {
