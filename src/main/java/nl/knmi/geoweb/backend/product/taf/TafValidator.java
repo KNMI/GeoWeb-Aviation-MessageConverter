@@ -24,6 +24,8 @@ import java.util.stream.StreamSupport;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -52,8 +54,8 @@ import nl.knmi.adaguc.tools.Debug;
 @Component
 public class TafValidator {
 
-	//	@Autowired
-	//	@Qualifier("tafObjectMapperBean")
+	@Autowired
+    @Qualifier("tafObjectMapper")	
 	private ObjectMapper objectMapper;
 
 	TafSchemaStore tafSchemaStore;
