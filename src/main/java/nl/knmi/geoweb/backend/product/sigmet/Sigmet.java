@@ -874,7 +874,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	}
 
 	@Override
-	public void export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
+	public String export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
 		//		String s=converter.ToIWXXM_2_1(this);
 		try {
 			String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
@@ -888,5 +888,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
 		} catch (IOException e) {
 		}
+		return "OK";
 	}
 }
