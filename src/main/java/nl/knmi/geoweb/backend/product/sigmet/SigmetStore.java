@@ -26,19 +26,19 @@ import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
 
 @Component
 public class SigmetStore {
-	
+
 	private String directory;
-	
+
 	@Autowired
 	@Qualifier("sigmetObjectMapper")
 	private ObjectMapper sigmetObjectMapper;
-	
+
 	public ObjectMapper getOM(){ return sigmetObjectMapper;}
-	
+
 	public SigmetStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
 		this.setLocation(productstorelocation);
 	}
-	
+
 	public void setLocation(String productstorelocation) throws IOException {
 		String dir = productstorelocation + "/sigmets";
 		Debug.println("SIGMET STORE at " + dir);
@@ -50,7 +50,7 @@ public class SigmetStore {
 			Debug.errprintln("Sigmet directory location is not a directory");
 			throw new NotDirectoryException("Sigmet directory location is not a directorty");
 		}
-		
+
 		this.directory=dir;
 	}
 
@@ -58,7 +58,7 @@ public class SigmetStore {
 		String fn=String.format("%s/sigmet_%s.json", this.directory, sigmet.getUuid());
 		sigmet.serializeSigmet(om, fn);	
 	}
-	
+
 	public void storeSigmet(Sigmet sigmet) {
 		String fn=String.format("%s/sigmet_%s.json", this.directory, sigmet.getUuid());
 		sigmet.serializeSigmet(sigmetObjectMapper, fn);	
@@ -75,7 +75,7 @@ public class SigmetStore {
 		}
 		return seq;
 	}
-	
+
 	public Sigmet[] getPublishedSigmetsSinceDay (int daysOffset) {
 		Sigmet[] sigmets = getSigmets(false, SigmetStatus.published);
 		OffsetDateTime offset = OffsetDateTime.now(ZoneId.of("Z")).minusDays(daysOffset);
@@ -114,12 +114,18 @@ public class SigmetStore {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
 						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
-						if ((sm.getStatus()==SigmetStatus.published)&&(sm.getValiddate().isBefore(now)) && (sm.getValiddate_end().isAfter(now))) {
+						if ((sm.getStatus()==SigmetStatus.published)&& sm.getValiddate_end().isAfter(now)) {
 							sigmets.add(sm);
 						}
 					}else if (selectStatus != null) {
-						if (sm.getStatus()==selectStatus) {
-							sigmets.add(sm);
+						if (selectStatus==SigmetStatus.canceled) {
+							if (sm.getValiddate_end().isBefore(now)) {
+								sigmets.add(sm);
+							}
+						} else {
+							if (sm.getStatus()==selectStatus) {
+								sigmets.add(sm);
+							}
 						}
 					} else {
 						sigmets.add(sm);
