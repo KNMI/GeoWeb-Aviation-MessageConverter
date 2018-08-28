@@ -57,7 +57,7 @@ public class SigmetToTACTest {
 			+"\"phenomenon\":\"OBSC_TS\","
 			+"\"obs_or_forecast\":{\"obs\":true},"
 			+"\"level\":{\"lev1\":{\"value\":100.0,\"unit\":\"FL\"}},"
-			+"\"movement\":{\"stationary\":true},"
+			+"\"movement_type\":\"stationary\","
 			+"\"change\":\"NC\","
 			+"\"issuedate\":\"2017-03-24T15:56:16Z\","
 			+"\"validdate\":\"2017-03-24T15:56:16Z\","
@@ -76,6 +76,7 @@ public class SigmetToTACTest {
 		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")).minusHours(1));
 		sm.setValiddate_end(OffsetDateTime.now(ZoneId.of("Z")).plusHours(3));
 		sm.setChange(SigmetChange.NC);
+		sm.setMovement_type(Sigmet.SigmetMovementType.STATIONARY);
 		sm.setLevelinfo(new Sigmet.SigmetLevel(new Sigmet.SigmetLevelPart(SigmetLevelUnit.FL, 300), SigmetLevelMode.TOPS_ABV));
 		setGeoFromString(sm, s);
 		return sm;

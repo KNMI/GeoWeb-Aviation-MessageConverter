@@ -43,11 +43,11 @@ public class SigmetToIWXXMTest {
 	static String testGeoJson="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]},\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}}}]}";
 
 	static String testSigmet="{\"geojson\":"
-			+"{\"type\":\"FeatureCollection\",\"features\":"+"[{\"type\":\"Feature\",\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]}}]},"
+			+"{\"type\":\"FeatureCollection\",\"features\":"+"[{\"type\":\"Feature\",\"properties\":{\"selectionType\": \"poly\", \"featureFunction\": \"start\"},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722],[4.44963571205923,52.75852934878266]]]}}]},"
 			+"\"phenomenon\":\"OBSC_TS\","
-			+"\"obs_or_forecast\":{\"obs\":true},"
-			+"\"levelinfo\":{\"mode\": \"BETW\", \"levels\":[{\"value\":100.0,\"unit\":\"FL\"},{\\\"value\\\"300.0,\\\"unit\\\":\\\"FL\\\"}]},"
-			+"\"movement\":{\"stationary\":true},"
+			+"\"obs_or_forecast\":{\"obs\":true, \"obsFcTime\":\"2017-03-24T15:50:00Z\"},"
+			+"\"levelinfo\":{\"mode\": \"BETW\", \"levels\":[{\"value\":100.0,\"unit\":\"FL\"},{\"value\":300.0,\"unit\":\"FL\"}]},"
+			+"\"movement_type\":\"STATIONARY\","
 			+"\"change\":\"NC\","
 			+"\"issuedate\":\"2017-03-24T15:56:16Z\","
 			+"\"validdate\":\"2017-03-24T16:00:00Z\","
@@ -138,12 +138,7 @@ public class SigmetToIWXXMTest {
 //			"        ,{\"value\": 300, \"unit\": \"FL\"}" +
 			"      ]" + 
 			"  }," + 
-			"  \"movement\": {" + 
-			"    \"stationary\": false," +
-			"    \"speed\": 5.0,"+
-			"    \"speeduom\": \"KT\","+
-			"    \"dir\": \"SW\""+
-			"  }," + 
+			"  \"movement_type\":\"FORECAST_POSITION\"," +
 			"  \"change\": \"NC\"," + 
 			"  \"issuedate\": \"2017-08-07T11:31:36Z\"," + 
 			"  \"validdate\": \"2017-08-07T12:00:00Z\"," + 
@@ -155,6 +150,8 @@ public class SigmetToIWXXMTest {
 			"  \"status\": \"concept\"," + 
 			"  \"sequence\": 0" + 
 			"}";
+	
+	static String[] testSigmets= {testSigmet, testSigmet2};
 	
 	public void setGeoFromString2(Sigmet sm, String json) {
 		Debug.println("setGeoFromString2 "+json);
@@ -175,12 +172,10 @@ public class SigmetToIWXXMTest {
 	@Autowired
 	FIRStore firStore;
 	
-	@Test
-	public void TestConversion() throws Exception {
-		
+	public void TestConversion(String s) {
 		Sigmet sm = null;
 		try {
-			sm=sigmetObjectMapper.readValue(testSigmet2, Sigmet.class);
+			sm=sigmetObjectMapper.readValue(s, Sigmet.class);
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 		}
@@ -188,7 +183,15 @@ public class SigmetToIWXXMTest {
 		String res=sigmetConverter.ToIWXXM_2_1(sm);
 		System.err.println(res);
 		System.err.println("TAC: "+sm.toTAC(firStore.lookup(sm.getFirname(), false)));
-		
+	}
+	
+	@Test
+	public void TestConversions(){
+		for (String sm: testSigmets) {
+			Debug.println("Testing sigmet: "+sm);
+			TestConversion(sm);
+			Debug.println("\n");
+		}
 	}
 
 }
