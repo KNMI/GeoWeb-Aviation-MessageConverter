@@ -66,7 +66,7 @@ public class SigmetPhenomenaMapping {
 		phen=new SigmetPhenomenon("Severe Turbulence",  "SEV_TURB", "sigmet_layer_SEV_TURB");
 		phenomena.add(phen);
 		phen=new SigmetPhenomenon("Severe Icing",  "SEV_ICE", "sigmet_layer_SEV_ICE");
-		phen.addAddition("due to freezing rain", "FRZA");
+		phen.addAddition("due to freezing rain", "FZRA");
 		phenomena.add(phen);
 		phen=new SigmetPhenomenon("Duststorm", "HVY_DS", "sigmet_layer_HVY_DS");
 		phenomena.add(phen);

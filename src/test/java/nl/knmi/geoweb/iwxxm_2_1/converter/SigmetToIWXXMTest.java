@@ -150,8 +150,37 @@ public class SigmetToIWXXMTest {
 			"  \"status\": \"concept\"," + 
 			"  \"sequence\": 0" + 
 			"}";
+	static String testSigmet3="{\"geojson\":"
+			+"{\"type\":\"FeatureCollection\",\"features\":"
+			+"[{\"type\":\"Feature\",\"id\":\"1\", \"properties\":{\"selectionType\": \"fir\", \"featureFunction\": \"start\"}}, "
+			+"{\"type\":\"Feature\",\"id\":\"2\", \"properties\":{\"selectionType\": \"poly\", \"featureFunction\": \"intersection\", \"relatesTo\":\"1\"},\"geometry\":{\"type\":\"Polygon\", \"coordinates\":[[[5.2,52.0],[6.2,53.0],[6.2,52.0],[5.2,52.0]]]}}]},"
+			+"\"phenomenon\":\"OBSC_TS\","
+			+"\"obs_or_forecast\":{\"obs\":true, \"obsFcTime\":\"2017-03-24T15:50:00Z\"},"
+			+"\"levelinfo\":{\"mode\": \"BETW\", \"levels\":[{\"value\":100.0,\"unit\":\"FL\"},{\"value\":300.0,\"unit\":\"FL\"}]},"
+			+"\"movement_type\":\"STATIONARY\","
+			+"\"change\":\"NC\","
+			+"\"issuedate\":\"2017-03-24T15:56:16Z\","
+			+"\"validdate\":\"2017-03-24T16:00:00Z\","
+			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
+			+"\"firname\":\"AMSTERDAM FIR\","
+			+"\"location_indicator_icao\":\"EHAA\","
+			+"\"location_indicator_mwo\":\"EHDB\"}";
 	
-	static String[] testSigmets= {testSigmet, testSigmet2};
+	static String testSigmet4="{\"geojson\":"
+			+"{\"type\":\"FeatureCollection\",\"features\":"+"[{\"type\":\"Feature\",\"properties\":{\"selectionType\": \"point\", \"featureFunction\": \"start\"},\"geometry\":{\"type\":\"Point\",\"coordinates\":[5.2,52.6]}}]},"
+			+"\"phenomenon\":\"OBSC_TS\","
+			+"\"obs_or_forecast\":{\"obs\":true, \"obsFcTime\":\"2017-03-24T15:50:00Z\"},"
+			+"\"levelinfo\":{\"mode\": \"BETW\", \"levels\":[{\"value\":100.0,\"unit\":\"FL\"},{\"value\":300.0,\"unit\":\"FL\"}]},"
+			+"\"movement_type\":\"STATIONARY\","
+			+"\"change\":\"NC\","
+			+"\"issuedate\":\"2017-03-24T15:56:16Z\","
+			+"\"validdate\":\"2017-03-24T16:00:00Z\","
+			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
+			+"\"firname\":\"AMSTERDAM FIR\","
+			+"\"location_indicator_icao\":\"EHAA\","
+			+"\"location_indicator_mwo\":\"EHDB\"}";
+	
+	static String[] testSigmets= {/* testSigmet, testSigmet2, testSigmet3,*/ testSigmet4};
 	
 	public void setGeoFromString2(Sigmet sm, String json) {
 		Debug.println("setGeoFromString2 "+json);

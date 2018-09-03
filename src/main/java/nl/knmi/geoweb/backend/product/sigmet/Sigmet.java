@@ -92,7 +92,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		FRQ_TS("FRQ TS", "Frequent Thunderstorms"),FRQ_TSGR("FRQ TSGR", "Frequent Thunderstorms with hail"),
 		SQL_TS("SQL TS", "Squall line"),SQL_TSGR("SQL TSGR", "Squall line with hail"),
 		SEV_TURB("SEV TURB", "Severe Turbulence"),
-		SEV_ICE("SEV ICE", "Severe Icing"), SEV_ICE_FRZA("SEV ICE (FRZA)", "Severe Icing with Freezing Rain"),
+		SEV_ICE("SEV ICE", "Severe Icing"), SEV_ICE_FZRA("SEV ICE (FZRA)", "Severe Icing with Freezing Rain"),
 		SEV_MTW("SEV MTW", "Severe Mountain Wave"),
 		HVY_DS("HVY DS", "Heavy Duststorm"),HVY_SS("HVY SS", "Heavy Sandstorm"),
 		RDOACT_CLD("RDOACT CLD", "Radioactive Cloud")
@@ -467,39 +467,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		return Arrays.stream(coords).map(coord -> this.pointToDMSString(coord)).collect(Collectors.joining(" - "));
 	}
 
-	public String lineToTAC(LineString intersectionLine, org.locationtech.jts.geom.Geometry box) {
-		// TODO: Might only work if all points are in the same octant of earth?
-		double _minX = Double.MAX_VALUE, _maxX = Double.MIN_VALUE, _minY = Double.MAX_VALUE, _maxY = Double.MIN_VALUE;
-		for (org.locationtech.jts.geom.Coordinate coord : box.getCoordinates()) {
-			_minX = Math.min(coord.x, _minX);
-			_maxX = Math.max(coord.x, _maxX);
-			_minY = Math.min(coord.y, _minY);
-			_maxY = Math.max(coord.y, _maxY);
-		}
-		final double minY = _minY;
-		final double minX = _minX;
-		final double maxX = _maxX;
-		final double maxY = _maxY;
-
-		if (Arrays.stream(intersectionLine.getCoordinates()).allMatch(point -> point.y == minY)) {
-			// South line intersects - so north of intersection line
-			return "N OF " + this.convertLat(minY);
-		} 
-		if (Arrays.stream(intersectionLine.getCoordinates()).allMatch(point -> point.y == maxY)) {
-			// North line intersects - so south of intersection line
-			return "S OF " + this.convertLat(maxY);
-		}
-		if (Arrays.stream(intersectionLine.getCoordinates()).allMatch(point -> point.x == maxX)) {
-			// East line intersects - so west of intersection line
-			return "E OF " + this.convertLon(maxX);
-		}
-		if (Arrays.stream(intersectionLine.getCoordinates()).allMatch(point -> point.x == minX)) {
-			// West line intersects - so east of intersection line
-			return "W OF " + this.convertLon(minX);
-		}
-		return "";
-	}
-
 	public String featureToTAC(Feature f, Feature FIR) {
 		Debug.println("featureToTAC("+f.getId()+","+f.getProperties().get("selectionType")+")");
 		List<LngLatAlt> coords;
@@ -639,26 +606,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 					Debug.println("More than 7 in intersection!!");
 					return "WI "+ this.latlonToDMS(drawn);
 				}
-				return "WIXXXX " + this.latlonToDMS(intersected);
-				
-//				// One line segment so encode that
-//				if (intersection.getClass().equals(org.locationtech.jts.geom.LineString.class)) {
-//					// single intersect
-//					org.locationtech.jts.geom.LineString intersectionLine = (org.locationtech.jts.geom.LineString)intersection;
-//					return this.lineToTAC(intersectionLine, drawnGeometry);
-//				} else if (intersection.getClass().equals(org.locationtech.jts.geom.MultiLineString.class)) {
-//					// Multiple intersects -- e.g. north east
-//					// Assert that they are encoded in the <North/South> - <East/West> order
-//					org.locationtech.jts.geom.MultiLineString intersectionLines = (org.locationtech.jts.geom.MultiLineString)intersection;
-//					List<LineString> asList = Arrays.asList((LineString)intersectionLines.getGeometryN(0), (LineString)intersectionLines.getGeometryN(1));
-//					if (asList.get(0).getCoordinateN(0).y != asList.get(0).getCoordinateN(1).y) {
-//						Collections.reverse(asList);
-//					}
-//					return asList.stream().map(line -> this.lineToTAC(line, drawnGeometry)).collect(Collectors.joining(" AND "));
-//				} else {
-//					coords = ((Polygon)(f.getGeometry())).getCoordinates().get(0);
-//					return "WI " + this.latlonToDMS(coords);
-//				}
+				return "WI " + this.latlonToDMS(intersected);
 			} catch (ParseException | JsonProcessingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -699,6 +647,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		sb.append(this.levelinfo.toTAC());
 		sb.append('\n');
 
+		if (this.movement_type==null) { //TODO this fixes front-end problems TEMPORARILY
+			this.movement_type=SigmetMovementType.STATIONARY;
+		}
+		
 		switch (this.movement_type) {
 		case STATIONARY:
 			sb.append("STNR ");
@@ -706,10 +658,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		case MOVEMENT:
 			sb.append(this.movement.toTAC());
 			sb.append('\n');
-			if (this.change!=null) {
-				sb.append(this.change.toTAC());
-				sb.append('\n');
-			}
 			break;
 		case FORECAST_POSITION:
 			// Present forecast_position geometry later

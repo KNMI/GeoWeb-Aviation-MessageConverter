@@ -52,6 +52,8 @@ public class SigmetToTACTest {
 	
 	static String testGeoJson4="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,52]}, \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"point\"} }]}";
 	
+	static String testGeoJson5="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\", \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"fir\"} }]}";
+
 	static String testSigmet="{\"geojson\":"
 			+"{\"type\":\"FeatureCollection\",\"features\":"+"[{\"type\":\"Feature\",\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]}}]},"
 			+"\"phenomenon\":\"OBSC_TS\","
@@ -135,7 +137,7 @@ public class SigmetToTACTest {
 	@Test
 	public void loadAndValidateSigmet () throws Exception {
 		SigmetStore store=createNewStore();
-		Sigmet sm = createSigmet(testGeoJson2);
+		Sigmet sm = createSigmet(testGeoJson5);
 		assertThat(store.getOM(),notNullValue());
 		store.storeSigmet(sm);
 		

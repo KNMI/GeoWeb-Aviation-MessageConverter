@@ -62,6 +62,9 @@ public class GeoUtils {
 	public static Geometry jsonFeature2jtsGeometry(Feature F)  {
 		try {
 			ObjectMapper om=getObjectMapper();
+			if (F.getGeometry()==null) {
+				return null;
+			}
 			String json=om.writeValueAsString(F.getGeometry());
 			return getReader().read(json);
 		} catch(ParseException | JsonProcessingException e) {

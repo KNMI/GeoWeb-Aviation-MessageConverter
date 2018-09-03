@@ -23,6 +23,7 @@ import fi.fmi.avi.model.AviationCodeListUser;
 import fi.fmi.avi.model.NumericMeasure;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetLevelMode;
+import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
 
 public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>{
@@ -63,6 +64,10 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 		}
 		sa.setApproximateLocation(false); //TODO
 		boolean fpaRequired=true;
+		
+		if (input.getMovement_type()==null) {
+			input.setMovement_type(SigmetMovementType.STATIONARY);
+		}
 		switch (input.getMovement_type()) {
 		case STATIONARY:
 			sa.setMovingDirection(null);
