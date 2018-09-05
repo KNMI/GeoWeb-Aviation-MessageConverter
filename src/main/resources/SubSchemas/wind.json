@@ -9,7 +9,7 @@
         },
         "winddirectionvrb":{
           "$geoweb::messages": {
-              "oneOf": "Direction must be variable or one of (10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable!"
+              "oneOf": "Direction must be VRB or one of (10, 20, ..., 360) degrees."
           },
           "oneOf": [
               {
@@ -54,56 +54,6 @@
                     "additionalProperties": false,
                     "properties": {
                         "direction": {
-                            "$geoweb::messages": {
-                                "oneOf": "Direction must be variable or one of (10, 20, ..., 360) degrees. If the speed is less than 3 knots or 2 meters per second it is always variable"
-                            },
-                            "enum": [
-                                "VRB"
-                            ],
-                            "type": "string"
-                        },
-                        "gusts": {
-                            "$geoweb::messages": {
-                                "oneOf": "Gust must be at least 10 knots or 5 meters per seconds more than average wind speed"
-                            },
-                            "oneOf": [
-                                {
-                                    "maximum": 99,
-                                    "minimum": 10,
-                                    "type": "integer"
-                                },
-                                {
-                                    "enum": [
-                                        "P99"
-                                    ],
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "speed": {
-                            "$geoweb::messages": {
-                                "maximum": "79",
-                                "minimum": "80"
-                            },
-                            "maximum": 2,
-                            "minimum": 0,
-                            "type": "integer"
-                        },
-                        "unit": {
-                            "$geoweb::messages": {
-                                "enum": "Unit must be knots or meters per second"
-                            },
-                            "enum": [
-                                "KT"
-                            ],
-                            "type": "string"
-                        }
-                    }
-                },
-                {
-                    "additionalProperties": false,
-                    "properties": {
-                        "direction": {
                           "$ref": "#/definitions/winddirectionvrb"
                         },
                         "speedOperator":{
@@ -133,7 +83,7 @@
                                 "minimum": "If the wind speed is less than 0 knots, the direction has to be variable."
                             },
                             "maximum": 99,
-                            "minimum": 0,
+                            "minimum": 1,
                             "type": "integer"
                         },
                         "unit": {
@@ -237,11 +187,11 @@
                         },
                         "speed": {
                           "$geoweb::messages": {
-                                "maximum": "210",
-                                "minimum": "211"
+                                "maximum": "Wind speed cannot be higher then 50 MPS",
+                                "minimum": "Wind speed should be at least 0 MPS"
                             },
                             "maximum": 49,
-                            "minimum": 2,
+                            "minimum": 1,
                             "type": "integer"
                         },
                         "unit": {

@@ -15,10 +15,43 @@
                         "phenomena": {
                             "items": {
                                 "$geoweb::messages": {
+                                    "enum": "Only moderate freezing fog is allowed"
+                                },
+                                "enum": [
+                                    "fog"
+                                ],
+                                "type": "string"
+                            },
+                            "minItems": 1,
+                            "type": "array",
+                            "uniqueItems": true
+                        },
+                        "qualifier": {
+                            "enum": [
+                                "moderate"
+                            ],
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "phenomena",
+                        "descriptor"
+                    ]
+                },{
+                    "additionalProperties": false,
+                    "properties": {
+                        "descriptor": {
+                            "enum": [
+                                "freezing"
+                            ],
+                            "type": "string"
+                        },
+                        "phenomena": {
+                            "items": {
+                                "$geoweb::messages": {
                                     "enum": "Only freezing fog, drizzle or rain is allowed"
                                 },
                                 "enum": [
-                                    "fog",
                                     "drizzle",
                                     "rain"
                                 ],
@@ -93,6 +126,7 @@
                                     "mist",
                                     "widespread dust",
                                     "haze",
+                                    "sand",
                                     "smoke",
                                     "volcanic ash",
                                     "squall",
@@ -107,7 +141,7 @@
                         },
                         "qualifier": {
                             "$geoweb::messages": {
-                                "enum": "FG, BR, DU, HZ, FU, VA, SQ, PO and TS can only be moderate"
+                                "enum": "FG, BR, DU, HZ, SA, FU, VA, SQ, PO and TS can only be moderate"
                             },
                             "enum": [
                                 "moderate"
@@ -162,7 +196,6 @@
                                     "snow",
                                     "snow grains",
                                     "ice pellets",
-                                    "sand",
                                     "sandstorm"
                                 ],
                                 "type": "string"
