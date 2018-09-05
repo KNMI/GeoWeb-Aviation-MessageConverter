@@ -23,13 +23,14 @@ import fi.fmi.avi.model.AviationCodeListUser;
 import fi.fmi.avi.model.NumericMeasure;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetLevelMode;
+import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
 
 public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>{
 
 	@Override
 	public ConversionResult<SIGMET> convertMessage(Sigmet input, ConversionHints hints) {
-		System.err.println("cinvertMessage: "+this.getClass().getName());
+		Debug.println("convertMessage: "+this.getClass().getName());
 		ConversionResult<SIGMET> retval = new ConversionResult<>();
 		SIGMET sigmet = new SigmetImpl();
 
@@ -63,27 +64,34 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 		}
 		sa.setApproximateLocation(false); //TODO
 		boolean fpaRequired=true;
-		if (input.getMovement()!=null) {
-			if (!input.getMovement().isStationary()) {
-				if ((input.getMovement().getDir()!=null) && (input.getMovement().getSpeed()!=null)) {
-					NumericMeasure numDir=new NumericMeasureImpl(input.getMovement().getDir().getDir(), "deg");
-					sa.setMovingDirection(numDir);
-					String uom=input.getMovement().getSpeeduom();
-					if ("KMH".equals(uom)) {
-						uom="km/h";
-					}
-					if ("KT".equals(uom)) {
-						uom="[kn_i]";
-					}
-					NumericMeasure numSpd=new NumericMeasureImpl(input.getMovement().getSpeed(), uom); 
-					sa.setMovingSpeed(numSpd);
-					fpaRequired=false;
+		
+		if (input.getMovement_type()==null) {
+			input.setMovement_type(SigmetMovementType.STATIONARY);
+		}
+		switch (input.getMovement_type()) {
+		case STATIONARY:
+			sa.setMovingDirection(null);
+			sa.setMovingSpeed(null);
+			fpaRequired=false;
+			break;
+		case MOVEMENT:
+			if ((input.getMovement().getDir()!=null) && (input.getMovement().getSpeed()!=null)) {
+				NumericMeasure numDir=new NumericMeasureImpl(input.getMovement().getDir().getDir(), "deg");
+				sa.setMovingDirection(numDir);
+				String uom=input.getMovement().getSpeeduom();
+				if ("KMH".equals(uom)) {
+					uom="km/h";
 				}
-			} else {
+				if ("KT".equals(uom)) {
+					uom="[kn_i]";
+				}
+				NumericMeasure numSpd=new NumericMeasureImpl(input.getMovement().getSpeed(), uom); 
+				sa.setMovingSpeed(numSpd);
 				fpaRequired=false;
-				sa.setMovingDirection(null);
-				sa.setMovingSpeed(null);
 			}
+			break;
+		case FORECAST_POSITION:
+			break;
 		}
 
 		Debug.println("levelinfo: "+input.getLevelinfo());;
@@ -134,7 +142,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 
 		sigmet.getAnalysis().add(sa);
 
-		System.err.println("FPA required: "+fpaRequired);
+		Debug.println("FPA required: "+fpaRequired);
 		if (fpaRequired) {
 			SigmetForecastPositionAnalysis fpa=new SigmetForecastPositionAnalysisImpl();
 			fpa.setTime(input.getValiddate_end().atZoneSameInstant(ZoneId.of("UTC")));

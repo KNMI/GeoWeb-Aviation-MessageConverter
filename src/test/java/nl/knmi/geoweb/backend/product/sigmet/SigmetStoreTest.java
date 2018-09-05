@@ -44,6 +44,7 @@ public class SigmetStoreTest {
 			+"\"phenomenon\":\"OBSC_TS\","
 			+"\"obs_or_forecast\":{\"obs\":true},"
 			+"\"level\":{\"lev1\":{\"value\":100.0,\"unit\":\"FL\"}},"
+			+"\"movement_type\":\"STATIONARY\","
 			+"\"movement\":{\"stationary\":true},"
 			+"\"change\":\"NC\","
 			+"\"issuedate\":\"2017-03-24T15:56:16Z\","

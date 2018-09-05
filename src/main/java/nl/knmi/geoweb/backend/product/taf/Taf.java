@@ -768,14 +768,14 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 		}
 
 		sb.append(this.metadata.location);
-		
+
 		/* Add issuetime */
 		if (this.metadata.issueTime != null) {
 			sb.append(" " + TAFtoTACMaps.toDDHHMM(this.metadata.issueTime));
 		} else{
 			sb.append(" " + "<not yet issued>");
 		}
-		
+
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case missing:
 			// If missing, we're done here
@@ -785,11 +785,11 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			// do nothing
 			break;
 		}
-		
+
 		/* Add date */
 		sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.validityStart) + "/"
 				+ TAFtoTACMaps.toDDHH(this.metadata.validityEnd));
-		
+
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case canceled:
 			// In case of a cancel there are no change groups so we're done here
@@ -864,14 +864,22 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 	}
 
 	@Override
-	public void export(File path, ProductConverter<Taf> converter, ObjectMapper om) {
+	public String export(File path, ProductConverter<Taf> converter, ObjectMapper om) {
 		//TODO Make LTNL99 configurable 
+		String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+		String validTime = this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
+		String name = "TAF_" + this.metadata.getLocation() + "_" + validTime + "_" + time;
 		try {
-			String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-            String validTime = this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
-			String name = "TAF_" + this.metadata.getLocation() + "_" + validTime + "_" + time;
 			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.getPublishableTAC());
+		} catch (Exception e) {
+			return "creation of TAC failed";
+		}
+		try {
 			Tools.writeFile(path.getPath() + "/" + name + ".json", this.toJSON(om));
+		} catch(Exception e) {
+			return "saving of JSON failed";
+		}
+		try {
 			String iwxxmName="A_"+"LTNL99"+this.metadata.getLocation()+this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("ddHHmm"));
 			switch (this.metadata.type) {
 			case amendment:
@@ -889,9 +897,11 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 
 			iwxxmName+="_C_"+this.metadata.getLocation()+"_"+time;
 			Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", converter.ToIWXXM_2_1(this));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} catch (Exception e) {
+			Debug.println("creation of IWXXM failed: ");
+			Debug.printStackTrace(e);
+			return "creation of IWXXM failed";
 		}
+		return "OK";
 	}
 }
