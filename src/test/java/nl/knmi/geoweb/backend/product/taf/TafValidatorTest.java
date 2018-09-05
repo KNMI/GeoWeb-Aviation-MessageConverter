@@ -152,7 +152,7 @@ public class TafValidatorTest {
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		
 		/* TESTING 1000 SHOULD VALIDATE */
-		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"}],\"visibility\":{\"unit\":\"M\",\"value\":1000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"freezing\",\"phenomena\":[\"fog\"]},{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[]}";
+		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"}],\"visibility\":{\"unit\":\"M\",\"value\":900},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"freezing\",\"phenomena\":[\"fog\"]},{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[]}";
 		TafValidationResult report = tafValidator.validate(tafString);
 		assertThat(report.isSucceeded(), is(true));
 
@@ -198,7 +198,8 @@ public class TafValidatorTest {
 		TafSchemaStore tafSchemaStore =  new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
-		assertThat(report.getErrors().toString(), is("{\"/forecast/visibilityAndFogWithoutDescriptorWithinLimit\":[\"Fog requires a visibility of 1000 meters or less\"]}"));
+		System.out.println(report.getErrors().toString());
+		assertThat(report.getErrors().toString(), is("{\"/forecast/visibilityAndFogWithoutDescriptorWithinLimit\":[\"Fog requires a visibility of less than 1000 meters\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 
 	}
@@ -212,7 +213,7 @@ public class TafValidatorTest {
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
 		System.out.println(report.getErrors().toString());
-		assertThat(report.getErrors().toString(), is("{\"/forecast/weather/0/qualifier\":[\"FG, BR, DU, HZ, FU, VA, SQ, PO and TS can only be moderate\"]}"));
+		assertThat(report.getErrors().toString(), is("{\"/forecast/weather/0/qualifier\":[\"FG, BR, DU, HZ, SA, FU, VA, SQ, PO and TS can only be moderate\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 
 	}

@@ -312,7 +312,7 @@
                 },
                 "visibilityAndFogWithoutDescriptorWithinLimit": {
                     "$geoweb::messages": {
-                        "enum": "Fog requires a visibility of 1000 meters or less"
+                        "enum": "Fog requires a visibility of less than 1000 meters"
                     },
                     "enum": [
                         true

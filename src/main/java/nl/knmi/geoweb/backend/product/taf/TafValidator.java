@@ -2,11 +2,9 @@ package nl.knmi.geoweb.backend.product.taf;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -14,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -23,7 +19,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.Resource;
@@ -36,7 +31,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.fge.jackson.jsonpointer.JsonPointer;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import com.github.fge.jsonschema.core.load.configuration.LoadingConfiguration;
@@ -50,12 +44,25 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentAmountCoverageClouds;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentAscendingHeightClouds;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentChangegroupDuration;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentChangegroupsIncreasingInTime;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentCloudNeededRainOrModifierNecessary;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentEndTimes;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentMaxVerticalVisibility;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentMaxVisibility;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentNonRepeatingChanges;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentOverlappingBecomingChangegroups;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentVisibilityWeatherRequired;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentWindEnoughChange;
+import nl.knmi.geoweb.backend.product.taf.augment.AugmentWindGust;
 
 @Component
 public class TafValidator {
 
 	@Autowired
-    @Qualifier("tafObjectMapper")	
+	@Qualifier("tafObjectMapper")	
 	private ObjectMapper objectMapper;
 
 	TafSchemaStore tafSchemaStore;
@@ -385,687 +392,20 @@ public class TafValidator {
 	}
 
 	public static void enrich(JsonNode input) throws ParseException, JsonProcessingException, IOException {
-		augmentChangegroupsIncreasingInTime(input);
-		augmentOverlappingBecomingChangegroups(input);
-		augmentChangegroupDuration(input);					
-		augmentWindGust(input);								
-		augmentAscendingHeightClouds(input);						//Done
-		augmentAmountCoverageClouds(input);
-		augmentEndTimes(input);
-		augmentVisibilityWeatherRequired(input);
-		augmentEnoughWindChange(input);						//Done
-		augmentCloudNeededRainOrModifierNecessary(input);
-		augmentMaxVisibility(input);
-		augmentNonRepeatingChanges(input);
-		augmentMaxVerticalVisibility(input);
+		AugmentChangegroupsIncreasingInTime.augment(input);
+		AugmentOverlappingBecomingChangegroups.augment(input);
+		AugmentChangegroupDuration.augment(input);					
+		AugmentWindGust.augment(input);								
+		AugmentAscendingHeightClouds.augment(input);				//Done
+		AugmentAmountCoverageClouds.augment(input);
+		AugmentEndTimes.augment(input);
+		AugmentVisibilityWeatherRequired.augment(input);
+		AugmentWindEnoughChange.augment(input);						// FM Done
+		AugmentCloudNeededRainOrModifierNecessary.augment(input);
+		AugmentMaxVisibility.augment(input);
+		AugmentNonRepeatingChanges.augment(input);					// FM Done
+		AugmentMaxVerticalVisibility.augment(input);
 		//		Debug.println(input.toString());
-	}
-
-	private static void augmentNonRepeatingChanges(JsonNode input) throws JsonProcessingException, IOException {
-		ObjectNode currentForecast = (ObjectNode) input.get("forecast");
-		if (currentForecast == null || currentForecast.isNull() || currentForecast.isMissingNode())
-			return;
-		JsonNode currentWeather = currentForecast.get("weather");
-
-		// If the base forecast contains no weather group, this means NSW.
-		// This is because space on punch cards is expensive. Because that matters here.
-		if (currentWeather == null || currentWeather.isNull() || currentWeather.isMissingNode()) {
-			currentForecast.setAll((ObjectNode) (new ObjectMapper().readTree("{\"weather\":\"NSW\"}")));
-		}
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
-			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode())
-				continue;
-
-			String changeGroupChangeAsText = "";
-			if (changegroup.get("changeType") != null ) {
-				changeGroupChangeAsText = changegroup.get("changeType").asText();
-			}
-//			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
-//				continue;
-//			}
-
-			boolean nonRepeatingChange = false;
-
-			JsonNode forecastWind = currentForecast.get("wind");
-			JsonNode changeWind = changeForecast.get("wind");
-
-			JsonNode forecastVisibility = currentForecast.get("visibility");
-			JsonNode changeVisibility = changeForecast.get("visibility");
-
-			JsonNode forecastWeather = currentForecast.get("weather");
-			JsonNode changeWeather = changeForecast.get("weather");
-
-			JsonNode forecastClouds = currentForecast.get("clouds");
-			JsonNode changeClouds = changeForecast.get("clouds");
-
-			if (forecastWind != null && !forecastWind.isNull() && !forecastWind.isMissingNode())
-				nonRepeatingChange |= forecastWind.equals(changeWind);
-			if (forecastVisibility != null && !forecastVisibility.isNull() && !forecastVisibility.isMissingNode())
-				nonRepeatingChange |= forecastVisibility.equals(changeVisibility);
-			if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode())
-				nonRepeatingChange |= forecastWeather.equals(changeWeather);
-			if (forecastClouds != null && !forecastClouds.isNull() && !forecastClouds.isMissingNode())
-				nonRepeatingChange |= forecastClouds.equals(changeClouds);
-
-			changegroup.put("repeatingChange", nonRepeatingChange);
-			JsonNode changeType = changegroup.get("changeType");
-			if (changeType != null && !changeType.isNull() && !changeType.isMissingNode()
-					&& !changeType.asText().startsWith("PROB") && !changeType.asText().equalsIgnoreCase("TEMPO")) {
-				currentForecast = changeForecast;
-			}
-
-		}
-	}
-
-	/**
-	 * Checks if visibility is in range for either a changegroup (weatherGroup) or forecast (weatherGroup)
-	 * @param weatherGroup
-	 * @param forecast
-	 * @param visibility
-	 */
-	private static void checkVisibilityWithinLimit (JsonNode weatherGroup, ObjectNode forecast, int visibility ){
-		if (!weatherGroup.has("phenomena"))
-			return;
-		ArrayNode phenomena = (ArrayNode) weatherGroup.get("phenomena");
-		boolean isFoggy = StreamSupport.stream(phenomena.spliterator(), false)
-				.anyMatch(phenomenon -> phenomenon.asText().equals("fog"));
-		if (isFoggy) {
-			if (!weatherGroup.has("descriptor")) {
-				forecast.put("visibilityAndFogWithoutDescriptorWithinLimit", visibility <= 1000);
-			} else {
-				String descriptor = weatherGroup.get("descriptor").asText();
-				if (descriptor.equals("freezing")) {
-					forecast.put("visibilityWithinLimit", visibility <= 1000);
-				} else if (descriptor.equals("shallow")) {
-					forecast.put("visibilityWithinLimit", visibility > 1000); // TODO Check > vs >=
-				} else {
-					forecast.put("visibilityWithinLimit", true);
-				}
-			}
-		}
-		if (StreamSupport.stream(phenomena.spliterator(), false)
-				.anyMatch(phenomenon -> phenomenon.asText().equals("smoke")
-						|| phenomenon.asText().equals("widespread dust") || phenomenon.asText().equals("sand")
-						|| phenomenon.asText().equals("volcanic ash"))) {
-			forecast.put("visibilityWithinLimit", visibility <= 5000);
-		}
-
-		if (StreamSupport.stream(phenomena.spliterator(), false)
-				.anyMatch(phenomenon -> phenomenon.asText().equals("mist"))) {
-			forecast.put("visibilityWithinLimit", visibility >= 1000 && visibility <= 5000);
-		}
-
-		if (StreamSupport.stream(phenomena.spliterator(), false)
-				.anyMatch(phenomenon -> phenomenon.asText().equals("haze"))) {
-			forecast.put("visibilityWithinLimit", visibility <= 5000);
-		}	
-	}
-
-	private static void augmentMaxVisibility(JsonNode input) {
-		//		Debug.println("Augmenting max visibility");
-		ObjectNode forecast = (ObjectNode) input.get("forecast");
-		if (forecast == null || forecast.isNull() || forecast.isMissingNode()) {
-			Debug.println("augmentMaxVisibility: No forecast");
-			return;
-		}
-
-
-		JsonNode forecastWeather = input.get("forecast").get("weather");
-		JsonNode forecastVisibility = input.get("forecast").get("visibility");
-		if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode()
-				&& forecastVisibility != null && !forecastVisibility.isNull() && !forecastVisibility.isMissingNode()) {
-			int visibility = forecastVisibility.get("value").asInt();
-			for (Iterator<JsonNode> weatherNode = forecastWeather.elements(); weatherNode.hasNext();) {
-				JsonNode nextNode = weatherNode.next();
-				if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-				JsonNode weatherGroup = (ObjectNode) nextNode;
-				checkVisibilityWithinLimit (weatherGroup, forecast, visibility);
-			}
-		}
-
-
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) 
-			return;
-
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-
-			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
-			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode())
-				return;
-
-			JsonNode changeWeather = changeForecast.get("weather");
-			JsonNode changeVisibility = changeForecast.get("visibility");
-
-			if ((changeWeather == null || changeWeather.isNull() || changeWeather.isMissingNode())
-					&& (changeVisibility == null || changeVisibility.isNull() || changeVisibility.isMissingNode()))
-				return;
-
-			String changeGroupChangeAsText = "";
-			if (changegroup.get("changeType") != null ) {
-				changeGroupChangeAsText = changegroup.get("changeType").asText();
-			}
-			if (changeGroupChangeAsText.equals("BECMG") || changeGroupChangeAsText.equals("TEMPO")) {
-				if (changeWeather == null || changeWeather.isNull() || changeWeather.isMissingNode()) {
-					changeWeather = forecastWeather;
-				}
-				if (changeVisibility == null || changeVisibility.isNull() || changeVisibility.isMissingNode()) {
-					changeVisibility = forecastVisibility;
-				}
-			}
-			if (changeWeather == null || changeVisibility == null)
-				continue;
-			int visibility = changeVisibility.get("value").asInt();
-			for (Iterator<JsonNode> weatherNode = changeWeather.elements(); weatherNode.hasNext();) {
-				JsonNode weatherGroup = (ObjectNode) weatherNode.next();
-				checkVisibilityWithinLimit (weatherGroup, changeForecast, visibility);
-			}
-
-			if (changegroup.get("changeType") != null && !changegroup.get("changeType").asText().startsWith("PROB")
-					&& !changegroup.get("changeType").asText().equalsIgnoreCase("TEMPO")) {
-				forecastWeather = changeWeather;
-				forecastVisibility = changeVisibility;
-			}
-		}
-	}	
-
-	private static void checkVerticalVisibilityWithinLimit (JsonNode weatherGroup, ObjectNode forecast, int visibility ){
-		if (!weatherGroup.has("phenomena"))
-			return;
-		ArrayNode phenomena = (ArrayNode) weatherGroup.get("phenomena");
-		boolean isFoggy = StreamSupport.stream(phenomena.spliterator(), false)
-				.anyMatch(phenomenon -> phenomenon.asText().equals("fog"));
-		boolean isPrecip = StreamSupport.stream(phenomena.spliterator(), false)
-				.anyMatch(phenomenon -> phenomenon.asText().equals("rain"));
-		if (isFoggy) {
-			forecast.put("verticalVisibilityAndFogWithinLimit", visibility <= 5);
-		} else if (isPrecip) {
-			forecast.put("verticalVisibilityAndPrecipitationWithinLimit", visibility <= 10);
-		}
-	}
-
-	private static void augmentMaxVerticalVisibility(JsonNode input) {
-		if (!checkIfNodeHasValue(input.get("forecast")) || 
-				!checkIfNodeHasValue(input.get("forecast").get("vertical_visibility")))return;
-		{
-			JsonNode forecastWeather = input.get("forecast").get("weather");
-			JsonNode forecastVerticalVisibility = input.get("forecast").get("vertical_visibility");
-			if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode()
-					&& forecastVerticalVisibility != null && !forecastVerticalVisibility.isNull() && !forecastVerticalVisibility.isMissingNode()) {
-				int visibility = forecastVerticalVisibility.asInt();
-				for (Iterator<JsonNode> weatherNode = forecastWeather.elements(); weatherNode.hasNext();) {
-					JsonNode nextNode = weatherNode.next();
-					if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-					JsonNode weatherGroup = (ObjectNode) nextNode;
-					checkVerticalVisibilityWithinLimit(weatherGroup, (ObjectNode) input.get("forecast"), visibility);
-				}
-			}
-		}
-
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode()) 
-			return;
-
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-			ObjectNode changeForecast = (ObjectNode) changegroup.get("forecast");
-			if (changeForecast == null || changeForecast.isNull() || changeForecast.isMissingNode())
-				return;
-
-			JsonNode changeWeather = changeForecast.get("weather");
-			JsonNode changeVisibility = changeForecast.get("visibility");
-			if (changeWeather != null && !changeWeather.isNull() && !changeWeather.isMissingNode()
-					&& changeVisibility != null && !changeVisibility.isNull() && !changeVisibility.isMissingNode()) {
-				int visibility = changeVisibility.asInt();
-				for (Iterator<JsonNode> weatherNode = changeWeather.elements(); weatherNode.hasNext();) {
-					JsonNode weatherGroup = (ObjectNode) weatherNode.next();
-					checkVerticalVisibilityWithinLimit (weatherGroup, changeForecast, visibility);
-				}
-			}
-
-
-		}
-	}
-
-	private static void augmentCloudNeededRainOrModifierNecessary(JsonNode input) {
-		ObjectNode forecast = (ObjectNode) input.get("forecast");
-		if (forecast == null || forecast.isNull() || forecast.isMissingNode())
-			return;
-
-		JsonNode forecastWeather = input.get("forecast").get("weather");
-		JsonNode forecastClouds = input.get("forecast").get("clouds");
-
-		processWeatherAndCloudGroup(forecast, forecastWeather, forecastClouds);
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-
-			if (!changegroup.has("forecast")) {
-				continue;
-			}
-			JsonNode changeForecastNode = changegroup.get("forecast");
-			if (changeForecastNode.isNull() || changeForecastNode == null || changeForecastNode.isMissingNode()) {
-				continue;
-			}
-			ObjectNode changeForecast = (ObjectNode) changeForecastNode;
-			JsonNode changeWeather = changeForecast.get("weather");
-			if (changeWeather == null) {
-				changeWeather = forecastWeather;
-			}
-			JsonNode changeClouds = changeForecast.get("clouds");
-			if (changeClouds == null) {
-				changeClouds = forecastClouds;
-			}
-
-			processWeatherAndCloudGroup(changeForecast, changeWeather, changeClouds);
-
-			if (changegroup.has("changeType") && !changegroup.get("changeType").asText().startsWith("PROB")
-					&& !changegroup.get("changeType").asText().equalsIgnoreCase("TEMPO")) {
-				forecastWeather = changeWeather;
-				forecastClouds = changeClouds;
-			}
-		}
-	}
-
-	private static void processWeatherAndCloudGroup(ObjectNode forecast, JsonNode forecastWeather,
-			JsonNode forecastClouds) {
-		if (forecastWeather != null && !forecastWeather.asText().equals("NSW")) {
-			boolean requiresClouds = false;
-			boolean requiresCB = false;
-			boolean requiresCBorTCU = false;
-			boolean rainOrThunderstormPresent = false;
-			ArrayNode weatherArray = (ArrayNode) forecastWeather;
-			for (Iterator<JsonNode> weather = weatherArray.elements(); weather.hasNext();) {
-				JsonNode weatherDescriptor = weather.next();
-				if (weatherDescriptor.has("descriptor")
-						&& weatherDescriptor.get("descriptor").asText().equals("showers")) {
-					requiresClouds = true;
-					requiresCBorTCU = true;
-					rainOrThunderstormPresent = true;
-				}
-				if (weatherDescriptor.has("descriptor")
-						&& weatherDescriptor.get("descriptor").asText().equals("thunderstorm")) {
-					requiresCB = true;
-					rainOrThunderstormPresent = true;
-				}
-			}
-
-			if (requiresClouds) {
-				if (forecastClouds == null || forecastClouds.asText().equals("NSC")) {
-					forecast.put("cloudsNeededAndPresent", false);
-				} else {
-					ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-					forecast.put("cloudsNeededAndPresent", cloudsArray.size() > 0);
-				}
-			}
-
-			if (requiresCB) {
-				if (forecastClouds == null || forecastClouds.asText().equals("NSC")) {
-					forecast.put("cloudsCBNeededAndPresent", false);
-				} else {
-					ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-					forecast.put("cloudsCBNeededAndPresent", StreamSupport.stream(cloudsArray.spliterator(), true)
-							.anyMatch(cloud -> cloud.has("mod") && cloud.get("mod").asText().equals("CB")));
-				}
-			}
-			if (requiresCBorTCU) {
-				if (forecastClouds == null || forecastClouds.asText().equals("NSC")) {
-					forecast.put("cloudsCBorTCUNeededAndPresent", false);
-				} else {
-					ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-					forecast.put("cloudsCBorTCUNeededAndPresent",
-							StreamSupport.stream(cloudsArray.spliterator(), true)
-							.anyMatch(cloud -> cloud.has("mod") && (cloud.get("mod").asText().equals("CB")
-									|| cloud.get("mod").asText().equals("TCU"))));
-				}
-			}
-			if (forecastClouds != null && forecastClouds.isArray()) {
-				ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-				boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true)
-						.anyMatch(cloud -> cloud.has("mod")
-								&& (cloud.get("mod").asText().equals("CB") || cloud.get("mod").asText().equals("TCU")));
-				if (modifierPresent) {
-					forecast.put("cloudsModifierHasWeatherPresent", rainOrThunderstormPresent);
-				}
-			}
-
-		} else {
-			if (forecastClouds != null && forecastClouds.isArray()) {
-				ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-				boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true)
-						.anyMatch(cloud -> cloud.has("mod")
-								&& (cloud.get("mod").asText().equals("CB") || cloud.get("mod").asText().equals("TCU")));
-				forecast.put("cloudsModifierHasWeatherPresent", !modifierPresent);
-			}
-		}
-	}
-
-	private static void augmentEnoughWindChange(JsonNode input) {
-		JsonNode forecastNode = input.get("forecast");
-		if (forecastNode == null || forecastNode.isNull() || forecastNode.isMissingNode())
-			return;
-
-		JsonNode forecastWind = forecastNode.get("wind");
-		if (forecastWind == null || forecastWind.isNull() || forecastWind.isMissingNode())
-			return;
-
-		if (forecastWind == null || !forecastWind.has("direction") || !forecastWind.has("speed"))
-			return;
-
-
-		String unit = forecastWind.get("unit").asText();
-
-		int forecastWindDirection = forecastWind.get("direction").asInt();
-		int forecastWindSpeed = forecastWind.get("speed").asInt();
-		//		// TODO: MP @ 18-06-2018, Where is forecastGust needed for?
-		//		JsonNode forecastGustNode = forecastWind.get("gusts");
-		//		boolean forecastGust = forecastGustNode == null || forecastGustNode.isNull() || forecastGustNode.isMissingNode()
-		//				|| forecastGustNode.asInt() == 0;
-		//		Debug.println("forecastGust == " + forecastGust);
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			boolean becomesGusty = false;
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-			if (!changegroup.has("forecast"))
-				continue;
-
-			String changeGroupChangeAsText = "";
-			if (changegroup.get("changeType") != null ) {
-				changeGroupChangeAsText = changegroup.get("changeType").asText();
-			}
-//			if (!changeGroupChangeAsText.equals("BECMG") && !changeGroupChangeAsText.equals("TEMPO")) {
-//				continue;
-//			}
-			JsonNode changeForecast =  changegroup.get("forecast");
-			if (changeForecast.has("wind")) {
-				ObjectNode wind = (ObjectNode) changeForecast.get("wind");
-				if (!wind.has("direction") || !wind.has("speed"))
-					continue;
-				becomesGusty = wind.has("gusts") && wind.get("gusts").asInt() > 0;
-				int changeWindDirection = wind.get("direction").asInt();
-				int changeWindSpeed = wind.get("speed").asInt();
-				String changeUnit = wind.get("unit").asText();
-				if (!unit.equals(changeUnit)) {
-					// one is in knots and the other in meters per second.
-					// compute it such that both are in knots
-					double MPS_TO_KNOTS_FACTOR = 1.943844; // 1 mps = 1.943844kt
-					if (unit.equalsIgnoreCase("KT")) {
-						changeUnit = "KT";
-						changeWindSpeed = (int) Math.round((changeWindSpeed * MPS_TO_KNOTS_FACTOR));
-					} else {
-						unit = "KT";
-						changeWindSpeed = (int) Math.round((forecastWindSpeed * MPS_TO_KNOTS_FACTOR));
-					}
-				}
-				int speedDifference = Math.abs(changeWindSpeed - forecastWindSpeed);
-
-				long directionDifference = Math.min(subtract(changeWindDirection, forecastWindDirection, 360),
-						subtract(forecastWindDirection, changeWindDirection, 360));
-				wind.put("directionDiff", directionDifference);
-				wind.put("speedDiff", speedDifference);
-				// Wind speed difference should be more than 5 knots or 2 meters per second.
-
-				int limitSpeedDifference = unit.equals("KT") ? 5 : 2;
-				wind.put("windEnoughDifference",
-						directionDifference >= 30 || speedDifference >= limitSpeedDifference || becomesGusty);
-				JsonNode changeType = changegroup.get("changeType");
-				if (changeType != null && !changeType.isNull() && !changeType.isMissingNode()
-						&& !changeType.asText().startsWith("PROB") && !changeType.asText().equalsIgnoreCase("TEMPO")) {
-					forecastWindDirection = changeWindDirection;
-					forecastWindSpeed = changeWindSpeed;
-				}
-			}
-		}
-	}
-
-	private static void augmentVisibilityWeatherRequired(JsonNode input) {
-		ObjectNode forecastNode = (ObjectNode) input.get("forecast");
-		if (forecastNode == null || forecastNode.isNull() || forecastNode.isMissingNode())
-			return;
-
-		JsonNode forecastWeather = forecastNode.get("weather");
-		JsonNode visibilityNode = forecastNode.findValue("visibility");
-
-		if (visibilityNode != null && visibilityNode.get("value") != null
-				&& visibilityNode.get("value").asInt() <= 5000)
-			forecastNode.put("visibilityWeatherRequiredAndPresent",
-					forecastWeather != null && forecastWeather.isArray());
-
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-			ObjectNode changegroupForecast = (ObjectNode) changegroup.get("forecast");
-			if (changegroupForecast == null || changegroupForecast.isNull() || changegroupForecast.isMissingNode())
-				continue;
-
-			JsonNode changeVisibilityNode = changegroupForecast.findValue("visibility");
-			if (changeVisibilityNode == null || !changeVisibilityNode.has("value")) {
-				changeVisibilityNode = visibilityNode;
-			}
-			;
-			int visibility;
-			if (changeVisibilityNode == null || !changeVisibilityNode.has("value")) {
-				// cavok
-				visibility = 9999;
-			} else {
-				visibility = changeVisibilityNode.get("value").asInt();
-			}
-			JsonNode weather = changegroupForecast.findValue("weather");
-			if (weather == null) {
-				weather = forecastWeather;
-			}
-			// TODO: Check visibility <=5000 or 5000
-			if (visibility < 5000) {
-				changegroupForecast.put("visibilityWeatherRequiredAndPresent", weather != null && weather.isArray());
-			}
-			JsonNode changeType = changegroup.get("changeType");
-			if (changeType != null && !changeType.asText().startsWith("PROB")) {
-				if (weather != null) {
-					forecastWeather = weather;
-				}
-				if (changeVisibilityNode != null) {
-					visibilityNode = changeVisibilityNode;
-				}
-			}
-		}
-	}
-
-	private static void augmentEndTimes(JsonNode input) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-			JsonNode changeStartNode = changegroup.findValue("changeStart");
-			if (changeStartNode == null)
-				continue;
-			try {
-				Date changeStart = formatter.parse(changeStartNode.asText());
-				Date changeEnd = null;
-				JsonNode end = changegroup.findValue("changeEnd");
-				if (end == null)
-					continue;
-				changeEnd = formatter.parse(end.asText());
-				changegroup.put("endAfterStart", changeStart.compareTo(changeEnd) < 1);
-			} catch (ParseException e) {
-				continue;
-			}
-		}
-	}
-
-	private static void augmentAscendingHeightClouds(JsonNode input) throws ParseException {
-		List<JsonNode> forecasts = input.findParents("clouds");
-		for (JsonNode forecast : forecasts) {
-			if (forecast == null || forecast.isNull() || forecast.isMissingNode())
-				continue;
-			int prevHeight = 0;
-			JsonNode cloudsNode=forecast.findValue("clouds");
-			if (cloudsNode.getClass().equals(String.class) || cloudsNode.getClass().equals(TextNode.class)) {
-				continue;
-			}
-			ArrayNode node = (ArrayNode) cloudsNode;
-
-			for (Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
-				JsonNode nextNode = it.next(); 
-				if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-				ObjectNode cloudNode = (ObjectNode) nextNode;				
-
-				JsonNode cloudHeight = cloudNode.findValue("height");
-				if (cloudHeight == null || cloudHeight.asText().equals("null"))
-					continue;
-				int height = Integer.parseInt(cloudHeight.asText());
-				if (height <= prevHeight) {
-					cloudNode.put("cloudsHeightAscending", false);
-				}else{
-					cloudNode.put("cloudsHeightAscending", true);
-				}
-				prevHeight = height;
-			}
-		}
-	}
-
-	private static void augmentAmountCoverageClouds(JsonNode input) throws ParseException {
-		// FEW -> SCT -> BKN -> OVC
-		List<JsonNode> forecasts = input.findParents("clouds");
-		for (JsonNode forecast : forecasts) {
-			if (forecast == null || forecast.isNull() || forecast.isMissingNode())
-				continue;
-			String prevAmount = null;
-			JsonNode cloudsNode=forecast.findValue("clouds");
-			if (cloudsNode.getClass().equals(String.class) || cloudsNode.getClass().equals(TextNode.class)) {
-				continue;
-			}
-			ArrayNode node = (ArrayNode) cloudsNode;
-
-			for (Iterator<JsonNode> it = node.iterator(); it.hasNext();) {
-				JsonNode nextNode = it.next(); 
-				if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-				ObjectNode cloudNode = (ObjectNode) nextNode;				
-
-				JsonNode amountNode = cloudNode.findValue("amount");
-				if (amountNode == null || amountNode.asText().equals("null"))
-					continue;
-				boolean isCBorTCU = false;
-				JsonNode modNode = cloudNode.findValue("mod");
-				if (modNode != null) {
-					if (modNode.asText().equals("CB") || modNode.asText().equals("TCU")) {
-						isCBorTCU = true;
-					}
-				}
-
-				String amount = amountNode.asText();
-				if (prevAmount != null && isCBorTCU == false ){
-					/* SCT can only be preceded by FEW */
-					if ("SCT".equals(amount)){
-						if ("FEW".equals(prevAmount) == false){
-							cloudNode.put("cloudsAmountAscending", false);
-						}
-					}
-					/* BKN can only be preceded by FEW or SCT */
-					if ("BKN".equals(amount)){
-						if ("FEW".equals(prevAmount) == false && "SCT".equals(prevAmount) == false){
-							cloudNode.put("cloudsAmountAscending", false);
-						}
-					}
-					/* OVC can only be preceded by FEW or SCT or BKN */
-					if ("OVC".equals(amount)){
-						if ("FEW".equals(prevAmount) == false && "SCT".equals(prevAmount) == false && "BKN".equals(prevAmount) == false){
-							cloudNode.put("cloudsAmountAscending", false);
-						}
-					}
-				}
-				prevAmount = amount;
-			}
-		}
-	}
-
-	private static void augmentWindGust(JsonNode input) throws ParseException {
-		List<JsonNode> windGroups = input.findValues("wind");
-		if (windGroups == null)
-			return;
-		for (JsonNode node : windGroups) {
-			ObjectNode windNode = (ObjectNode) node;
-			JsonNode gustField = node.findValue("gusts");
-			if (gustField == null)
-				continue;
-			try {
-				int gust = Integer.parseInt(gustField.asText());
-				int windspeed = Integer.parseInt(node.findValue("speed").asText());
-				windNode.put("gustFastEnough", gust >= (windspeed + 10));
-			} catch (NumberFormatException e) {
-				continue;
-			}
-		}
-	}
-
-	private static void augmentChangegroupDuration(JsonNode input) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-			JsonNode changeStartNode = changegroup.findValue("changeStart");
-			if (changeStartNode == null)
-				continue;
-			try {
-				Date changeStart = formatter.parse(changeStartNode.asText());
-				Date changeEnd = null;
-				JsonNode end = changegroup.findValue("changeEnd");
-				if (end != null) {
-					changeEnd = formatter.parse(end.asText());
-				} else {
-					changeEnd = formatter.parse(input.findValue("validityEnd").asText());
-				}
-				long diffInMillies = Math.abs(changeEnd.getTime() - changeStart.getTime());
-				long diffInHours = TimeUnit.HOURS.convert(diffInMillies, TimeUnit.MILLISECONDS);
-				changegroup.put("changeDurationInHours", diffInHours);
-			} catch (ParseException e) {
-				continue;
-			}
-		}
 	}
 
 	/**
@@ -1073,125 +413,14 @@ public class TafValidator {
 	 * @param node
 	 * @return
 	 */
-	private static boolean checkIfNodeHasValue(JsonNode node){
+	public static boolean checkIfNodeHasValue(JsonNode node){
 		if ( node == null || node.isMissingNode() || node.isNull())return false;
 		return true;		
 	}
 
-	private static void augmentOverlappingBecomingChangegroups(JsonNode input) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-		List<Date> becmgEndTimes = new ArrayList<Date>();
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-
-			JsonNode changeType = changegroup.findValue("changeType");
-			JsonNode changeStart = changegroup.findValue("changeStart");
-			if (changeType == null || changeType.isMissingNode() || changeType.isNull())
-				continue;
-			if (changeStart == null || changeStart.isMissingNode() || changeStart.isNull())
-				continue;
-
-			/* Check if in range */
-			JsonNode changeEndNode = changegroup.findValue("changeEnd");
-			JsonNode validityStart = input.findValue("validityStart");
-			JsonNode validityEnd = input.findValue("validityEnd");
-
-			if (checkIfNodeHasValue(validityEnd) &&
-					checkIfNodeHasValue(validityStart) && 
-					checkIfNodeHasValue(changeStart) && 
-					checkIfNodeHasValue(changeEndNode)) {
-
-				Date validityStartDate = formatter.parse(input.findValue("validityStart").asText());
-				Date validityEndDate = formatter.parse(input.findValue("validityEnd").asText());
-				Date changeStartDate = formatter.parse(changegroup.findValue("changeStart").asText());
-				Date changeEndDate = formatter.parse(changegroup.findValue("changeEnd").asText());
-//				Debug.println(validityStartDate.toGMTString() + "," + validityEndDate.toGMTString() + "," + changeStartDate.toGMTString() + "," + changeEndDate.toGMTString());
-				if (changeStartDate.compareTo(validityStartDate) < 0 || changeStartDate.compareTo(validityEndDate) > 0 ||
-						changeEndDate.compareTo(validityStartDate) < 0 || changeEndDate.compareTo(validityEndDate) > 0){
-					changegroup.put("changegroupDateOutsideRange", false);
-				}		else {
-					changegroup.put("changegroupDateOutsideRange", true);
-				}
-
-
-			}
 
 
 
-
-
-
-			String type = changegroup.findValue("changeType").asText();
-			if (!"BECMG".equals(type))
-				continue;
-
-			Date becmgStart = formatter.parse(changegroup.findValue("changeStart").asText());
-			boolean overlap = false;
-			for (Date otherEnd : becmgEndTimes) {
-				if (becmgStart.before(otherEnd)) {
-					overlap = true;
-				}
-			}
-
-			if (changeEndNode != null && !changeEndNode.isNull() && !changeEndNode.isMissingNode()) {
-				becmgEndTimes.add(formatter.parse(changeEndNode.asText()));
-			}
-			changegroup.put("changegroupBecomingOverlaps", overlap);
-		}
-	}
-
-	private static void augmentChangegroupsIncreasingInTime(JsonNode input) throws ParseException {
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-		Date prevChangeStart;
-		Date tafStartTime;
-		try {
-			prevChangeStart = formatter.parse(input.findValue("validityStart").asText());
-			tafStartTime = (Date) prevChangeStart.clone();
-		} catch (ParseException e) {
-			return;
-		}
-		JsonNode changeGroups = input.get("changegroups");
-		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
-			return;
-		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			JsonNode nextNode = change.next(); 
-			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
-			ObjectNode changegroup = (ObjectNode) nextNode;
-			JsonNode changeStartNode = changegroup.findValue("changeStart");
-
-			if (changeStartNode == null)
-				continue;
-			String changeStart = changeStartNode.asText();
-			JsonNode changeTypeNode = changegroup.findValue("changeType");
-			if (changeTypeNode == null)
-				continue;
-			String changeType = changeTypeNode.asText();
-			try {
-				Date parsedDate = formatter.parse(changeStart);
-				boolean comesAfter = parsedDate.compareTo(prevChangeStart) >= 0
-						|| (parsedDate.equals(prevChangeStart) && changeType.startsWith("PROB"))
-						|| (parsedDate.equals(prevChangeStart) && changeType.startsWith("BECMG")
-								&& parsedDate.equals(tafStartTime))
-						|| (parsedDate.equals(prevChangeStart) && changeType.startsWith("TEMPO")
-								&& parsedDate.equals(tafStartTime));
-				if ("FM".equals(changeType) && parsedDate.compareTo(prevChangeStart) <= 0) {
-					comesAfter = false;
-				}
-				changegroup.put("changegroupsAscending", comesAfter);
-				prevChangeStart = parsedDate;
-			} catch (ParseException e) {
-				changegroup.put("changegroupsAscending", false);
-			}
-		}
-	}
 
 	public DualReturn performValidation(String schemaFile, String tafStr) throws IOException, ProcessingException {
 		return performValidation(schemaFile, ValidationUtils.getJsonNode(tafStr));
@@ -1321,7 +550,7 @@ public class TafValidator {
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 
 		if (!validationReport.isSuccess()) {
-			// Debug.println("Validation report failed: " + validationReport.toString());	
+			Debug.println("Validation report failed: " + validationReport.toString());	
 
 			//			validationReport.forEach(report -> {
 			//				
@@ -1330,7 +559,6 @@ public class TafValidator {
 			//							report.asJson().toString()
 			//							)).toString(4));
 			//				} catch (JSONException e) {
-			//					// TODO Auto-generated catch block
 			//					e.printStackTrace();
 			//				}
 			//				
@@ -1362,6 +590,8 @@ public class TafValidator {
 		// Debug.println("Second: " + enrichedValidationReport.toString());
 
 		if (!enrichedValidationReport.isSuccess()) {
+//			Debug.println("Enriched report failed" + enrichedValidationReport.toString());
+//			Debug.println(jsonNode.toString());
 			// Try to find all possible errors and map them to the human-readable variants
 			// using the messages map
 			// Append them to any previous errors, if any
@@ -1375,13 +605,13 @@ public class TafValidator {
 		try{
 			objectMapper.readValue(tafStr, Taf.class).toTAC();
 		}catch(Exception e){
-//			Debug.printStackTrace(e);
+			//			Debug.printStackTrace(e);
 			ObjectMapper om = new ObjectMapper();
 			return new TafValidationResult(false,
 					(ObjectNode) om.readTree("{\"/forecast/message\": [\"Unable to generate TAC report\"]}"), validationReport,
 					enrichedValidationReport);
 		}
-		
+
 		// If everything is okay, return true as succeeded with null as errors
 		if (enrichedValidationReport.isSuccess() && validationReport.isSuccess()) {
 			return new TafValidationResult(true);
