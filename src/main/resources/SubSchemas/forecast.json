@@ -189,8 +189,26 @@
                                     "$ref": "wind.json#/definitions/wind"
                                 }
                             }
-                        },
-                        {
+                        },{
+                            "additionalProperties": false,
+                            "properties": {
+                                "clouds": {
+                                    "$ref": "clouds.json#/definitions/clouds"
+                                },
+                                "vertical_visibility": {
+                                    "$ref": "vertical_visibility.json#/definitions/vertical_visibility"
+                                },
+                                "visibility": {
+                                    "$ref": "visibility.json#/definitions/visibility"
+                                },
+                                "weather": {
+                                    "$ref": "weather.json#/definitions/weather"
+                                },
+                                "wind": {
+                                    "$ref": "wind.json#/definitions/wind"
+                                }
+                            }
+                        },{
                             "additionalProperties": false,
                             "properties": {
                                 "caVOK": {
