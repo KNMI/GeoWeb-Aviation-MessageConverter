@@ -4,6 +4,9 @@
         "base_forecast": {
             "oneOf": [
                 {
+                   "$geoweb::messages": {
+                        "required": "Forecast is missing either wind, visibility or clouds"
+                    },
                     "additionalProperties": false,
                     "properties": {
                         "clouds": {
@@ -29,6 +32,9 @@
                     ]
                 },
                 {
+                    "$geoweb::messages": {
+                        "required": "Forecast is missing either wind, visibility or vertical visibility"
+                    },
                     "additionalProperties": false,
                     "properties": {
                         "temperature": {
@@ -54,8 +60,37 @@
                     ]
                 },
                 {
+                    "additionalProperties": false,
+                    "properties": {
+                        "clouds": {
+                            "$ref": "clouds.json#/definitions/clouds"
+                        },
+                        "temperature": {
+                            "$ref": "#/definitions/temperature"
+                        },
+                        "vertical_visibility": {
+                            "$ref": "vertical_visibility.json#/definitions/vertical_visibility"
+                        },
+                        "visibility": {
+                            "$ref": "visibility.json#/definitions/visibility"
+                        },
+                        "weather": {
+                            "$ref": "weather.json#/definitions/base_weather"
+                        },
+                        "wind": {
+                            "$ref": "wind.json#/definitions/wind"
+                        }
+                    },
+                    "required": [
+                        "clouds",
+                        "wind",
+                        "visibility",
+                        "vertical_visibility"
+                    ]
+                },
+                {
                     "$geoweb::messages": {
-                        "additionalProperties": "Forecast is not valid.",
+                        "additionalProperties": "Forecast is not valid, in case of CAVOK no weather or clouds are allowed.",
                         "required": "Forecast is a wind group with visibility, weather, either clouds or vertical visibility or CAVOK"
                     },
                     "additionalProperties": false,
@@ -154,8 +189,26 @@
                                     "$ref": "wind.json#/definitions/wind"
                                 }
                             }
-                        },
-                        {
+                        },{
+                            "additionalProperties": false,
+                            "properties": {
+                                "clouds": {
+                                    "$ref": "clouds.json#/definitions/clouds"
+                                },
+                                "vertical_visibility": {
+                                    "$ref": "vertical_visibility.json#/definitions/vertical_visibility"
+                                },
+                                "visibility": {
+                                    "$ref": "visibility.json#/definitions/visibility"
+                                },
+                                "weather": {
+                                    "$ref": "weather.json#/definitions/weather"
+                                },
+                                "wind": {
+                                    "$ref": "wind.json#/definitions/wind"
+                                }
+                            }
+                        },{
                             "additionalProperties": false,
                             "properties": {
                                 "caVOK": {

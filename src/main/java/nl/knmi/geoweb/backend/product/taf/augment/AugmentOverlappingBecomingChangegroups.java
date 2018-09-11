@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.locationtech.jts.util.Debug;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -20,6 +22,8 @@ public class AugmentOverlappingBecomingChangegroups {
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
 		List<Date> becmgEndTimes = new ArrayList<Date>();
+		List<Date> becmgStartTimes = new ArrayList<Date>();
+		
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
 			return;
@@ -67,10 +71,17 @@ public class AugmentOverlappingBecomingChangegroups {
 			if (!"BECMG".equals(type))
 				continue;
 
+//			Date becmgStart = formatter.parse(changegroup.findValue("changeStart").asText());
+//			boolean overlap = false;
+//			for (Date otherEnd : becmgEndTimes) {
+//				if (becmgStart.before(otherEnd)) {
+//					overlap = true;
+//				}
+//			}
 			Date becmgStart = formatter.parse(changegroup.findValue("changeStart").asText());
 			boolean overlap = false;
-			for (Date otherEnd : becmgEndTimes) {
-				if (becmgStart.before(otherEnd)) {
+			for (Date otherStart: becmgStartTimes) {
+				if (becmgStart.before(otherStart) || becmgStart.compareTo(otherStart) == 0) {
 					overlap = true;
 				}
 			}
@@ -78,11 +89,10 @@ public class AugmentOverlappingBecomingChangegroups {
 			if (changeEndNode != null && !changeEndNode.isNull() && !changeEndNode.isMissingNode()) {
 				becmgEndTimes.add(formatter.parse(changeEndNode.asText()));
 			}
-			
-			/* Test if phenomena differ, in this case changegroups are allowed to overlap */
-			if (overlap) {				
-				overlap = false;
+			if (changeStart != null && !changeStart.isNull() && !changeStart.isMissingNode()) {
+				becmgStartTimes.add(formatter.parse(changeStart.asText()));
 			}
+//			/* TODO: Test if phenomena differ, in this case changegroups are allowed to overlap */
 			changegroup.put("changegroupBecomingOverlaps", overlap);
 		}
 	}
