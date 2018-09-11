@@ -1,5 +1,6 @@
 package nl.knmi.geoweb.backend.product.taf.converter;
 
+import fi.fmi.avi.model.AviationCodeListUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -60,13 +61,21 @@ public class TafConverter implements ProductConverter<Taf>{
 				refPoint.setElevationValue(airportInfo.getFieldElevation());
 		        refPoint.setElevationUom("m");
 				ad.setReferencePoint(refPoint);
-				
-				ad.setFieldElevation(airportInfo.getFieldElevation());
-				ad.setLocationIndicatorICAO(airportInfo.getICAOName());
-				ad.setName(airportInfo.getName());
-				ad.setDesignator(airportName);
-				
+
+                ad.setFieldElevation(airportInfo.getFieldElevation());
+                ad.setLocationIndicatorICAO(airportInfo.getICAOName());
+                ad.setName(airportInfo.getName());
+                ad.setDesignator(airportName);
+
 				pojo.amendAerodromeInfo(ad);
+
+				if (pojo.getReferredReport()!=null) {
+					pojo.getReferredReport().getAerodrome().setLocationIndicatorICAO(airportInfo.getICAOName());
+					pojo.getReferredReport().getAerodrome().setReferencePoint(refPoint);
+					pojo.getReferredReport().getAerodrome().setDesignator(airportName);
+					pojo.getReferredReport().getAerodrome().setName(airportInfo.getName());
+					pojo.getReferredReport().getAerodrome().setFieldElevation(airportInfo.getFieldElevation());
+				}
 			}
 			else {
 				System.err.println("airportinfo for "+airportName+" not found");

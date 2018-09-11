@@ -154,6 +154,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			return true;
 		}
 		private String previousUuid = null;
+		private Taf.Metadata previousMetadata; //TODO: add this field to equals()/hashcode()
 		private String uuid = null;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime issueTime;
@@ -169,6 +170,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 		String location;
 		TAFReportPublishedConcept status;
 		TAFReportType type;
+
 	};
 
 	public Metadata metadata;
@@ -800,7 +802,9 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			break;
 		}
 		// Add the rest of the TAC
-		sb.append(" " + this.forecast.toTAC());
+		if (this.forecast!=null) {
+			sb.append(" " + this.forecast.toTAC());
+		}
 		if (this.changegroups != null) {
 			for (ChangeForecast ch : this.changegroups) {
 				sb.append("\n" + ch.toTAC());
