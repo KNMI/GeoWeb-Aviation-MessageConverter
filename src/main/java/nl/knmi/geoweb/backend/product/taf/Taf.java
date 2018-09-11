@@ -652,6 +652,10 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 					}
 				}
 
+				if (getVertical_visibility() != null) {
+					sb.append(String.format(" VV%03d", getVertical_visibility()));
+				}
+				
 				if (getClouds() != null) {
 					for (TAFCloudType tp : getClouds()) {
 						sb.append(" ");
@@ -725,7 +729,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			if (changeEnd!=null) { 
 				sb.append("/" + TAFtoTACMaps.toDDHH(changeEnd));
 			}
-			sb.append(" " + forecast.toTAC());
+			if (forecast!=null)sb.append(" " + forecast.toTAC());
 			return sb.toString();
 		}
 	}

@@ -439,7 +439,9 @@
                             },
                             "enum":[
                                 "BKN",
-                                "OVC"
+                                "OVC",
+                                "FEW",
+                                "SCT"
                             ],
                             "type":"string"
                         },

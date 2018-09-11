@@ -49,7 +49,6 @@ public class FoundJsonField {
             return false;
         }
 
-        @SuppressWarnings("unchecked")
         FoundJsonField otherField = (FoundJsonField) anotherObject;
         if (name == null) {
             if (otherField.name != null) {

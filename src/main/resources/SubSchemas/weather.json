@@ -3,7 +3,7 @@
     "definitions": {
         "base_weather": {
             "$geoweb::messages": {
-                "type": "Base forecast cannot contain NSW",
+                "type": "Base forecast cannot contain NSW, maybe you meant visibility is CAVOK?",
                 "uniqueItems": "Weather groups must be unique"
             },
             "items": {
