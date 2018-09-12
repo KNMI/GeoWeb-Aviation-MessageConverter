@@ -550,7 +550,7 @@ public class TafValidator {
 		JsonNode errorJson = new ObjectMapper().readTree("{}");
 
 		if (!validationReport.isSuccess()) {
-			Debug.println("Validation report failed: " + validationReport.toString());	
+//			Debug.println("Validation report failed: " + validationReport.toString());	
 
 			//			validationReport.forEach(report -> {
 			//				

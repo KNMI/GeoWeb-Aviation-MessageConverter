@@ -88,19 +88,25 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		taf.setValidityEndTime(ZonedDateTime.from(input.getMetadata().getValidityEnd()));
 		taf.setIssueTime(ZonedDateTime.from(input.getMetadata().getIssueTime()));
 
-		if (input.getMetadata().getType()==TAFReportType.canceled) {
+		if (input.getMetadata().getType()==TAFReportType.canceled||
+				input.getMetadata().getType()==TAFReportType.correction||
+				input.getMetadata().getType()==TAFReportType.amendment) {
+			taf.setReferredReport(new TAFReference());
 			if (taf.getReferredReport()!=null) {
-				taf.getReferredReport().setAerodrome(taf.getAerodrome());
-				taf.getReferredReport().setIssueTime(taf.getIssueTime());
-				taf.getReferredReport().setValidityStartTime(taf.getValidityStartTime());
-				taf.getReferredReport().setValidityEndTime(taf.getValidityEndTime());
-				taf.getReferredReport().setStatus(taf.getStatus());
+				taf.getReferredReport().setAerodrome(new Aerodrome(input.getMetadata().getLocation()));
+				taf.getReferredReport().setIssueTime(ZonedDateTime.from(input.getMetadata().getPreviousMetadata().getIssueTime()));
+				taf.getReferredReport().setValidityStartTime(ZonedDateTime.from(input.getMetadata().getPreviousMetadata().getValidityStart()));
+				taf.getReferredReport().setValidityEndTime(ZonedDateTime.from(input.getMetadata().getPreviousMetadata().getValidityEnd()));
+			//	taf.getReferredReport().setStatus(input.getMetadata().getPreviousMetadata().getStatus()); //TODO: really unnecessary??
 			}
 		}
 
-		retval.addIssue(updateBaseForecast(taf, input, hints));
+		//There are no base and changeforecasts when cancelling
+		if (input.getMetadata().getType()!=TAFReportType.canceled) {
+			retval.addIssue(updateBaseForecast(taf, input, hints));
 
-		retval.addIssue(updateChangeForecasts(taf, input, hints));
+			retval.addIssue(updateChangeForecasts(taf, input, hints));
+		}
 
 
 		return retval;

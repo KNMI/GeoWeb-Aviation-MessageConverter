@@ -154,6 +154,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			return true;
 		}
 		private String previousUuid = null;
+		private Taf.Metadata previousMetadata; //TODO: add this field to equals()/hashcode()
 		private String uuid = null;
 		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime issueTime;
@@ -169,6 +170,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 		String location;
 		TAFReportPublishedConcept status;
 		TAFReportType type;
+
 	};
 
 	public Metadata metadata;
@@ -804,8 +806,9 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			break;
 		}
 		// Add the rest of the TAC
-		if (this.forecast!=null)
+		if (this.forecast!=null) {
 			sb.append(" " + this.forecast.toTAC());
+		}
 		if (this.changegroups != null) {
 			for (ChangeForecast ch : this.changegroups) {
 				sb.append("\n" + ch.toTAC());
@@ -872,7 +875,12 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 	public String export(File path, ProductConverter<Taf> converter, ObjectMapper om) {
 		//TODO Make LTNL99 configurable 
 		String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
-		String validTime = this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
+		OffsetDateTime reportTime=this.metadata.getBaseTime();
+		if (reportTime==null) {
+		    Debug.println("MISSING baseTime, using validityStart");
+		    reportTime=this.metadata.getValidityStart();
+        }
+		String validTime = reportTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 		String name = "TAF_" + this.metadata.getLocation() + "_" + validTime + "_" + time;
 		try {
 			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.getPublishableTAC());
@@ -885,7 +893,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			return "saving of JSON failed";
 		}
 		try {
-			String iwxxmName="A_"+"LTNL99"+this.metadata.getLocation()+this.metadata.getBaseTime().format(DateTimeFormatter.ofPattern("ddHHmm"));
+			String iwxxmName="A_"+"LTNL99"+this.metadata.getLocation()+reportTime.format(DateTimeFormatter.ofPattern("ddHHmm"));
 			switch (this.metadata.type) {
 			case amendment:
 				iwxxmName+="AMD";
