@@ -88,7 +88,9 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF>{
 		taf.setValidityEndTime(ZonedDateTime.from(input.getMetadata().getValidityEnd()));
 		taf.setIssueTime(ZonedDateTime.from(input.getMetadata().getIssueTime()));
 
-		if (input.getMetadata().getType()==TAFReportType.canceled) {
+		if (input.getMetadata().getType()==TAFReportType.canceled||
+				input.getMetadata().getType()==TAFReportType.correction||
+				input.getMetadata().getType()==TAFReportType.amendment) {
 			taf.setReferredReport(new TAFReference());
 			if (taf.getReferredReport()!=null) {
 				taf.getReferredReport().setAerodrome(new Aerodrome(input.getMetadata().getLocation()));
