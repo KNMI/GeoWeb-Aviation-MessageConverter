@@ -181,13 +181,19 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 		public String toTAC() {
 			if (this.unit==SigmetLevelUnit.FL) {
-				return "FL"+value;
+				return String.format("FL%03d", value);
 			}
 			if (this.unit==SigmetLevelUnit.FT) {
-				return value+"FT";
+				if (value>9999) {
+					return String.format("%05dFT", value);
+				} else {
+					return String.format("%04dFT", value);
+				}
 			}
 			if (this.unit==SigmetLevelUnit.M) {
-				return value+"M";
+				if (value<=9999) {
+					return String.format("%04dtM", value);
+				}
 			}
 			return "";
 		}
@@ -241,17 +247,17 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				break;
 			case TOPS:
 				if (this.levels[0]!=null) {
-					return "TOPS "+this.levels[0].toTAC();
+					return "TOP "+this.levels[0].toTAC();
 				}
 				break;
 			case TOPS_ABV:
 				if (this.levels[0]!=null) {
-					return "TOPS ABV "+this.levels[0].toTAC();
+					return "TOP ABV "+this.levels[0].toTAC();
 				}
 				break;
 			case TOPS_BLW:
 				if (this.levels[0]!=null) {
-					return "TOPS BLW "+this.levels[0].toTAC();
+					return "TOP BLW "+this.levels[0].toTAC();
 				}
 				break;
 			default:
