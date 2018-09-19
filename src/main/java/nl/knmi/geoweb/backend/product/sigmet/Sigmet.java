@@ -171,7 +171,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	@JsonInclude(Include.NON_NULL)
 	@Getter
 	public static class SigmetLevelPart{
-		int value;
+		Integer value;
 		SigmetLevelUnit unit;
 		public SigmetLevelPart(){};
 		public SigmetLevelPart(SigmetLevelUnit unit, int val) {
@@ -180,6 +180,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		}
 
 		public String toTAC() {
+		    if (value==null) return "";
 			if (this.unit==SigmetLevelUnit.FL) {
 				return String.format("FL%03d", value);
 			}
@@ -297,6 +298,14 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			this.speeduom=uoM;
 			this.dir=SigmetDirection.getSigmetDirection(dir);
 		}
+
+		public String getSpeeduom() {
+		    if (this.speeduom==null) {
+		        return "KT";
+            } else {
+		        return speeduom;
+            }
+        }
 
 		public String toTAC() {
 				if ((this.dir!=null)&&(this.speed!=null)) {
@@ -474,7 +483,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	}
 
 	public String featureToTAC(Feature f, Feature FIR) {
-		Debug.println("featureToTAC("+f.getId()+","+f.getProperties().get("selectionType")+")");
 		List<LngLatAlt> coords;
 		
 		switch(f.getProperty("selectionType").toString().toLowerCase()) {
@@ -505,8 +513,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				
 				org.locationtech.jts.geom.Geometry geom_fir=reader.read(FIRs);
 
-				org.locationtech.jts.geom.Geometry tempGeom=drawnGeometry;
-				
 				//Sort box's coordinates
 				Envelope env=drawnGeometry.getEnvelopeInternal();
 				double minX=env.getMinX();
@@ -623,10 +629,18 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	}
 
 	public String toTAC(Feature FIR) {
-		GeoJsonObject startGeometry = this.findStartGeometry() ; //findStartGeometry();
-		if (!((Feature)startGeometry).getProperty("selectionType").equals("box")&&
-		  !((Feature)startGeometry).getProperty("selectionType").equals("fir"))	{
-			startGeometry = this.extractSingleStartGeometry(); // Use intersection result
+		GeoJsonObject effectiveStartGeometry = this.findStartGeometry() ; //findStartGeometry();
+        if ((effectiveStartGeometry==null)||(((Feature)effectiveStartGeometry).getProperty("selectionType")==null)) {
+            return "Error 1";
+        }
+		if (!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("box")&&
+		  !((Feature)effectiveStartGeometry).getProperty("selectionType").equals("fir")&&
+        !((Feature)effectiveStartGeometry).getProperty("selectionType").equals("point"))	{
+		    GeoJsonObject intersected=this.extractSingleStartGeometry();
+		    int sz=((Polygon)((Feature)intersected).getGeometry()).getCoordinates().get(0).size();
+		    if (sz<=7)  {
+                effectiveStartGeometry = intersected; // Use intersection result
+            }
 		}
 		StringBuilder sb = new StringBuilder();
 		String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth()) + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
@@ -648,22 +662,28 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			sb.append(this.obs_or_forecast.toTAC());
 			sb.append('\n');
 		}
-		sb.append(this.featureToTAC((Feature)startGeometry, FIR));
-		sb.append('\n');
-		sb.append(this.levelinfo.toTAC());
+		sb.append(this.featureToTAC((Feature)effectiveStartGeometry, FIR));
 		sb.append('\n');
 
-		if (this.movement_type==null) { //TODO this fixes front-end problems TEMPORARILY
+		String levelInfoText=this.levelinfo.toTAC();
+		if (!levelInfoText.isEmpty()) {
+            sb.append(levelInfoText);
+            sb.append('\n');
+        }
+
+		if (this.movement_type==null) {
 			this.movement_type=SigmetMovementType.STATIONARY;
 		}
-		
+
 		switch (this.movement_type) {
 		case STATIONARY:
 			sb.append("STNR ");
 			break;
 		case MOVEMENT:
-			sb.append(this.movement.toTAC());
-			sb.append('\n');
+		    if (this.movement!=null) {
+                sb.append(this.movement.toTAC());
+                sb.append('\n');
+            }
 			break;
 		case FORECAST_POSITION:
 			// Present forecast_position geometry later
@@ -674,13 +694,13 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			sb.append(this.change.toTAC());
 			sb.append('\n');
 		}
-		GeoJsonObject endGeometry=this.findEndGeometry(((Feature)startGeometry).getId());
+		GeoJsonObject endGeometry=this.findEndGeometry(((Feature)effectiveStartGeometry).getId());
 		
 		if (this.movement_type==SigmetMovementType.FORECAST_POSITION) {
 			OffsetDateTime fpaTime=this.validdate_end;
 			sb.append("FCST AT ").append(String.format("%02d", fpaTime.getHour())).append(String.format("%02d", fpaTime.getMinute())).append("Z");
 			sb.append('\n');
-			sb.append(this.featureToTAC((Feature)this.findEndGeometry(((Feature)startGeometry).getId()), FIR));
+			sb.append(this.featureToTAC((Feature)this.findEndGeometry(((Feature)findStartGeometry()).getId()), FIR));
 		}
 		
 		return sb.toString();
