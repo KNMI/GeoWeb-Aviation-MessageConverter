@@ -108,18 +108,18 @@ public class SigmetStore {
 		if (files!=null) {
 			List<Sigmet> sigmets=new ArrayList<Sigmet>();
 			for (File f: files) {
-				Debug.println("f:"+f);
 				Sigmet sm;
 				try {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
 						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
-						if ((sm.getStatus()==SigmetStatus.published)&& sm.getValiddate_end().isAfter(now)) {
+						if ((sm.getStatus()==SigmetStatus.published)&&
+								(sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);
 						}
 					}else if (selectStatus != null) {
 						if (selectStatus==SigmetStatus.canceled) {
-							if (sm.getValiddate_end().isBefore(now)) {
+							if ((sm.getValiddate_end().isBefore(now))||(sm.getStatus()==SigmetStatus.canceled)) {
 								sigmets.add(sm);
 							}
 						} else {
