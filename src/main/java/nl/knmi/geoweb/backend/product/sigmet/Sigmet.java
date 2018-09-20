@@ -883,17 +883,44 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		return om.writerWithDefaultPrettyPrinter().writeValueAsString(this);
 	}
 
+	// Same as TAC, but maximum line with 69 chars where words (e.g. "OVC020CB") are not split
+	// Also has a header and footer to the message
+	private String getPublishableTAC() {
+		String line = "";
+		String publishTAC = "";
+		String[] TACwords = this.toTAC(this.getFirFeature()).split("\\s+");
+		for(int i = 0; i < TACwords.length; ++i) {
+			if (line.length() + TACwords[i].length() + 1 <= 69) {
+				if (line.length() > 0) line += " ";
+				line += TACwords[i];
+			} else {
+				publishTAC += line + '\n';
+				line = TACwords[i];
+			}
+		}
+		publishTAC += line;
+		String time = this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));;
+
+		String header = "WSNL31 " + this.getLocation_indicator_mwo() + " " + time +'\n';
+		String footer = "=";
+		return header + publishTAC + footer;
+	}
+
 	@Override
 	public String export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
 		//		String s=converter.ToIWXXM_2_1(this);
 		try {
 			String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 			String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
-			String name = "SIGMET_" + this.getLocation_indicator_icao() + "_" + validTime + "_" + time;
-			Tools.writeFile(path.getPath() + "/" + name + ".tac", this.toTAC(this.getFirFeature()));
+
+			String TACName = "WSNL31" + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
+			Tools.writeFile(path.getPath() + "/" + TACName + ".tac", this.toTAC(this.getFirFeature()));
+
+			String name = "SIGMET_" + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
 			Tools.writeFile(path.getPath() + "/" + name + ".json", this.toJSON(om));
-			String iwxxmName="A_"+"WSNL99"+this.getLocation_indicator_icao()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
-			iwxxmName+="_C_"+this.getLocation_indicator_icao()+"_"+time;
+
+			String iwxxmName="A_"+"LSNL31"+this.getLocation_indicator_mwo()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
+			iwxxmName+="_C_"+this.getLocation_indicator_mwo()+"_"+time;
 			String s=converter.ToIWXXM_2_1(this);
 			Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
 		} catch (IOException e) {
