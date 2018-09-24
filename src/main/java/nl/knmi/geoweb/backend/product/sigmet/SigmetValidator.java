@@ -27,7 +27,7 @@ public class SigmetValidator {
     }
 
     public SigmetValidationResult validate(String sigmetStr)throws ProcessingException, JSONException, IOException, ParseException {
-        		/* Check if we can make a TAC */
+        /* Check if we can make a TAC */
 		try{
 			objectMapper.readValue(sigmetStr, Sigmet.class).toTAC();
 		}catch(Exception e){
