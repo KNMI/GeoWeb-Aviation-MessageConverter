@@ -110,7 +110,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			this.shortDescription=shrt;
 			this.description=description;
 		}
-		
+
 		public static Phenomenon getPhenomenon(String desc) {
 			for (Phenomenon phen: Phenomenon.values()) {
 				if (desc.equals(phen.toString())){
@@ -125,7 +125,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	@Getter
 	public static class ObsFc {
 		private boolean obs=true ;
-		@JsonFormat(shape = JsonFormat.Shape.STRING)		
+		@JsonFormat(shape = JsonFormat.Shape.STRING)
 		OffsetDateTime obsFcTime;
 		public ObsFc(){};
 		public ObsFc(boolean obs){
@@ -139,7 +139,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		public String toTAC () {
 			StringBuilder sb = new StringBuilder();
 
-			if (this.obs) { 
+			if (this.obs) {
 				sb.append("OBS");
 			} else {
 				sb.append("FCST");
@@ -159,7 +159,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	public enum SigmetLevelMode {
 		AT, ABV, BETW, BETW_SFC, TOPS, TOPS_ABV, TOPS_BLW;
 	}
-	
+
 	public enum SigmetMovementType {
 		STATIONARY, MOVEMENT, FORECAST_POSITION;
 	}
@@ -336,7 +336,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 	@Getter
 	public enum SigmetStatus {
-		concept("concept"), canceled("canceled"), published("published"), test("test"); 
+		concept("concept"), canceled("canceled"), published("published"), test("test");
 		private String status;
 		private SigmetStatus (String status) {
 			this.status = status;
@@ -407,7 +407,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 
 	public void serializeSigmet(ObjectMapper om, String fn) {
-		Debug.println("serializeSigmet to "+fn);		
+		Debug.println("serializeSigmet to "+fn);
 		if(this.geojson == null || this.phenomenon == null) {
 			throw new IllegalArgumentException("GeoJSON and Phenomenon are required");
 		}
@@ -465,7 +465,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 		return this.convertLat(lat) + " " + this.convertLon(lon);
 	}
-	
+
 	public String pointToDMSString(Coordinate coord) {
 		double lon = coord.getOrdinate(Coordinate.X);
 		double lat = coord.getOrdinate(Coordinate.Y);
@@ -476,7 +476,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	public String latlonToDMS(List<LngLatAlt> coords) {
 		return coords.stream().map(lnglat -> this.pointToDMSString(lnglat)).collect(Collectors.joining(" - "));
 	}
-	
+
 	public String latlonToDMS(Coordinate[] coords) {
 		Arrays.stream(coords);
 		return Arrays.stream(coords).map(coord -> this.pointToDMSString(coord)).collect(Collectors.joining(" - "));
@@ -484,7 +484,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 	public String featureToTAC(Feature f, Feature FIR) {
 		List<LngLatAlt> coords;
-		
+
 		switch(f.getProperty("selectionType").toString().toLowerCase()) {
 		case "poly":
 			// This assumes that one feature contains one set of coordinates
@@ -500,7 +500,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			// If one line segment intersects, the phenomenon happens in the area opposite of the line intersection
 			// e.g. if the south border of the box intersects, the phenomenon happens north of this line.
 			// If there are multiple intersections -- we assume two currently -- the phenomenon happens in the quadrant
-			// opposite of the intersection lines. 
+			// opposite of the intersection lines.
 			// E.g. the south and west border of the box intersect, the phenomenon happens north of the south intersection line and east of the west intersection line
 			GeometryFactory gf=new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING));
 			GeoJsonReader reader=new GeoJsonReader(gf);
@@ -510,7 +510,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				String FIRs=om.writeValueAsString(FIR.getGeometry()); //FIR as String
 
 				org.locationtech.jts.geom.Geometry drawnGeometry = reader.read(om.writeValueAsString(f.getGeometry()));
-				
+
 				org.locationtech.jts.geom.Geometry geom_fir=reader.read(FIRs);
 
 				//Sort box's coordinates
@@ -520,9 +520,9 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				double minY=env.getMinY();
 				double maxY=env.getMaxY();
 				Debug.println("BBOX (++);: "+minX+"-"+maxX+","+minY+"-"+maxY);
-				
+
 				org.locationtech.jts.geom.Geometry firBorder=geom_fir.getBoundary();
-				
+
 				//Find intersections with box's sides
 				CoordinateArraySequenceFactory caf=CoordinateArraySequenceFactory.instance();
 				boolean[] boxSidesIntersecting=new boolean[4];
@@ -546,7 +546,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 					}
 				}
 				drawnCoords[4]=drawnCoords[0];
-				
+
 				for (int i=0; i<4; i++) {
 					LineString side=new LineString(caf.create(Arrays.copyOfRange(drawnCoords, i, i+2)), gf);
 					if (side.intersects(geom_fir)) { //TODO or: firBorder
@@ -605,11 +605,11 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				org.locationtech.jts.geom.Geometry intersection = drawnGeometry.intersection(geom_fir);
 
 				Debug.println("intersection: "+intersection);
-				
+
 				if (intersection.equalsTopo(geom_fir)) {
 					return "ENTIRE FIR";
 				}
-				
+
 				Coordinate[] drawn=drawnGeometry.getCoordinates();
 				Coordinate[] intersected=intersection.getCoordinates();
 				coords = ((Polygon)(f.getGeometry())).getCoordinates().get(0);
@@ -626,6 +626,13 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		default:
 			return "";
 		}
+	}
+
+	public String toTAC() {
+		if (this.firFeature!=null) {
+			return this.toTAC(this.firFeature);
+		}
+		return "";
 	}
 
 	public String toTAC(Feature FIR) {
@@ -653,7 +660,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			String validdateCancelled = String.format("%02d", this.cancelsStart.getDayOfMonth()) + String.format("%02d", this.cancelsStart.getHour()) + String.format("%02d", this.cancelsStart.getMinute());
 
 			sb.append(' ').append("CNL SIGMET ").append(this.cancels).append(" ").append(validdateCancelled).append('/').append(validdateEndFormatted);
-			return sb.toString();	
+			return sb.toString();
 		}
 		sb.append('\n');
 		sb.append(this.phenomenon.getShortDescription());
@@ -689,20 +696,20 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			// Present forecast_position geometry later
 			break;
 		}
-		
+
 		if (this.change!=null) {
 			sb.append(this.change.toTAC());
 			sb.append('\n');
 		}
 		GeoJsonObject endGeometry=this.findEndGeometry(((Feature)effectiveStartGeometry).getId());
-		
+
 		if (this.movement_type==SigmetMovementType.FORECAST_POSITION) {
 			OffsetDateTime fpaTime=this.validdate_end;
 			sb.append("FCST AT ").append(String.format("%02d", fpaTime.getHour())).append(String.format("%02d", fpaTime.getMinute())).append("Z");
 			sb.append('\n');
 			sb.append(this.featureToTAC((Feature)this.findEndGeometry(((Feature)findStartGeometry()).getId()), FIR));
 		}
-		
+
 		return sb.toString();
 	}
 
