@@ -179,10 +179,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
             this.value=val;
         }
 
-        public String getValue() {
-
-        }
-
         public String toTACValue() {
             if (value==null) return "";
             if (this.unit==SigmetLevelUnit.FL) {
@@ -249,7 +245,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
                                 case M:
                                     return this.levels[0].toTACValue() + "/" + this.levels[1].toTAC();
                             }
-                            return "":
+                            return "";
                         } else if (this.levels[0].getUnit().equals(SigmetLevelUnit.M) && this.levels[1].getUnit().equals(SigmetLevelUnit.FL)){
                               return this.levels[0].toTAC() + "/" + this.levels[1].toTAC();
                         } else if (this.levels[0].getUnit().equals(SigmetLevelUnit.FT) && this.levels[1].getUnit().equals(SigmetLevelUnit.FL)){
@@ -258,12 +254,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
                     }
                     break;
                 case BETW_SFC:
-                    if (this.levels[0] != null) {
-                        if (this.levels[1].unit == SigmetLevelUnit.M || this.levels[1].unit == SigmetLevelUnit.FT) {
-                            return "SFC/"+this.levels[1].value + this.levels[1].unit.toString().toUpperCase();
-                        } else 	if (this.levels[1].unit == SigmetLevelUnit.FL) {
-                            return "SFC/FL" + this.levels[1].value;
-                        }
+                    if (this.levels[1] != null) {
+                            return "SFC/"+this.levels[1].toTAC();
                     }
                     break;
                 case ABV:
