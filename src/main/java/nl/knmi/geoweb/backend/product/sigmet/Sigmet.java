@@ -938,21 +938,28 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
     @Override
     public String export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
         //		String s=converter.ToIWXXM_2_1(this);
+        List<String> toDeleteIfError=new ArrayList<>(); //List of products to delete in case of error
         try {
             String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 
             String TACName = "WSNL31" + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
-            Tools.writeFile(path.getPath() + "/" + TACName + ".tac", this.toTAC(this.getFirFeature()));
+            String tacFileName=path.getPath() + "/" + TACName + ".tac";
+            Tools.writeFile(tacFileName, this.toTAC(this.getFirFeature()));
+            toDeleteIfError.add(tacFileName);
 
             String name = "SIGMET_" + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
-            Tools.writeFile(path.getPath() + "/" + name + ".json", this.toJSON(om));
+            String jsonFileName=path.getPath() + "/" + name + ".json";
+            Tools.writeFile(jsonFileName, this.toJSON(om));
+            toDeleteIfError.add(jsonFileName);
 
             String iwxxmName="A_"+"LSNL31"+this.getLocation_indicator_mwo()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
             iwxxmName+="_C_"+this.getLocation_indicator_mwo()+"_"+time;
             String s=converter.ToIWXXM_2_1(this);
             Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
         } catch (IOException e) {
+            toDeleteIfError.stream().map(f ->  Tools.rm(f));
+            return "ERROR "+e.getMessage();
         }
         return "OK";
     }
