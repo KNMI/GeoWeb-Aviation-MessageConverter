@@ -70,7 +70,8 @@ public class SigmetStore {
 		int seq = 1;
 
 		if (sigmets.length > 0){
-			Arrays.sort(sigmets, (rhs, lhs) -> rhs.getSequence() < lhs.getSequence() ? 1 : (rhs.getSequence() == lhs.getSequence() ? 0 : -1));
+			Arrays.sort(sigmets, (rhs, lhs) -> rhs.getSequence() < lhs.getSequence() ? 1 :
+                    (rhs.getSequence() == lhs.getSequence() ? 0 : -1));
 			seq = sigmets[0].getSequence() + 1;
 		}
 		return seq;
@@ -108,18 +109,18 @@ public class SigmetStore {
 		if (files!=null) {
 			List<Sigmet> sigmets=new ArrayList<Sigmet>();
 			for (File f: files) {
-				Debug.println("f:"+f);
 				Sigmet sm;
 				try {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
 						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
-						if ((sm.getStatus()==SigmetStatus.published)&& sm.getValiddate_end().isAfter(now)) {
+						if ((sm.getStatus()==SigmetStatus.published)&&
+								(sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);
 						}
 					}else if (selectStatus != null) {
 						if (selectStatus==SigmetStatus.canceled) {
-							if (sm.getValiddate_end().isBefore(now)) {
+							if ((sm.getValiddate_end().isBefore(now))||(sm.getStatus()==SigmetStatus.canceled)) {
 								sigmets.add(sm);
 							}
 						} else {
@@ -159,5 +160,21 @@ public class SigmetStore {
 	public boolean deleteSigmetByUuid(String uuid) {
 		String fn=String.format("%s/sigmet_%s.json", this.directory, uuid);
 		return Tools.rm(fn);
+	}
+
+	public boolean isPublished(String uuid) {
+		Sigmet sigmet=getByUuid(uuid);
+		if (sigmet!=null) {
+			return (sigmet.getStatus()==SigmetStatus.published);
+		}
+		return false;
+	}
+
+	public boolean isCanceled(String uuid) {
+		Sigmet sigmet=getByUuid(uuid);
+		if (sigmet!=null) {
+			return (sigmet.getStatus()==SigmetStatus.canceled);
+		}
+		return false;
 	}
 }
