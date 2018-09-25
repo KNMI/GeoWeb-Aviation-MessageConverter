@@ -70,7 +70,8 @@ public class SigmetStore {
 		int seq = 1;
 
 		if (sigmets.length > 0){
-			Arrays.sort(sigmets, (rhs, lhs) -> rhs.getSequence() < lhs.getSequence() ? 1 : (rhs.getSequence() == lhs.getSequence() ? 0 : -1));
+			Arrays.sort(sigmets, (rhs, lhs) -> rhs.getSequence() < lhs.getSequence() ? 1 :
+                    (rhs.getSequence() == lhs.getSequence() ? 0 : -1));
 			seq = sigmets[0].getSequence() + 1;
 		}
 		return seq;
@@ -159,5 +160,21 @@ public class SigmetStore {
 	public boolean deleteSigmetByUuid(String uuid) {
 		String fn=String.format("%s/sigmet_%s.json", this.directory, uuid);
 		return Tools.rm(fn);
+	}
+
+	public boolean isPublished(String uuid) {
+		Sigmet sigmet=getByUuid(uuid);
+		if (sigmet!=null) {
+			return (sigmet.getStatus()==SigmetStatus.published);
+		}
+		return false;
+	}
+
+	public boolean isCanceled(String uuid) {
+		Sigmet sigmet=getByUuid(uuid);
+		if (sigmet!=null) {
+			return (sigmet.getStatus()==SigmetStatus.canceled);
+		}
+		return false;
 	}
 }
