@@ -957,8 +957,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
             iwxxmName+="_C_"+this.getLocation_indicator_mwo()+"_"+time;
             String s=converter.ToIWXXM_2_1(this);
             Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
-        } catch (IOException e) {
-            toDeleteIfError.stream().map(f ->  Tools.rm(f));
+        } catch (IOException | NullPointerException e) {
+            toDeleteIfError.stream().forEach(f ->  {Debug.println("REMOVING "+f); Tools.rm(f); });
             return "ERROR "+e.getMessage();
         }
         return "OK";
