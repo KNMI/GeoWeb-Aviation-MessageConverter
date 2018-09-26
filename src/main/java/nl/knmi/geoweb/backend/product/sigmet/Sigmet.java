@@ -660,7 +660,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
     public String toTAC(Feature FIR) {
         GeoJsonObject effectiveStartGeometry = this.findStartGeometry() ; //findStartGeometry();
         if ((effectiveStartGeometry==null)||(((Feature)effectiveStartGeometry).getProperty("selectionType")==null)) {
-            return "Error 1";
+            return "Missing geometry";
         }
         if (!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("box")&&
                 !((Feature)effectiveStartGeometry).getProperty("selectionType").equals("fir")&&
