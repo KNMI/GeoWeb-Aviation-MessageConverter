@@ -38,7 +38,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -485,7 +484,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
         try {
             om.writeValue(new File(fn), this);
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -530,14 +528,14 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
         double lon = lnglat.getLongitude();
         double lat = lnglat.getLatitude();
 
-        return this.convertLat(lat) + " " + this.convertLon(lon);
+        return Sigmet.convertLat(lat) + " " + Sigmet.convertLon(lon);
     }
 
     public String pointToDMSString(Coordinate coord) {
         double lon = coord.getOrdinate(Coordinate.X);
         double lat = coord.getOrdinate(Coordinate.Y);
 
-        return this.convertLat(lat) + " " + this.convertLon(lon);
+        return Sigmet.convertLat(lat) + " " + Sigmet.convertLon(lon);
     }
 
     public String latlonToDMS(List<LngLatAlt> coords) {
@@ -687,7 +685,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
                     }
                     return "WI " + this.latlonToDMS(intersected);
                 } catch (ParseException | JsonProcessingException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             default:
@@ -773,6 +770,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
             sb.append(this.change.toTAC());
             sb.append('\n');
         }
+        // TODO: Check why endGeometry is not used
         GeoJsonObject endGeometry=this.findEndGeometry(((Feature)effectiveStartGeometry).getId());
 
         if (this.movement_type==SigmetMovementType.FORECAST_POSITION) {
@@ -964,26 +962,26 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
     // Same as TAC, but maximum line with 69 chars where words (e.g. "OVC020CB") are not split
     // Also has a header and footer to the message
-    private String getPublishableTAC() {
-        String line = "";
-        String publishTAC = "";
-        String[] TACwords = this.toTAC(this.getFirFeature()).split("\\s+");
-        for(int i = 0; i < TACwords.length; ++i) {
-            if (line.length() + TACwords[i].length() + 1 <= 69) {
-                if (line.length() > 0) line += " ";
-                line += TACwords[i];
-            } else {
-                publishTAC += line + '\n';
-                line = TACwords[i];
-            }
-        }
-        publishTAC += line;
-        String time = this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));;
-
-        String header = "WSNL31 " + this.getLocation_indicator_mwo() + " " + time +'\n';
-        String footer = "=";
-        return header + publishTAC + footer;
-    }
+//    private String __getPublishableTAC() {
+//        String line = "";
+//        String publishTAC = "";
+//        String[] TACwords = this.toTAC(this.getFirFeature()).split("\\s+");
+//        for(int i = 0; i < TACwords.length; ++i) {
+//            if (line.length() + TACwords[i].length() + 1 <= 69) {
+//                if (line.length() > 0) line += " ";
+//                line += TACwords[i];
+//            } else {
+//                publishTAC += line + '\n';
+//                line = TACwords[i];
+//            }
+//        }
+//        publishTAC += line;
+//        String time = this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));;
+//
+//        String header = "WSNL31 " + this.getLocation_indicator_mwo() + " " + time +'\n';
+//        String footer = "=";
+//        return header + publishTAC + footer;
+//    }
 
     @Override
     public String export(File path, ProductConverter<Sigmet> converter, ObjectMapper om) {
