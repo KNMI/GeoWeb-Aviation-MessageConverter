@@ -38,6 +38,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -81,10 +82,33 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
     @JsonInclude(Include.NON_NULL)
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private OffsetDateTime cancelsStart;
+    
+    @JsonInclude(Include.NON_NULL)
+    VAExtraFields va_extra_fields;
+    
+    @JsonInclude(Include.NON_NULL)
+    TCExtraFields tc_extra_fields;
 
     @JsonIgnore
     private Feature firFeature;
 
+    public class VAExtraFields {
+    	public Volcano volcano;
+    	boolean no_va_expected;
+    	List <String> move_to;
+    	class Volcano {
+    		String name;
+    		List <Number> position;
+    	}
+    }
+    
+    public class TCExtraFields {
+    	TropicalCyclone tropical_cyclone;
+    	class TropicalCyclone {
+    		String name;
+    	}
+    }
+    
     @Getter
     public enum Phenomenon {
         OBSC_TS("OBSC TS", "Obscured Thunderstorms"),OBSC_TSGR("OBSC TSGR", "Obscured Thunderstorms with hail"),
