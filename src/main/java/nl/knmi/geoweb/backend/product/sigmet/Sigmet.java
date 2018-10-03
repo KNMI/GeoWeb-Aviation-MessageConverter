@@ -84,27 +84,44 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
     private OffsetDateTime cancelsStart;
     
     @JsonInclude(Include.NON_NULL)
-    VAExtraFields va_extra_fields;
+    private VAExtraFields va_extra_fields;
     
     @JsonInclude(Include.NON_NULL)
-    TCExtraFields tc_extra_fields;
+    private TCExtraFields tc_extra_fields;
 
     @JsonIgnore
     private Feature firFeature;
 
-    public class VAExtraFields {
+    @Getter
+    public static class VAExtraFields {
+    	// TODO: Add TAC for no_va_expected and move_to
+    	// TODO: Check TAC for Volcano.toTAC();
+    	/* https://www.icao.int/APAC/Documents/edocs/WV-SIGMET.pdf */
     	public Volcano volcano;
     	boolean no_va_expected;
     	List <String> move_to;
-    	class Volcano {
+        @Getter
+    	public static class Volcano {
     		String name;
     		List <Number> position;
+			public String toTAC() {
+				return this.name + 
+						" " + 
+						Sigmet.convertLat(position.get(0).doubleValue()) +
+						" " +
+						Sigmet.convertLon(position.get(1).doubleValue());
+			}
     	}
+        public String toTAC () {
+        	return " " + volcano.toTAC() + " ";
+        }
     }
     
-    public class TCExtraFields {
+    @Getter
+    public static class TCExtraFields {
     	TropicalCyclone tropical_cyclone;
-    	class TropicalCyclone {
+        @Getter
+    	public static class TropicalCyclone {
     		String name;
     	}
     }
@@ -119,8 +136,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
         SEV_ICE("SEV ICE", "Severe Icing"), SEV_ICE_FZRA("SEV ICE (FZRA)", "Severe Icing with Freezing Rain"),
         SEV_MTW("SEV MTW", "Severe Mountain Wave"),
         HVY_DS("HVY DS", "Heavy Duststorm"),HVY_SS("HVY SS", "Heavy Sandstorm"),
-        RDOACT_CLD("RDOACT CLD", "Radioactive Cloud")
-        ;
+        RDOACT_CLD("RDOACT CLD", "Radioactive Cloud"),
+    	VA_ERUPTION("VA ERUPTION", "Volcanic Ash Eruption"), /* https://www.icao.int/APAC/Documents/edocs/sigmet_guide6.pdf, 3.2 Sigmet phenomena */
+    	TROPICAL_CYCLONE("TC", "Tropical Cyclone");
+    	
         private String description;
         private String shortDescription;
 
@@ -431,6 +450,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
         this.validdate_end = otherSigmet.getValiddate_end();
         this.issuedate = otherSigmet.getIssuedate();
         this.firFeature = otherSigmet.firFeature;
+        this.va_extra_fields = otherSigmet.va_extra_fields;
+        this.tc_extra_fields = otherSigmet.tc_extra_fields;
     }
 
     public Sigmet(String firname, String location, String issuing_mwo, String uuid) {
@@ -473,7 +494,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
         return om.writeValueAsString(this);
     }
 
-    public String convertLat(double lat) {
+    public static String convertLat(double lat) {
         String latDM = "";
         if (lat < 0) {
             latDM = "S";
@@ -489,7 +510,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
         return latDM;
     }
 
-    public String convertLon(double lon) {
+    public static String convertLon(double lon) {
         String lonDM = "";
         if (lon < 0) {
             lonDM = "W";
@@ -710,6 +731,11 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
         }
         sb.append('\n');
         sb.append(this.phenomenon.getShortDescription());
+        
+        if (va_extra_fields!=null){
+        	sb.append(va_extra_fields.toTAC());
+        }
+        
         sb.append('\n');
         if (this.getObs_or_forecast()!=null) {
             sb.append(this.obs_or_forecast.toTAC());

@@ -78,6 +78,8 @@ public class SigmetPhenomenaMapping {
 		phenomena.add(phen);
 		phen=new SigmetPhenomenon("Volcanic Ash eruption", "VA_ERUPTION", null);
 		phenomena.add(phen);
+//		phen=new SigmetPhenomenon("Tropical Cyclone", "TROPICAL_CYCLONE", null);
+//		phenomena.add(phen);
 	}
 
 }
