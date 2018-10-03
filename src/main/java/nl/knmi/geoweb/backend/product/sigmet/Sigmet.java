@@ -93,9 +93,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
     @Getter
     public static class VAExtraFields {
-    	// TODO: Add TAC for no_va_expected and move_to
-    	// TODO: Check TAC for Volcano.toTAC();
     	/* https://www.icao.int/APAC/Documents/edocs/WV-SIGMET.pdf */
+    	/* TODO: no_va_expected */
+    	// TODO: Add TAC for move_to
+    	// TODO: Check TAC for Volcano.toTAC();
     	public Volcano volcano;
     	boolean no_va_expected;
     	List <String> move_to;
@@ -112,7 +113,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			}
     	}
         public String toTAC () {
-        	return " " + volcano.toTAC() + " ";
+        	if (volcano != null ) {
+        		return " " + volcano.toTAC() + " ";
+        	}
+        	return "";
         }
     }
     
