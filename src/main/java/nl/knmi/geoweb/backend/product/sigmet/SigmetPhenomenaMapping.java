@@ -76,7 +76,7 @@ public class SigmetPhenomenaMapping {
 		phenomena.add(phen);
 		phen=new SigmetPhenomenon("Severe Mountainwaves", "SEV_MTW", "sigmet_layer_SEV_MTW");
 		phenomena.add(phen);
-		phen=new SigmetPhenomenon("Volcanic Ash eruption", "VA_ERUPTION", null);
+		phen=new SigmetPhenomenon("Volcanic Ash Cloud", "VA_CLD", null); /* TODO Rename VA_ERUPTION to VA */
 		phenomena.add(phen);
 //		phen=new SigmetPhenomenon("Tropical Cyclone", "TROPICAL_CYCLONE", null);
 //		phenomena.add(phen);
