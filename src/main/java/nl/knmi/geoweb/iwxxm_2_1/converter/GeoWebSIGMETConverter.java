@@ -24,6 +24,7 @@ import fi.fmi.avi.model.NumericMeasure;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetLevelMode;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
+import nl.knmi.geoweb.backend.product.sigmet.SigmetPhenomenaMapping.SigmetPhenomenon;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
 
 public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>{
@@ -32,6 +33,11 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 	public ConversionResult<SIGMET> convertMessage(Sigmet input, ConversionHints hints) {
 		Debug.println("convertMessage: "+this.getClass().getName());
 		ConversionResult<SIGMET> retval = new ConversionResult<>();
+		if (input.getPhenomenon().equals(Sigmet.Phenomenon.VA_CLD)) {
+			Debug.println("Unable to convert VA_CLD sigmet");
+			return retval;
+		}
+
 		SIGMET sigmet = new SigmetImpl();
 
 		AirTrafficServicesUnit unit=new AirTrafficServicesUnitImpl(input.getFirname(),input.getLocation_indicator_icao(), input.getLocation_indicator_mwo());

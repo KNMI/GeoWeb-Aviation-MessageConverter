@@ -2,33 +2,55 @@ package nl.knmi.geoweb.backend.product.sigmet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import lombok.Getter;
+
+/*
+ * {
+    "location_indicator_wmo": "EHDB",
+    "firareas": {
+      "EHAA": {
+        "firname": "AMSTERDAM FIR",
+        "location_indicator_icao": "EHAA",
+        "areapreset": "NL_FIR",
+        "maxhoursofvalidity": 4,
+        "hoursbeforevalidity": 4,
+        "tc_maxhoursofvalidity": 12,
+        "tc_hoursbeforevalidity": 6,
+        "va_maxhoursofvalidity": 12,
+        "va_hoursbeforevalidity": 6,
+        "adjacent_firs": [
+          "EKDK",
+          "EDWW",
+          "EDGG",
+          "EBBU",
+          "EGTT",
+          "EGPX" 
+        ]
+      }
+    },
+    "active_firs": [ "EHAA" ]
+}
+ */
 
 @Getter
 public class SigmetParameters {
 	@Getter
-    public class FirArea {
+    static public class FirArea {
     	String location_indicator_icao;
     	String firname;
     	String areapreset;
-    	public FirArea(String icao, String firName, String areaPreset) {
-    		this.location_indicator_icao=icao;
-    		this.firname=firName;
-    		this.areapreset=areaPreset;
-    	}
+    	float maxhoursofvalidity;
+    	float hoursbeforevalidity;
+    	float tc_maxhoursofvalidity;
+    	float tc_hoursbeforevalidity;
+    	float va_maxhoursofvalidity;
+    	float va_hoursbeforevalidity;
+    	private List<String> adjacent_firs;
     }
 	
-	private float maxhoursofvalidity;
-	private float hoursbeforevalidity;
-	private List<FirArea> firareas;
+	private Map<String, FirArea> firareas;
 	private String location_indicator_wmo;
-	public SigmetParameters() {
-		this.maxhoursofvalidity=4;
-		this.hoursbeforevalidity=4;
-		this.location_indicator_wmo="EHDB";
-		this.firareas=new ArrayList<FirArea>();
-		firareas.add(new FirArea("EHAA", "FIR AMSTERDAM", "NL_FIR"));
-	}
-	
+	private List<String> active_firs;
 }
