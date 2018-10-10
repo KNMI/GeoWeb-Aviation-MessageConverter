@@ -98,9 +98,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	@Getter
 	public static class VAExtraFields {
 		/* https://www.icao.int/APAC/Documents/edocs/WV-SIGMET.pdf */
-		/* TODO: no_va_expected */
-		// TODO: Add TAC for move_to
-		// TODO: Check TAC for Volcano.toTAC();
+		// TODO: Add TAC for CANCEL move_to
+		// TODO TAC should be truncated on 69 characters.
 		public Volcano volcano;
 		boolean no_va_expected;
 		List <String> move_to;
@@ -790,8 +789,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			sb.append(this.change.toTAC());
 			sb.append('\n');
 		}
-		// TODO: Check why endGeometry is not used
-		GeoJsonObject endGeometry=this.findEndGeometry(((Feature)effectiveStartGeometry).getId());
 
 		if (this.movement_type==SigmetMovementType.FORECAST_POSITION) {
 			OffsetDateTime fpaTime=this.validdate_end;
