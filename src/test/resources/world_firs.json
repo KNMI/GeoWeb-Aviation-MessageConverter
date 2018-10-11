@@ -234,7 +234,7 @@
                 "centlong": 39.5815728,
                 "REGION": "AFI",
                 "StateName": "Ethiopia",
-                "FIRname": "FIR ADDIS ABABA",
+                "FIRname": "ADDIS ABABA FIR",
                 "StateCode": "ETH",
                 "centlat": 8.69334686,
                 "ICAOCODE": "HAAA"
@@ -1977,7 +1977,7 @@
                 "centlong": 1.15354469,
                 "REGION": "AFI",
                 "StateName": "Ghana",
-                "FIRname": "FIR ACCRA",
+                "FIRname": "ACCRA FIR",
                 "StateCode": "GHA",
                 "centlat": 0.66587273,
                 "ICAOCODE": "DGAC"
@@ -2712,7 +2712,7 @@
                 "centlong": 36.58120769,
                 "REGION": "AFI",
                 "StateName": "United Republic of Tanzania",
-                "FIRname": "FIR DAR ES SALAAM",
+                "FIRname": "DAR ES SALAAM FIR",
                 "StateCode": "TZA",
                 "centlat": -6.61641365,
                 "ICAOCODE": "HTDC"
@@ -2775,7 +2775,7 @@
                 "centlong": 48.56534436,
                 "REGION": "AFI",
                 "StateName": "Madagascar",
-                "FIRname": "FIR ANTANANARIVO",
+                "FIRname": "ANTANANARIVO FIR",
                 "StateCode": "MDG",
                 "centlat": -20.63101971,
                 "ICAOCODE": "FMMM"
@@ -2914,7 +2914,7 @@
                 "centlong": 39.46657666,
                 "REGION": "AFI",
                 "StateName": "Eritrea",
-                "FIRname": "FIR ASMARA",
+                "FIRname": "ASMARA FIR",
                 "StateCode": "ERI",
                 "centlat": 15.89620704,
                 "ICAOCODE": "HHAA"
@@ -3321,7 +3321,7 @@
                 "centlong": 36.94806325,
                 "REGION": "AFI",
                 "StateName": "Mozambique",
-                "FIRname": "FIR BEIRA",
+                "FIRname": "BEIRA FIR",
                 "StateCode": "MOZ",
                 "centlat": -19.7629223,
                 "ICAOCODE": "FQBE"
@@ -3816,7 +3816,7 @@
                 "centlong": 14.11381943,
                 "REGION": "AFI",
                 "StateName": "Congo",
-                "FIRname": "FIR BRAZZAVILLE",
+                "FIRname": "BRAZZAVILLE FIR",
                 "StateCode": "COG",
                 "centlat": 2.19748971,
                 "ICAOCODE": "FCCC"
@@ -3927,7 +3927,7 @@
                 "centlong": 29.88920823,
                 "REGION": "AFI",
                 "StateName": "Burundi",
-                "FIRname": "FIR BUJUMBURA",
+                "FIRname": "BUJUMBURA FIR",
                 "StateCode": "BDI",
                 "centlat": -3.35443987,
                 "ICAOCODE": "HBBA"
@@ -4034,7 +4034,7 @@
                 "centlong": 22.43157245,
                 "REGION": "AFI",
                 "StateName": "South Africa",
-                "FIRname": "FIR CAPETOWN",
+                "FIRname": "CAPETOWN FIR",
                 "StateCode": "ZAF",
                 "centlat": -33.83339809,
                 "ICAOCODE": "FACA"
@@ -4225,7 +4225,7 @@
                 "centlong": 32.38269271,
                 "REGION": "AFI",
                 "StateName": "Uganda",
-                "FIRname": "FIR ENTEBBE",
+                "FIRname": "ENTEBBE FIR",
                 "StateCode": "UGA",
                 "centlat": 1.35943002,
                 "ICAOCODE": "HUEC"
@@ -4584,7 +4584,7 @@
                 "centlong": 23.81416158,
                 "REGION": "AFI",
                 "StateName": "Botswana",
-                "FIRname": "FIR GABORONE",
+                "FIRname": "GABORONE FIR",
                 "StateCode": "BWA",
                 "centlat": -22.18226148,
                 "ICAOCODE": "FBGR"
@@ -5043,7 +5043,7 @@
                 "centlong": 29.87078207,
                 "REGION": "AFI",
                 "StateName": "Zimbabwe",
-                "FIRname": "FIR HARARE",
+                "FIRname": "HARARE FIR",
                 "StateCode": "ZWE",
                 "centlat": -19.00166009,
                 "ICAOCODE": "FVHF"
@@ -5330,7 +5330,7 @@
                 "centlong": 26.2925873,
                 "REGION": "AFI",
                 "StateName": "South Africa",
-                "FIRname": "FIR JOHANNESBURG",
+                "FIRname": "JOHANNESBURG FIR",
                 "StateCode": "ZAF",
                 "centlat": -28.01854522,
                 "ICAOCODE": "FAJA"
@@ -5445,7 +5445,7 @@
                 "centlong": 29.31948027,
                 "REGION": "AFI",
                 "StateName": "South Africa",
-                "FIRname": "FIR JOHANNESBURG OCEANIC",
+                "FIRname": "JOHANNESBURG OCEANIC FIR",
                 "StateCode": "ZAF",
                 "centlat": -60.01556413,
                 "ICAOCODE": "FAJO"
@@ -5788,7 +5788,7 @@
                 "centlong": 7.87652985,
                 "REGION": "AFI",
                 "StateName": "Nigeria",
-                "FIRname": "FIR KANO",
+                "FIRname": "KANO FIR",
                 "StateCode": "NGA",
                 "centlat": 9.22146301,
                 "ICAOCODE": "DNKK"
@@ -5915,7 +5915,7 @@
                 "centlong": 29.91995367,
                 "REGION": "AFI",
                 "StateName": "Rwanda",
-                "FIRname": "FIR KIGALI",
+                "FIRname": "KIGALI FIR",
                 "StateCode": "RWA",
                 "centlat": -1.99718035,
                 "ICAOCODE": "HRYR"
@@ -6602,7 +6602,7 @@
                 "centlong": 23.74065444,
                 "REGION": "AFI",
                 "StateName": "Democratic Republic of the Congo",
-                "FIRname": "FIR KINSHASA",
+                "FIRname": "KINSHASA FIR",
                 "StateCode": "COD",
                 "centlat": -2.62541455,
                 "ICAOCODE": "FZZA"
@@ -7413,7 +7413,7 @@
                 "centlong": 34.3105481,
                 "REGION": "AFI",
                 "StateName": "Malawi",
-                "FIRname": "FIR LILONGWE",
+                "FIRname": "LILONGWE FIR",
                 "StateCode": "MWI",
                 "centlat": -13.3248427,
                 "ICAOCODE": "FWLL"
@@ -8088,7 +8088,7 @@
                 "centlong": 7.4165984,
                 "REGION": "AFI",
                 "StateName": "Angola",
-                "FIRname": "FIR LUANDA",
+                "FIRname": "LUANDA FIR",
                 "StateCode": "AGO",
                 "centlat": -12.53154554,
                 "ICAOCODE": "FNAN"
@@ -8159,7 +8159,7 @@
                 "centlong": 65.90740277,
                 "REGION": "AFI",
                 "StateName": "Mauritius",
-                "FIRname": "FIR MAURITIUS",
+                "FIRname": "MAURITIUS FIR",
                 "StateCode": "MUS",
                 "centlat": -25.56802802,
                 "ICAOCODE": "FIMM"
@@ -8330,7 +8330,7 @@
                 "centlong": 49.04955793,
                 "REGION": "AFI",
                 "StateName": "Somalia",
-                "FIRname": "FIR MOGADISHU",
+                "FIRname": "MOGADISHU FIR",
                 "StateCode": "SOM",
                 "centlat": 6.52336819,
                 "ICAOCODE": "HCSM"
@@ -8601,7 +8601,7 @@
                 "centlong": 17.64380912,
                 "REGION": "AFI",
                 "StateName": "Chad",
-                "FIRname": "FIR N DJAMENA",
+                "FIRname": "N DJAMENA FIR",
                 "StateCode": "TCD",
                 "centlat": 15.13445645,
                 "ICAOCODE": "FTTT"
@@ -8788,7 +8788,7 @@
                 "centlong": 38.7278013,
                 "REGION": "AFI",
                 "StateName": "Kenya",
-                "FIRname": "FIR NAIROBI",
+                "FIRname": "NAIROBI FIR",
                 "StateCode": "KEN",
                 "centlat": -0.28128436,
                 "ICAOCODE": "HKNA"
@@ -9107,7 +9107,7 @@
                 "centlong": 2.98540862,
                 "REGION": "AFI",
                 "StateName": "Niger",
-                "FIRname": "FIR NIAMEY",
+                "FIRname": "NIAMEY FIR",
                 "StateCode": "NER",
                 "centlat": 16.56072815,
                 "ICAOCODE": "DRRR"
@@ -9190,7 +9190,7 @@
                 "centlong": -26.59214455,
                 "REGION": "AFI",
                 "StateName": "Cabo Verde",
-                "FIRname": "FIR SAL OCEANIC",
+                "FIRname": "SAL OCEANIC FIR",
                 "StateCode": "CPV",
                 "centlat": 18.10431904,
                 "ICAOCODE": "GVSC"
@@ -13205,7 +13205,7 @@
                 "centlong": -11.13781559,
                 "REGION": "AFI",
                 "StateName": "Liberia",
-                "FIRname": "FIR ROBERTS",
+                "FIRname": "ROBERTS FIR",
                 "StateCode": "LBR",
                 "centlat": 7.56715571,
                 "ICAOCODE": "GLRB"
@@ -13264,7 +13264,7 @@
                 "centlong": 53.17360814,
                 "REGION": "AFI",
                 "StateName": "Seychelles",
-                "FIRname": "FIR SEYCHELLES",
+                "FIRname": "SEYCHELLES FIR",
                 "StateCode": "SYC",
                 "centlat": -2.3623023,
                 "ICAOCODE": "FSSS"
@@ -13835,7 +13835,7 @@
                 "centlong": 15.41259996,
                 "REGION": "AFI",
                 "StateName": "Namibia",
-                "FIRname": "FIR WINDHOEK",
+                "FIRname": "WINDHOEK FIR",
                 "StateCode": "NAM",
                 "centlat": -22.37133622,
                 "ICAOCODE": "FYWH"
@@ -15704,7 +15704,7 @@
                 "centlong": 33.3700417,
                 "REGION": "AFI",
                 "StateName": "Zambia",
-                "FIRname": "FIR LUSAKA",
+                "FIRname": "LUSAKA FIR",
                 "StateCode": "ZMB",
                 "centlat": -9.75769681,
                 "ICAOCODE": "FLFI"
@@ -21265,7 +21265,7 @@
                 "centlong": -10.03773698,
                 "REGION": "AFI",
                 "StateName": "Senegal",
-                "FIRname": "FIR DAKAR",
+                "FIRname": "DAKAR FIR",
                 "StateCode": "SEN",
                 "centlat": 15.28212275,
                 "ICAOCODE": "GOOO"
@@ -21562,7 +21562,7 @@
                 "centlong": 160.16989723,
                 "REGION": "ASIA",
                 "StateName": "United States of America",
-                "FIRname": "FIR OAKLAND OCEANIC EAST",
+                "FIRname": "OAKLAND OCEANIC EAST FIR",
                 "StateCode": "USA",
                 "centlat": 18.70799003,
                 "ICAOCODE": "KZAK"
@@ -21793,7 +21793,7 @@
                 "centlong": 113.37837175,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR BEIJING",
+                "FIRname": "BEIJING FIR",
                 "StateCode": "CHN",
                 "centlat": 40.18898985,
                 "ICAOCODE": "ZBPE"
@@ -22044,7 +22044,7 @@
                 "centlong": 145.19848592,
                 "REGION": "ASIA",
                 "StateName": "Australia",
-                "FIRname": "FIR BRISBANE",
+                "FIRname": "BRISBANE FIR",
                 "StateCode": "AUS",
                 "centlat": -22.74328666,
                 "ICAOCODE": "YBBB"
@@ -22163,7 +22163,7 @@
                 "centlong": 82.78007397,
                 "REGION": "ASIA",
                 "StateName": "India",
-                "FIRname": "FIR CHENNAI",
+                "FIRname": "CHENNAI FIR",
                 "StateCode": "IND",
                 "centlat": 11.72280479,
                 "ICAOCODE": "VOMF"
@@ -22214,7 +22214,7 @@
                 "centlong": 84.62999738,
                 "REGION": "ASIA",
                 "StateName": "Sri Lanka",
-                "FIRname": "FIR COLOMBO",
+                "FIRname": "COLOMBO FIR",
                 "StateCode": "LKA",
                 "centlat": 3.23853515,
                 "ICAOCODE": "VCCF"
@@ -22657,7 +22657,7 @@
                 "centlong": 76.58991917,
                 "REGION": "ASIA",
                 "StateName": "India",
-                "FIRname": "FIR DELHI",
+                "FIRname": "DELHI FIR",
                 "StateCode": "IND",
                 "centlat": 29.59090946,
                 "ICAOCODE": "VIDF"
@@ -22872,7 +22872,7 @@
                 "centlong": 90.35726895,
                 "REGION": "ASIA",
                 "StateName": "Bangladesh",
-                "FIRname": "FIR DHAKA",
+                "FIRname": "DHAKA FIR",
                 "StateCode": "BGD",
                 "centlat": 23.53105987,
                 "ICAOCODE": "VGFR"
@@ -23247,7 +23247,7 @@
                 "centlong": 111.12805532,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR GUANGZHOU",
+                "FIRname": "GUANGZHOU FIR",
                 "StateCode": "CHN",
                 "centlat": 24.71530141,
                 "ICAOCODE": "ZGZU"
@@ -23482,7 +23482,7 @@
                 "centlong": 105.7789515,
                 "REGION": "ASIA",
                 "StateName": "Viet Nam",
-                "FIRname": "FIR HANOI",
+                "FIRname": "HANOI FIR",
                 "StateCode": "VNM",
                 "centlat": 20.38260594,
                 "ICAOCODE": "VVVV"
@@ -23653,7 +23653,7 @@
                 "centlong": 108.82740073,
                 "REGION": "ASIA",
                 "StateName": "Viet Nam",
-                "FIRname": "FIR HO-CHI-MINH",
+                "FIRname": "HO-CHI-MINH FIR",
                 "StateCode": "VNM",
                 "centlat": 11.36950944,
                 "ICAOCODE": "VVTS"
@@ -23948,7 +23948,7 @@
                 "centlong": 114.49915127,
                 "REGION": "ASIA",
                 "StateName": "China, Hong Kong Special Administrative Region",
-                "FIRname": "FIR HONG KONG",
+                "FIRname": "HONG KONG FIR",
                 "StateCode": "HKG",
                 "centlat": 20.30801681,
                 "ICAOCODE": "VHHK"
@@ -24023,7 +24023,7 @@
                 "centlong": 160.05590355,
                 "REGION": "ASIA",
                 "StateName": "Solomon Islands",
-                "FIRname": "FIR HONIARA",
+                "FIRname": "HONIARA FIR",
                 "StateCode": "SLB",
                 "centlat": -10.09628311,
                 "ICAOCODE": "AGGG"
@@ -24130,7 +24130,7 @@
                 "centlong": 127.35093059,
                 "REGION": "ASIA",
                 "StateName": "Republic of Korea",
-                "FIRname": "FIR INCHEON",
+                "FIRname": "INCHEON FIR",
                 "StateCode": "KOR",
                 "centlat": 35.35877707,
                 "ICAOCODE": "RKRR"
@@ -24545,7 +24545,7 @@
                 "centlong": 102.27731974,
                 "REGION": "ASIA",
                 "StateName": "Indonesia",
-                "FIRname": "FIR JAKARTA",
+                "FIRname": "JAKARTA FIR",
                 "StateCode": "IDN",
                 "centlat": -2.90361786,
                 "ICAOCODE": "WIIF"
@@ -24996,7 +24996,7 @@
                 "centlong": 66.02568565,
                 "REGION": "ASIA",
                 "StateName": "Afghanistan",
-                "FIRname": "FIR KABUL",
+                "FIRname": "KABUL FIR",
                 "StateCode": "AFG",
                 "centlat": 33.83855928,
                 "ICAOCODE": "OAKX"
@@ -25291,7 +25291,7 @@
                 "centlong": 66.5973295,
                 "REGION": "ASIA",
                 "StateName": "Pakistan",
-                "FIRname": "FIR KARACHI",
+                "FIRname": "KARACHI FIR",
                 "StateCode": "PAK",
                 "centlat": 26.87121528,
                 "ICAOCODE": "OPKR"
@@ -25542,7 +25542,7 @@
                 "centlong": 83.93846557,
                 "REGION": "ASIA",
                 "StateName": "Nepal",
-                "FIRname": "FIR KATHMANDU",
+                "FIRname": "KATHMANDU FIR",
                 "StateCode": "NPL",
                 "centlat": 28.25457027,
                 "ICAOCODE": "VNSM"
@@ -26089,7 +26089,7 @@
                 "centlong": 88.07649517,
                 "REGION": "ASIA",
                 "StateName": "India",
-                "FIRname": "FIR KOLKATA",
+                "FIRname": "KOLKATA FIR",
                 "StateCode": "IND",
                 "centlat": 21.80661573,
                 "ICAOCODE": "VECF"
@@ -26380,7 +26380,7 @@
                 "centlong": 114.16586686,
                 "REGION": "ASIA",
                 "StateName": "Brunei Darussalam",
-                "FIRname": "FIR KOTA KINABALU",
+                "FIRname": "KOTA KINABALU FIR",
                 "StateCode": "BRN",
                 "centlat": 4.25940667,
                 "ICAOCODE": "WBFC"
@@ -26527,7 +26527,7 @@
                 "centlong": 99.4451898,
                 "REGION": "ASIA",
                 "StateName": "Malaysia",
-                "FIRname": "FIR KUALA LUMPUR",
+                "FIRname": "KUALA LUMPUR FIR",
                 "StateCode": "MYS",
                 "centlat": 5.62992883,
                 "ICAOCODE": "WMFC"
@@ -27034,7 +27034,7 @@
                 "centlong": 97.40323005,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR KUNMING",
+                "FIRname": "KUNMING FIR",
                 "StateCode": "CHN",
                 "centlat": 29.36171407,
                 "ICAOCODE": "ZPKM"
@@ -27345,7 +27345,7 @@
                 "centlong": 71.41442801,
                 "REGION": "ASIA",
                 "StateName": "Pakistan",
-                "FIRname": "FIR LAHORE",
+                "FIRname": "LAHORE FIR",
                 "StateCode": "PAK",
                 "centlat": 32.35869468,
                 "ICAOCODE": "OPLR"
@@ -27416,7 +27416,7 @@
                 "centlong": 73.06026708,
                 "REGION": "ASIA",
                 "StateName": "Maldives",
-                "FIRname": "FIR MALE",
+                "FIRname": "MALE FIR",
                 "StateCode": "MDV",
                 "centlat": 0.321102,
                 "ICAOCODE": "VRMF"
@@ -27487,7 +27487,7 @@
                 "centlong": 122.87124395,
                 "REGION": "ASIA",
                 "StateName": "Philippines",
-                "FIRname": "FIR MANILA",
+                "FIRname": "MANILA FIR",
                 "StateCode": "PHL",
                 "centlat": 12.71991576,
                 "ICAOCODE": "RPHI"
@@ -27758,7 +27758,7 @@
                 "centlong": 114.19170126,
                 "REGION": "ASIA",
                 "StateName": "Australia",
-                "FIRname": "FIR MELBOURNE",
+                "FIRname": "MELBOURNE FIR",
                 "StateCode": "AUS",
                 "centlat": -52.95064385,
                 "ICAOCODE": "YMMM"
@@ -27929,7 +27929,7 @@
                 "centlong": 67.90919989,
                 "REGION": "ASIA",
                 "StateName": "India",
-                "FIRname": "FIR MUMBAI",
+                "FIRname": "MUMBAI FIR",
                 "StateCode": "IND",
                 "centlat": 12.12400118,
                 "ICAOCODE": "VABF"
@@ -27984,7 +27984,7 @@
                 "centlong": 165.45467381,
                 "REGION": "ASIA",
                 "StateName": "Nauru",
-                "FIRname": "FIR NAURU",
+                "FIRname": "NAURU FIR",
                 "StateCode": "NRU",
                 "centlat": -2.78202566,
                 "ICAOCODE": "ANAU"
@@ -28149,7 +28149,7 @@
                 "centlong": 146.08903632,
                 "REGION": "ASIA",
                 "StateName": "Japan",
-                "FIRname": "FIR FUKUOKA",
+                "FIRname": "FUKUOKA FIR",
                 "StateCode": "JPN",
                 "centlat": 33.08564136,
                 "ICAOCODE": "RJJJ"
@@ -28364,7 +28364,7 @@
                 "centlong": 104.92531464,
                 "REGION": "ASIA",
                 "StateName": "Cambodia",
-                "FIRname": "FIR PHNOM PENH",
+                "FIRname": "PHNOM PENH FIR",
                 "StateCode": "KHM",
                 "centlat": 12.71653074,
                 "ICAOCODE": "VDPP"
@@ -28479,7 +28479,7 @@
                 "centlong": 149.66580218,
                 "REGION": "ASIA",
                 "StateName": "Papua New Guinea",
-                "FIRname": "FIR PORT MORESBY",
+                "FIRname": "PORT MORESBY FIR",
                 "StateCode": "PNG",
                 "centlat": -5.32870421,
                 "ICAOCODE": "AYPM"
@@ -28654,7 +28654,7 @@
                 "centlong": 129.37457204,
                 "REGION": "ASIA",
                 "StateName": "Democratic People's Republic of Korea",
-                "FIRname": "FIR PYONGYANG",
+                "FIRname": "PYONGYANG FIR",
                 "StateCode": "PRK",
                 "centlat": 39.99987895,
                 "ICAOCODE": "ZKKP"
@@ -28717,7 +28717,7 @@
                 "centlong": 110.86981367,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR SANYA",
+                "FIRname": "SANYA FIR",
                 "StateCode": "CHN",
                 "centlat": 17.68081056,
                 "ICAOCODE": "ZJSA"
@@ -28832,7 +28832,7 @@
                 "centlong": 119.31119031,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR SHANGHAI",
+                "FIRname": "SHANGHAI FIR",
                 "StateCode": "CHN",
                 "centlat": 31.31102375,
                 "ICAOCODE": "ZSHA"
@@ -29331,7 +29331,7 @@
                 "centlong": 123.98769925,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR SHENYANG",
+                "FIRname": "SHENYANG FIR",
                 "StateCode": "CHN",
                 "centlat": 45.97107967,
                 "ICAOCODE": "ZYSH"
@@ -29602,7 +29602,7 @@
                 "centlong": 108.54412411,
                 "REGION": "ASIA",
                 "StateName": "Singapore",
-                "FIRname": "FIR SINGAPORE",
+                "FIRname": "SINGAPORE FIR",
                 "StateCode": "SGP",
                 "centlat": 4.90779053,
                 "ICAOCODE": "WSJC"
@@ -29669,7 +29669,7 @@
                 "centlong": -137.77365806,
                 "REGION": "ASIA",
                 "StateName": "French Polynesia",
-                "FIRname": "FIR TAHITI",
+                "FIRname": "TAHITI FIR",
                 "StateCode": "PYF",
                 "centlat": -13.9313198,
                 "ICAOCODE": "NTTT"
@@ -29716,7 +29716,7 @@
                 "centlong": 121.23715316,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR TAIPEI",
+                "FIRname": "TAIPEI FIR",
                 "StateCode": "CHN",
                 "centlat": 23.95080954,
                 "ICAOCODE": "RCAA"
@@ -29947,7 +29947,7 @@
                 "centlong": 125.46758399,
                 "REGION": "ASIA",
                 "StateName": "Indonesia",
-                "FIRname": "FIR UJUNG PANDANG",
+                "FIRname": "UJUNG PANDANG FIR",
                 "StateCode": "IDN",
                 "centlat": -3.3662108,
                 "ICAOCODE": "WAAF"
@@ -30754,7 +30754,7 @@
                 "centlong": 103.08161268,
                 "REGION": "ASIA",
                 "StateName": "Mongolia",
-                "FIRname": "FIR ULAN BATOR",
+                "FIRname": "ULAN BATOR FIR",
                 "StateCode": "MNG",
                 "centlat": 46.83583772,
                 "ICAOCODE": "ZMUB"
@@ -31365,7 +31365,7 @@
                 "centlong": 84.71617392,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR URUMQI",
+                "FIRname": "URUMQI FIR",
                 "StateCode": "CHN",
                 "centlat": 40.23751213,
                 "ICAOCODE": "ZWUQ"
@@ -31752,7 +31752,7 @@
                 "centlong": 103.76410125,
                 "REGION": "ASIA",
                 "StateName": "Lao People's Democratic Republic",
-                "FIRname": "FIR VIENTIANE",
+                "FIRname": "VIENTIANE FIR",
                 "StateCode": "LAO",
                 "centlat": 18.50173646,
                 "ICAOCODE": "VLVT"
@@ -31863,7 +31863,7 @@
                 "centlong": 112.99542341,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR WUHAN",
+                "FIRname": "WUHAN FIR",
                 "StateCode": "CHN",
                 "centlat": 32.13379849,
                 "ICAOCODE": "ZHWH"
@@ -32310,7 +32310,7 @@
                 "centlong": 95.97056771,
                 "REGION": "ASIA",
                 "StateName": "Myanmar",
-                "FIRname": "FIR YANGON",
+                "FIRname": "YANGON FIR",
                 "StateCode": "MMR",
                 "centlat": 18.5337047,
                 "ICAOCODE": "VYYF"
@@ -32765,7 +32765,7 @@
                 "centlong": 100.93718013,
                 "REGION": "ASIA",
                 "StateName": "Thailand",
-                "FIRname": "FIR BANGKOK",
+                "FIRname": "BANGKOK FIR",
                 "StateCode": "THA",
                 "centlat": 13.1619411,
                 "ICAOCODE": "VTBB"
@@ -32932,7 +32932,7 @@
                 "centlong": 0,
                 "REGION": "ASIA",
                 "StateName": "New Zealand",
-                "FIRname": "FIR NEW ZEALAND",
+                "FIRname": "NEW ZEALAND FIR",
                 "StateCode": "NZL",
                 "centlat": 0,
                 "ICAOCODE": "NZZC"
@@ -33283,7 +33283,7 @@
                 "centlong": 100.06391046,
                 "REGION": "ASIA",
                 "StateName": "China",
-                "FIRname": "FIR LANZHOU",
+                "FIRname": "LANZHOU FIR",
                 "StateCode": "CHN",
                 "centlat": 36.96893188,
                 "ICAOCODE": "ZLHW"
@@ -33384,7 +33384,7 @@
                 "centlong": 171.49960968,
                 "REGION": "ASIA",
                 "StateName": "New Zealand",
-                "FIRname": "FIR AUCKLAND OCEANIC EAST",
+                "FIRname": "AUCKLAND OCEANIC EAST FIR",
                 "StateCode": "NZL",
                 "centlat": -59.74717193,
                 "ICAOCODE": "NZZO"
@@ -33485,7 +33485,7 @@
                 "centlong": 172.47350197,
                 "REGION": "ASIA",
                 "StateName": "Fiji",
-                "FIRname": "FIR NADI EAST",
+                "FIRname": "NADI EAST FIR",
                 "StateCode": "FJI",
                 "centlat": -13.51745381,
                 "ICAOCODE": "NFFF"
@@ -33660,7 +33660,7 @@
                 "centlong": -90.06263306,
                 "REGION": "CAR",
                 "StateName": "Honduras",
-                "FIRname": "FIR CENTRAL AMERICAN",
+                "FIRname": "CENTRAL AMERICAN FIR",
                 "StateCode": "HND",
                 "centlat": 9.76622163,
                 "ICAOCODE": "MHTG"
@@ -33735,7 +33735,7 @@
                 "centlong": -70.48399138,
                 "REGION": "CAR",
                 "StateName": "Aruba",
-                "FIRname": "FIR CURACAO",
+                "FIRname": "CURACAO FIR",
                 "StateCode": "ABW",
                 "centlat": 14.41683648,
                 "ICAOCODE": "TNCF"
@@ -33818,7 +33818,7 @@
                 "centlong": -79.97238004,
                 "REGION": "CAR",
                 "StateName": "Cuba",
-                "FIRname": "FIR HABANA",
+                "FIRname": "HABANA FIR",
                 "StateCode": "CUB",
                 "centlat": 21.70920964,
                 "ICAOCODE": "MUFH"
@@ -33881,7 +33881,7 @@
                 "centlong": -78.28838164,
                 "REGION": "CAR",
                 "StateName": "Jamaica",
-                "FIRname": "FIR KINGSTON",
+                "FIRname": "KINGSTON FIR",
                 "StateCode": "JAM",
                 "centlat": 17.24925114,
                 "ICAOCODE": "MKJK"
@@ -33968,7 +33968,7 @@
                 "centlong": -113.53021418,
                 "REGION": "CAR",
                 "StateName": "Mexico",
-                "FIRname": "FIR MAZATLAN OCEANIC",
+                "FIRname": "MAZATLAN OCEANIC FIR",
                 "StateCode": "MEX",
                 "centlat": 15.56919334,
                 "ICAOCODE": "MMFO"
@@ -34071,7 +34071,7 @@
                 "centlong": -77.35608016,
                 "REGION": "CAR",
                 "StateName": "Bahamas",
-                "FIRname": "FIR NASSAU",
+                "FIRname": "NASSAU FIR",
                 "StateCode": "BHS",
                 "centlat": 25.27337362,
                 "ICAOCODE": "MYNA"
@@ -34150,7 +34150,7 @@
                 "centlong": -72.93061489,
                 "REGION": "CAR",
                 "StateName": "Haiti",
-                "FIRname": "FIR PORT AU PRINCE",
+                "FIRname": "PORT AU PRINCE FIR",
                 "StateCode": "HTI",
                 "centlat": 18.66678359,
                 "ICAOCODE": "MTEG"
@@ -34237,7 +34237,7 @@
                 "centlong": -64.44904177,
                 "REGION": "CAR",
                 "StateName": "Puerto Rico",
-                "FIRname": "FIR SAN JUAN",
+                "FIRname": "SAN JUAN FIR",
                 "StateCode": "PRI",
                 "centlat": 19.78098389,
                 "ICAOCODE": "TJZS"
@@ -34320,7 +34320,7 @@
                 "centlong": -69.98530335,
                 "REGION": "CAR",
                 "StateName": "Dominican Republic",
-                "FIRname": "FIR SANTO DOMINGO",
+                "FIRname": "SANTO DOMINGO FIR",
                 "StateCode": "DOM",
                 "centlat": 18.00685348,
                 "ICAOCODE": "MDCS"
@@ -34455,7 +34455,7 @@
                 "centlong": -67.2034943,
                 "REGION": "CAR",
                 "StateName": "United States of America",
-                "FIRname": "FIR NEW YORK OCEANIC WEST",
+                "FIRname": "NEW YORK OCEANIC WEST FIR",
                 "StateCode": "USA",
                 "centlat": 31.17014512,
                 "ICAOCODE": "KZWY"
@@ -34854,7 +34854,7 @@
                 "centlong": -102.20451727,
                 "REGION": "CAR",
                 "StateName": "Mexico",
-                "FIRname": "FIR MEXICO",
+                "FIRname": "MEXICO FIR",
                 "StateCode": "MEX",
                 "centlat": 22.58129772,
                 "ICAOCODE": "MMFR"
@@ -35213,7 +35213,7 @@
                 "centlong": 11.5399662,
                 "REGION": "EUR",
                 "StateName": "Norway",
-                "FIRname": "FIR NORWAY",
+                "FIRname": "NORWAY FIR",
                 "StateCode": "NOR",
                 "centlat": 64.28034605,
                 "ICAOCODE": "ENOR"
@@ -35348,7 +35348,7 @@
                 "centlong": 4.98042633,
                 "REGION": "EUR",
                 "StateName": "Netherlands",
-                "FIRname": "FIR AMSTERDAM",
+                "FIRname": "AMSTERDAM FIR",
                 "StateCode": "NLD",
                 "centlat": 52.8618788,
                 "ICAOCODE": "EHAA"
@@ -35717,7 +35717,7 @@
                 "centlong": 155.1183595,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR MAGADAN OCEANIC EAST",
+                "FIRname": "MAGADAN OCEANIC EAST FIR",
                 "StateCode": "RUS",
                 "centlat": 78.00106054,
                 "ICAOCODE": "UHMM"
@@ -36198,7 +36198,7 @@
                 "centlong": 90.89753946,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR MURMANSK OCEANIC EAST",
+                "FIRname": "MURMANSK OCEANIC EAST FIR",
                 "StateCode": "RUS",
                 "centlat": 83.19836986,
                 "ICAOCODE": "ULMM"
@@ -36545,7 +36545,7 @@
                 "centlong": 53.15049962,
                 "REGION": "EUR",
                 "StateName": "Kazakhstan",
-                "FIRname": "FIR AKTOBE",
+                "FIRname": "AKTOBE FIR",
                 "StateCode": "KAZ",
                 "centlat": 43.97787269,
                 "ICAOCODE": "UATT"
@@ -36800,7 +36800,7 @@
                 "centlong": 36.6662835,
                 "REGION": "EUR",
                 "StateName": "Turkey",
-                "FIRname": "FIR ANKARA",
+                "FIRname": "ANKARA FIR",
                 "StateCode": "TUR",
                 "centlat": 39.34007168,
                 "ICAOCODE": "LTAA"
@@ -36927,7 +36927,7 @@
                 "centlong": 58.91957143,
                 "REGION": "EUR",
                 "StateName": "Turkmenistan",
-                "FIRname": "FIR ASHGABAT",
+                "FIRname": "ASHGABAT FIR",
                 "StateCode": "TKM",
                 "centlat": 38.68757438,
                 "ICAOCODE": "UTAA"
@@ -37494,7 +37494,7 @@
                 "centlong": 72.39623334,
                 "REGION": "EUR",
                 "StateName": "Kazakhstan",
-                "FIRname": "FIR ASTANA",
+                "FIRname": "ASTANA FIR",
                 "StateCode": "KAZ",
                 "centlat": 50.26315605,
                 "ICAOCODE": "UACC"
@@ -37793,7 +37793,7 @@
                 "centlong": 24.06741551,
                 "REGION": "EUR",
                 "StateName": "Greece",
-                "FIRname": "FIR ATHINAI",
+                "FIRname": "ATHINAI FIR",
                 "StateCode": "GRC",
                 "centlat": 37.36592285,
                 "ICAOCODE": "LGGG"
@@ -38032,7 +38032,7 @@
                 "centlong": 1.43376744,
                 "REGION": "EUR",
                 "StateName": "Spain",
-                "FIRname": "FIR BARCELONA",
+                "FIRname": "BARCELONA FIR",
                 "StateCode": "ESP",
                 "centlat": 39.75182914,
                 "ICAOCODE": "LECB"
@@ -38237,7 +38237,7 @@
                 "centlong": 48.97907505,
                 "REGION": "EUR",
                 "StateName": "Azerbaijan",
-                "FIRname": "FIR BAKU",
+                "FIRname": "BAKU FIR",
                 "StateCode": "AZE",
                 "centlat": 40.26654054,
                 "ICAOCODE": "UBBA"
@@ -38492,7 +38492,7 @@
                 "centlong": 76.18684896,
                 "REGION": "EUR",
                 "StateName": "Kyrgyzstan",
-                "FIRname": "FIR BISHKEK",
+                "FIRname": "BISHKEK FIR",
                 "StateCode": "KGZ",
                 "centlat": 42.10298525,
                 "ICAOCODE": "UCFM"
@@ -38767,7 +38767,7 @@
                 "centlong": 0.70015265,
                 "REGION": "EUR",
                 "StateName": "France",
-                "FIRname": "FIR BORDEAUX",
+                "FIRname": "BORDEAUX FIR",
                 "StateCode": "FRA",
                 "centlat": 44.85564839,
                 "ICAOCODE": "LFBB"
@@ -38914,7 +38914,7 @@
                 "centlong": 19.48691523,
                 "REGION": "EUR",
                 "StateName": "Slovakia",
-                "FIRname": "FIR BRATISLAVA",
+                "FIRname": "BRATISLAVA FIR",
                 "StateCode": "SVK",
                 "centlat": 48.70602861,
                 "ICAOCODE": "LZBB"
@@ -39145,7 +39145,7 @@
                 "centlong": 10.66162139,
                 "REGION": "EUR",
                 "StateName": "Germany",
-                "FIRname": "FIR BREMEN",
+                "FIRname": "BREMEN FIR",
                 "StateCode": "DEU",
                 "centlat": 53.27796707,
                 "ICAOCODE": "EDWW"
@@ -39208,7 +39208,7 @@
                 "centlong": -4.08542526,
                 "REGION": "EUR",
                 "StateName": "France",
-                "FIRname": "FIR BREST",
+                "FIRname": "BREST FIR",
                 "StateCode": "FRA",
                 "centlat": 47.10808143,
                 "ICAOCODE": "LFRR"
@@ -39403,7 +39403,7 @@
                 "centlong": 16.41675109,
                 "REGION": "EUR",
                 "StateName": "Italy",
-                "FIRname": "FIR BRINDISI",
+                "FIRname": "BRINDISI FIR",
                 "StateCode": "ITA",
                 "centlat": 41.07327118,
                 "ICAOCODE": "LIBB"
@@ -39534,7 +39534,7 @@
                 "centlong": 4.60011242,
                 "REGION": "EUR",
                 "StateName": "Belgium",
-                "FIRname": "FIR BRUXELLES",
+                "FIRname": "BRUXELLES FIR",
                 "StateCode": "BEL",
                 "centlat": 50.63011733,
                 "ICAOCODE": "EBBU"
@@ -39729,7 +39729,7 @@
                 "centlong": 19.41470471,
                 "REGION": "EUR",
                 "StateName": "Hungary",
-                "FIRname": "FIR BUDAPEST",
+                "FIRname": "BUDAPEST FIR",
                 "StateCode": "HUN",
                 "centlat": 47.16587731,
                 "ICAOCODE": "LHCC"
@@ -40216,7 +40216,7 @@
                 "centlong": 25.28307997,
                 "REGION": "EUR",
                 "StateName": "Romania",
-                "FIRname": "FIR BUCURESTI",
+                "FIRname": "BUCURESTI FIR",
                 "StateCode": "ROU",
                 "centlat": 45.73705272,
                 "ICAOCODE": "LRBB"
@@ -40423,7 +40423,7 @@
                 "centlong": -8.48457164,
                 "REGION": "EUR",
                 "StateName": "Morocco",
-                "FIRname": "FIR CASABLANCA",
+                "FIRname": "CASABLANCA FIR",
                 "StateCode": "MAR",
                 "centlat": 32.40039738,
                 "ICAOCODE": "GMMM"
@@ -40546,7 +40546,7 @@
                 "centlong": 28.46599705,
                 "REGION": "EUR",
                 "StateName": "Republic of Moldova",
-                "FIRname": "FIR CHISINAU",
+                "FIRname": "CHISINAU FIR",
                 "StateCode": "MDA",
                 "centlat": 47.19591144,
                 "ICAOCODE": "LUUU"
@@ -40609,7 +40609,7 @@
                 "centlong": 58.99633536,
                 "REGION": "EUR",
                 "StateName": "Turkmenistan",
-                "FIRname": "FIR DASHOGUZ",
+                "FIRname": "DASHOGUZ FIR",
                 "StateCode": "TKM",
                 "centlat": 41.27526196,
                 "ICAOCODE": "UTAT"
@@ -40924,7 +40924,7 @@
                 "centlong": 71.05819763,
                 "REGION": "EUR",
                 "StateName": "Tajikistan",
-                "FIRname": "FIR DUSHANBE",
+                "FIRname": "DUSHANBE FIR",
                 "StateCode": "TJK",
                 "centlat": 38.3361955,
                 "ICAOCODE": "UTDD"
@@ -41215,7 +41215,7 @@
                 "centlong": 25.48153406,
                 "REGION": "EUR",
                 "StateName": "Finland",
-                "FIRname": "FIR FINLAND",
+                "FIRname": "FINLAND FIR",
                 "StateCode": "FIN",
                 "centlat": 63.99792851,
                 "ICAOCODE": "EFIN"
@@ -41390,7 +41390,7 @@
                 "centlong": 28.56775787,
                 "REGION": "EUR",
                 "StateName": "Turkey",
-                "FIRname": "FIR ISTANBUL",
+                "FIRname": "ISTANBUL FIR",
                 "StateCode": "TUR",
                 "centlat": 39.62640089,
                 "ICAOCODE": "LTBB"
@@ -41747,7 +41747,7 @@
                 "centlong": 109.77993988,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR IRKUTSK",
+                "FIRname": "IRKUTSK FIR",
                 "StateCode": "RUS",
                 "centlat": 54.85856924,
                 "ICAOCODE": "UIII"
@@ -42122,7 +42122,7 @@
                 "centlong": 138.90454128,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR KHABAROVSK",
+                "FIRname": "KHABAROVSK FIR",
                 "StateCode": "RUS",
                 "centlat": 51.57674284,
                 "ICAOCODE": "UHHH"
@@ -42301,7 +42301,7 @@
                 "centlong": 36.35528568,
                 "REGION": "EUR",
                 "StateName": "Ukraine",
-                "FIRname": "FIR DNIPROPETROVS'K",
+                "FIRname": "DNIPROPETROVS'K FIR",
                 "StateCode": "UKR",
                 "centlat": 48.77541711,
                 "ICAOCODE": "UKDV"
@@ -42400,7 +42400,7 @@
                 "centlong": 9.08314993,
                 "REGION": "EUR",
                 "StateName": "Denmark",
-                "FIRname": "FIR KOBENHAVN",
+                "FIRname": "KOBENHAVN FIR",
                 "StateCode": "DNK",
                 "centlat": 56.15208179,
                 "ICAOCODE": "EKDK"
@@ -42903,7 +42903,7 @@
                 "centlong": 94.97443822,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR KRASNOYARSK",
+                "FIRname": "KRASNOYARSK FIR",
                 "StateCode": "RUS",
                 "centlat": 67.2942114,
                 "ICAOCODE": "UNKL"
@@ -43054,7 +43054,7 @@
                 "centlong": 25.29173589,
                 "REGION": "EUR",
                 "StateName": "Ukraine",
-                "FIRname": "FIR L VIV",
+                "FIRname": "L VIV FIR",
                 "StateCode": "UKR",
                 "centlat": 49.76798051,
                 "ICAOCODE": "UKLV"
@@ -43349,7 +43349,7 @@
                 "centlong": 8.37408533,
                 "REGION": "EUR",
                 "StateName": "Germany",
-                "FIRname": "FIR LANGEN",
+                "FIRname": "LANGEN FIR",
                 "StateCode": "DEU",
                 "centlat": 50.14273354,
                 "ICAOCODE": "EDGG"
@@ -43610,7 +43610,7 @@
                 "centlong": -12.28603249,
                 "REGION": "EUR",
                 "StateName": "Portugal",
-                "FIRname": "FIR LISBOA",
+                "FIRname": "LISBOA FIR",
                 "StateCode": "PRT",
                 "centlat": 37.80070203,
                 "ICAOCODE": "LPPC"
@@ -43721,7 +43721,7 @@
                 "centlong": 14.81210143,
                 "REGION": "EUR",
                 "StateName": "Slovenia",
-                "FIRname": "FIR LJUBLJANA",
+                "FIRname": "LJUBLJANA FIR",
                 "StateCode": "SVN",
                 "centlat": 46.11686967,
                 "ICAOCODE": "LJLA"
@@ -43804,7 +43804,7 @@
                 "centlong": -2.02513122,
                 "REGION": "EUR",
                 "StateName": "United Kingdom of Great Britain and Northern Ireland",
-                "FIRname": "FIR LONDON",
+                "FIRname": "LONDON FIR",
                 "StateCode": "GBR",
                 "centlat": 52.34872622,
                 "ICAOCODE": "EGTT"
@@ -44023,7 +44023,7 @@
                 "centlong": -5.5904606,
                 "REGION": "EUR",
                 "StateName": "Spain",
-                "FIRname": "FIR MADRID",
+                "FIRname": "MADRID FIR",
                 "StateCode": "ESP",
                 "centlat": 40.98960632,
                 "ICAOCODE": "LECM"
@@ -44062,7 +44062,7 @@
                 "centlong": 16.48522613,
                 "REGION": "EUR",
                 "StateName": "Malta",
-                "FIRname": "FIR MALTA",
+                "FIRname": "MALTA FIR",
                 "StateCode": "MLT",
                 "centlat": 35.33215254,
                 "ICAOCODE": "LMMM"
@@ -44225,7 +44225,7 @@
                 "centlong": 5.92485781,
                 "REGION": "EUR",
                 "StateName": "France",
-                "FIRname": "FIR MARSEILLE",
+                "FIRname": "MARSEILLE FIR",
                 "StateCode": "FRA",
                 "centlat": 42.84509057,
                 "ICAOCODE": "LFMM"
@@ -44396,7 +44396,7 @@
                 "centlong": 10.50286752,
                 "REGION": "EUR",
                 "StateName": "Italy",
-                "FIRname": "FIR MILANO",
+                "FIRname": "MILANO FIR",
                 "StateCode": "ITA",
                 "centlat": 45.03056364,
                 "ICAOCODE": "LIMM"
@@ -44703,7 +44703,7 @@
                 "centlong": 28.04786581,
                 "REGION": "EUR",
                 "StateName": "Belarus",
-                "FIRname": "FIR MINSK",
+                "FIRname": "MINSK FIR",
                 "StateCode": "BLR",
                 "centlat": 53.53865721,
                 "ICAOCODE": "UMMV"
@@ -45052,7 +45052,7 @@
                 "centlong": 38.65960495,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR MOSCOW",
+                "FIRname": "MOSCOW FIR",
                 "StateCode": "RUS",
                 "centlat": 54.83593061,
                 "ICAOCODE": "UUWV"
@@ -45287,7 +45287,7 @@
                 "centlong": 11.85269959,
                 "REGION": "EUR",
                 "StateName": "Germany",
-                "FIRname": "FIR MUNICH",
+                "FIRname": "MUNICH FIR",
                 "StateCode": "DEU",
                 "centlat": 49.62269318,
                 "ICAOCODE": "EDMM"
@@ -45434,7 +45434,7 @@
                 "centlong": -18.48957645,
                 "REGION": "EUR",
                 "StateName": "Spain",
-                "FIRname": "FIR CANARIAS",
+                "FIRname": "CANARIAS FIR",
                 "StateCode": "ESP",
                 "centlat": 25.91456388,
                 "ICAOCODE": "GCCC"
@@ -45513,7 +45513,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR VOLOGDA",
+                "FIRname": "VOLOGDA FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "ULWW"
@@ -45620,7 +45620,7 @@
                 "centlong": 32.68917695,
                 "REGION": "EUR",
                 "StateName": "Cyprus",
-                "FIRname": "FIR NICOSIA",
+                "FIRname": "NICOSIA FIR",
                 "StateCode": "CYP",
                 "centlat": 34.37881013,
                 "ICAOCODE": "LCCC"
@@ -45967,7 +45967,7 @@
                 "centlong": 81.05760284,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR NOVOSIBIRSK",
+                "FIRname": "NOVOSIBIRSK FIR",
                 "StateCode": "RUS",
                 "centlat": 55.64548378,
                 "ICAOCODE": "UNNT"
@@ -46078,7 +46078,7 @@
                 "centlong": 59.52603793,
                 "REGION": "EUR",
                 "StateName": "Uzbekistan",
-                "FIRname": "FIR NUKUS",
+                "FIRname": "NUKUS FIR",
                 "StateCode": "UZB",
                 "centlat": 43.12049313,
                 "ICAOCODE": "UTNR"
@@ -46221,7 +46221,7 @@
                 "centlong": 73.17913397,
                 "REGION": "EUR",
                 "StateName": "Kyrgyzstan",
-                "FIRname": "FIR OSH",
+                "FIRname": "OSH FIR",
                 "StateCode": "KGZ",
                 "centlat": 40.85994749,
                 "ICAOCODE": "UCFO"
@@ -46340,7 +46340,7 @@
                 "centlong": 2.48113238,
                 "REGION": "EUR",
                 "StateName": "France",
-                "FIRname": "FIR PARIS",
+                "FIRname": "PARIS FIR",
                 "StateCode": "FRA",
                 "centlat": 48.73897298,
                 "ICAOCODE": "LFFF"
@@ -46495,7 +46495,7 @@
                 "centlong": 15.33371818,
                 "REGION": "EUR",
                 "StateName": "Czech Republic",
-                "FIRname": "FIR PRAHA",
+                "FIRname": "PRAHA FIR",
                 "StateCode": "CZE",
                 "centlat": 49.73907564,
                 "ICAOCODE": "LKAA"
@@ -46650,7 +46650,7 @@
                 "centlong": 6.13976924,
                 "REGION": "EUR",
                 "StateName": "France",
-                "FIRname": "FIR REIMS",
+                "FIRname": "REIMS FIR",
                 "StateCode": "FRA",
                 "centlat": 47.98937557,
                 "ICAOCODE": "LFEE"
@@ -46961,7 +46961,7 @@
                 "centlong": 23.74019195,
                 "REGION": "EUR",
                 "StateName": "Latvia",
-                "FIRname": "FIR RIGA",
+                "FIRname": "RIGA FIR",
                 "StateCode": "LVA",
                 "centlat": 56.96587905,
                 "ICAOCODE": "EVRR"
@@ -47056,7 +47056,7 @@
                 "centlong": 13.05479056,
                 "REGION": "EUR",
                 "StateName": "Italy",
-                "FIRname": "FIR ROMA",
+                "FIRname": "ROMA FIR",
                 "StateCode": "ITA",
                 "centlat": 39.52469962,
                 "ICAOCODE": "LIRR"
@@ -47347,7 +47347,7 @@
                 "centlong": 43.4853314,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR ROSTOV-NA-DONU",
+                "FIRname": "ROSTOV-NA-DONU FIR",
                 "StateCode": "RUS",
                 "centlat": 45.97532586,
                 "ICAOCODE": "URRV"
@@ -47670,7 +47670,7 @@
                 "centlong": 51.23755176,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR SAMARA",
+                "FIRname": "SAMARA FIR",
                 "StateCode": "RUS",
                 "centlat": 53.49817904,
                 "ICAOCODE": "UWWW"
@@ -47833,7 +47833,7 @@
                 "centlong": 65.43803155,
                 "REGION": "EUR",
                 "StateName": "Uzbekistan",
-                "FIRname": "FIR SAMARKAND",
+                "FIRname": "SAMARKAND FIR",
                 "StateCode": "UZB",
                 "centlat": 39.61775405,
                 "ICAOCODE": "UTSD"
@@ -48284,7 +48284,7 @@
                 "centlong": 17.78714774,
                 "REGION": "EUR",
                 "StateName": "Bosnia and Herzegovina",
-                "FIRname": "FIR SARAJEVO",
+                "FIRname": "SARAJEVO FIR",
                 "StateCode": "BIH",
                 "centlat": 44.16819532,
                 "ICAOCODE": "LQSB"
@@ -48383,7 +48383,7 @@
                 "centlong": -3.46911466,
                 "REGION": "EUR",
                 "StateName": "United Kingdom of Great Britain and Northern Ireland",
-                "FIRname": "FIR SCOTTISH",
+                "FIRname": "SCOTTISH FIR",
                 "StateCode": "GBR",
                 "centlat": 57.66336837,
                 "ICAOCODE": "EGPX"
@@ -48450,7 +48450,7 @@
                 "centlong": -10.37048823,
                 "REGION": "EUR",
                 "StateName": "Ireland",
-                "FIRname": "FIR SHANNON",
+                "FIRname": "SHANNON FIR",
                 "StateCode": "IRL",
                 "centlat": 52.80785629,
                 "ICAOCODE": "EISN"
@@ -48797,7 +48797,7 @@
                 "centlong": 17.07654852,
                 "REGION": "EUR",
                 "StateName": "Sweden",
-                "FIRname": "FIR SWEDEN",
+                "FIRname": "SWEDEN FIR",
                 "StateCode": "SWE",
                 "centlat": 61.92759365,
                 "ICAOCODE": "ESAA"
@@ -49304,7 +49304,7 @@
                 "centlong": 26.16622929,
                 "REGION": "EUR",
                 "StateName": "Bulgaria",
-                "FIRname": "FIR SOFIA",
+                "FIRname": "SOFIA FIR",
                 "StateCode": "BGR",
                 "centlat": 42.79867055,
                 "ICAOCODE": "LBSR"
@@ -49527,7 +49527,7 @@
                 "centlong": 8.24006271,
                 "REGION": "EUR",
                 "StateName": "Switzerland",
-                "FIRname": "FIR SWITZERLAND",
+                "FIRname": "SWITZERLAND FIR",
                 "StateCode": "CHE",
                 "centlat": 46.83027478,
                 "ICAOCODE": "LSAS"
@@ -49734,7 +49734,7 @@
                 "centlong": 24.64177781,
                 "REGION": "EUR",
                 "StateName": "Estonia",
-                "FIRname": "FIR TALLINN",
+                "FIRname": "TALLINN FIR",
                 "StateCode": "EST",
                 "centlat": 58.73067306,
                 "ICAOCODE": "EETT"
@@ -49977,7 +49977,7 @@
                 "centlong": 68.23317474,
                 "REGION": "EUR",
                 "StateName": "Uzbekistan",
-                "FIRname": "FIR TASHKENT",
+                "FIRname": "TASHKENT FIR",
                 "StateCode": "UZB",
                 "centlat": 41.01793593,
                 "ICAOCODE": "UTTR"
@@ -50124,7 +50124,7 @@
                 "centlong": 42.97227817,
                 "REGION": "EUR",
                 "StateName": "Georgia",
-                "FIRname": "FIR TBILISI",
+                "FIRname": "TBILISI FIR",
                 "StateCode": "GEO",
                 "centlat": 42.22222254,
                 "ICAOCODE": "UGGG"
@@ -50247,7 +50247,7 @@
                 "centlong": 34.82184133,
                 "REGION": "EUR",
                 "StateName": "Israel",
-                "FIRname": "FIR TEL AVIV",
+                "FIRname": "TEL AVIV FIR",
                 "StateCode": "ISR",
                 "centlat": 31.66915626,
                 "ICAOCODE": "LLTA"
@@ -50618,7 +50618,7 @@
                 "centlong": 19.91366698,
                 "REGION": "EUR",
                 "StateName": "Albania",
-                "FIRname": "FIR TIRANA",
+                "FIRname": "TIRANA FIR",
                 "StateCode": "ALB",
                 "centlat": 41.09030909,
                 "ICAOCODE": "LAAA"
@@ -50781,7 +50781,7 @@
                 "centlong": 63.03823087,
                 "REGION": "EUR",
                 "StateName": "Turkmenistan",
-                "FIRname": "FIR TURKMENABAT",
+                "FIRname": "TURKMENABAT FIR",
                 "StateCode": "TKM",
                 "centlat": 37.91661227,
                 "ICAOCODE": "UTAV"
@@ -51096,7 +51096,7 @@
                 "centlong": 53.78350906,
                 "REGION": "EUR",
                 "StateName": "Turkmenistan",
-                "FIRname": "FIR TURKMENBASHI",
+                "FIRname": "TURKMENBASHI FIR",
                 "StateCode": "TKM",
                 "centlat": 39.88042727,
                 "ICAOCODE": "UTAK"
@@ -51251,7 +51251,7 @@
                 "centlong": 71.89469342,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR TYUMEN ROSCHINO",
+                "FIRname": "TYUMEN ROSCHINO FIR",
                 "StateCode": "RUS",
                 "centlat": 64.54803617,
                 "ICAOCODE": "USTR"
@@ -51398,7 +51398,7 @@
                 "centlong": 23.29964946,
                 "REGION": "EUR",
                 "StateName": "Lithuania",
-                "FIRname": "FIR VILNIUS",
+                "FIRname": "VILNIUS FIR",
                 "StateCode": "LTU",
                 "centlat": 55.41454074,
                 "ICAOCODE": "EYVL"
@@ -51709,7 +51709,7 @@
                 "centlong": 19.17164798,
                 "REGION": "EUR",
                 "StateName": "Poland",
-                "FIRname": "FIR WARSZAWA",
+                "FIRname": "WARSZAWA FIR",
                 "StateCode": "POL",
                 "centlat": 52.35242988,
                 "ICAOCODE": "EPWW"
@@ -51940,7 +51940,7 @@
                 "centlong": 14.13599787,
                 "REGION": "EUR",
                 "StateName": "Austria",
-                "FIRname": "FIR WIEN",
+                "FIRname": "WIEN FIR",
                 "StateCode": "AUT",
                 "centlat": 47.59008383,
                 "ICAOCODE": "LOVV"
@@ -52055,7 +52055,7 @@
                 "centlong": 44.94664422,
                 "REGION": "EUR",
                 "StateName": "Armenia",
-                "FIRname": "FIR YEREVAN ZVARTNOTS",
+                "FIRname": "YEREVAN ZVARTNOTS FIR",
                 "StateCode": "ARM",
                 "centlat": 40.28974335,
                 "ICAOCODE": "UDDD"
@@ -52558,7 +52558,7 @@
                 "centlong": 16.11036373,
                 "REGION": "EUR",
                 "StateName": "Croatia",
-                "FIRname": "FIR ZAGREB",
+                "FIRname": "ZAGREB FIR",
                 "StateCode": "HRV",
                 "centlat": 44.24158228,
                 "ICAOCODE": "LDZO"
@@ -52917,7 +52917,7 @@
                 "centlong": 21.70142912,
                 "REGION": "EUR",
                 "StateName": "The former Yugoslav Republic of Macedonia",
-                "FIRname": "FIR SKOPJE",
+                "FIRname": "SKOPJE FIR",
                 "StateCode": "MKD",
                 "centlat": 41.59275387,
                 "ICAOCODE": "LWSS"
@@ -54274,7 +54274,7 @@
                 "centlong": 20.50005629,
                 "REGION": "EUR",
                 "StateName": "Serbia",
-                "FIRname": "FIR BEOGRAD",
+                "FIRname": "BEOGRAD FIR",
                 "StateCode": "SRB",
                 "centlat": 43.73736172,
                 "ICAOCODE": "LYBA"
@@ -54385,7 +54385,7 @@
                 "centlong": 33.9035515,
                 "REGION": "EUR",
                 "StateName": "Ukraine",
-                "FIRname": "FIR SIMFEROPOL",
+                "FIRname": "SIMFEROPOL FIR",
                 "StateCode": "UKR",
                 "centlat": 44.87499797,
                 "ICAOCODE": "UKFV"
@@ -54496,7 +54496,7 @@
                 "centlong": 30.86249151,
                 "REGION": "EUR",
                 "StateName": "Ukraine",
-                "FIRname": "FIR ODESA",
+                "FIRname": "ODESA FIR",
                 "StateCode": "UKR",
                 "centlat": 46.60885024,
                 "ICAOCODE": "UKOV"
@@ -54727,7 +54727,7 @@
                 "centlong": 9.69400388,
                 "REGION": "EUR",
                 "StateName": "Tunisia",
-                "FIRname": "FIR TUNIS",
+                "FIRname": "TUNIS FIR",
                 "StateCode": "TUN",
                 "centlat": 34.54141183,
                 "ICAOCODE": "DTTC"
@@ -54930,7 +54930,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR MAGNITOGORSK",
+                "FIRname": "MAGNITOGORSK FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USCM"
@@ -55117,7 +55117,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR CHELYABINSK",
+                "FIRname": "CHELYABINSK FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USCC"
@@ -55188,7 +55188,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR PERM",
+                "FIRname": "PERM FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USPP"
@@ -55403,7 +55403,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR YEKATERINBURG",
+                "FIRname": "YEKATERINBURG FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USSS"
@@ -55490,7 +55490,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR TARKO-SALE",
+                "FIRname": "TARKO-SALE FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USDS"
@@ -55569,7 +55569,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR SALEKHARD",
+                "FIRname": "SALEKHARD FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USDD"
@@ -55660,7 +55660,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR KAMENNY",
+                "FIRname": "KAMENNY FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USDK"
@@ -55775,7 +55775,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR ARKHANGELSK",
+                "FIRname": "ARKHANGELSK FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "ULAA"
@@ -56110,7 +56110,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Kazakhstan",
-                "FIRname": "FIR ALMATY",
+                "FIRname": "ALMATY FIR",
                 "StateCode": "KAZ",
                 "centlat": 0,
                 "ICAOCODE": "UAAA"
@@ -56173,7 +56173,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR KOTLAS",
+                "FIRname": "KOTLAS FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "ULKK"
@@ -56272,7 +56272,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR NARYAN-MAR",
+                "FIRname": "NARYAN-MAR FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "ULAM"
@@ -56347,7 +56347,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR CHULMAN",
+                "FIRname": "CHULMAN FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "UELL"
@@ -56510,7 +56510,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR SYKTYVKAR",
+                "FIRname": "SYKTYVKAR FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "UUYY"
@@ -56569,7 +56569,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR OLEKMINSK",
+                "FIRname": "OLEKMINSK FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "UEMO"
@@ -56644,7 +56644,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR MIRNY",
+                "FIRname": "MIRNY FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "UERR"
@@ -56919,7 +56919,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR YAKUTSK",
+                "FIRname": "YAKUTSK FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "UEEE"
@@ -56990,7 +56990,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR POLIARNY",
+                "FIRname": "POLIARNY FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "UERP"
@@ -57261,7 +57261,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Kazakhstan",
-                "FIRname": "FIR SHYMKENT",
+                "FIRname": "SHYMKENT FIR",
                 "StateCode": "KAZ",
                 "centlat": 0,
                 "ICAOCODE": "UAII"
@@ -57888,7 +57888,7 @@
                 "centlong": 2.72424004,
                 "REGION": "EUR",
                 "StateName": "Algeria",
-                "FIRname": "FIR ALGER",
+                "FIRname": "ALGER FIR",
                 "StateCode": "DZA",
                 "centlat": 28.77834341,
                 "ICAOCODE": "DAAA"
@@ -58285,7 +58285,7 @@
                 "centlong": -175.03456454,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR MAGADAN WEST",
+                "FIRname": "MAGADAN WEST FIR",
                 "StateCode": "RUS",
                 "centlat": 67.31902714,
                 "ICAOCODE": "UHPP"
@@ -58360,7 +58360,7 @@
                 "centlong": 20.2577528,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR KALININGRAD",
+                "FIRname": "KALININGRAD FIR",
                 "StateCode": "RUS",
                 "centlat": 55.04606933,
                 "ICAOCODE": "UMKK"
@@ -58439,7 +58439,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR KAZAN",
+                "FIRname": "KAZAN FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "UWKD"
@@ -58518,7 +58518,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR KIROV",
+                "FIRname": "KIROV FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "USKK"
@@ -58729,7 +58729,7 @@
                 "centlong": 30.88847826,
                 "REGION": "EUR",
                 "StateName": "Ukraine",
-                "FIRname": "FIR KYIV",
+                "FIRname": "KYIV FIR",
                 "StateCode": "UKR",
                 "centlat": 50.08313098,
                 "ICAOCODE": "UKBV"
@@ -59200,7 +59200,7 @@
                 "centlong": 0,
                 "REGION": "EUR",
                 "StateName": "Russian Federation",
-                "FIRname": "FIR SANKT-PETERBURG",
+                "FIRname": "SANKT-PETERBURG FIR",
                 "StateCode": "RUS",
                 "centlat": 0,
                 "ICAOCODE": "ULLL"
@@ -59455,7 +59455,7 @@
                 "centlong": 43.77647984,
                 "REGION": "MID",
                 "StateName": "Iraq",
-                "FIRname": "FIR BAGHDAD",
+                "FIRname": "BAGHDAD FIR",
                 "StateCode": "IRQ",
                 "centlat": 33.04485508,
                 "ICAOCODE": "ORBB"
@@ -59530,7 +59530,7 @@
                 "centlong": 35.50489325,
                 "REGION": "MID",
                 "StateName": "Lebanon",
-                "FIRname": "FIR BEIRUT",
+                "FIRname": "BEIRUT FIR",
                 "StateCode": "LBN",
                 "centlat": 33.94201407,
                 "ICAOCODE": "OLBB"
@@ -59633,7 +59633,7 @@
                 "centlong": 30.11315001,
                 "REGION": "MID",
                 "StateName": "Egypt",
-                "FIRname": "FIR CAIRO",
+                "FIRname": "CAIRO FIR",
                 "StateCode": "EGY",
                 "centlat": 27.36918244,
                 "ICAOCODE": "HECC"
@@ -59816,7 +59816,7 @@
                 "centlong": 38.46383424,
                 "REGION": "MID",
                 "StateName": "Syrian Arab Republic",
-                "FIRname": "FIR DAMASCUS",
+                "FIRname": "DAMASCUS FIR",
                 "StateCode": "SYR",
                 "centlat": 35.0163828,
                 "ICAOCODE": "OSTT"
@@ -59883,7 +59883,7 @@
                 "centlong": 54.10898384,
                 "REGION": "MID",
                 "StateName": "United Arab Emirates",
-                "FIRname": "FIR EMIRATES",
+                "FIRname": "EMIRATES FIR",
                 "StateCode": "ARE",
                 "centlat": 24.33196585,
                 "ICAOCODE": "OMAE"
@@ -60186,7 +60186,7 @@
                 "centlong": 30.14570584,
                 "REGION": "MID",
                 "StateName": "Sudan",
-                "FIRname": "FIR KHARTOUM",
+                "FIRname": "KHARTOUM FIR",
                 "StateCode": "SDN",
                 "centlat": 14.00763234,
                 "ICAOCODE": "HSSS"
@@ -60293,7 +60293,7 @@
                 "centlong": 57.6032009,
                 "REGION": "MID",
                 "StateName": "Oman",
-                "FIRname": "FIR MUSCAT",
+                "FIRname": "MUSCAT FIR",
                 "StateCode": "OMN",
                 "centlat": 21.09096046,
                 "ICAOCODE": "OOMM"
@@ -60472,7 +60472,7 @@
                 "centlong": 51.46893527,
                 "REGION": "MID",
                 "StateName": "Yemen",
-                "FIRname": "FIR SANA A",
+                "FIRname": "SANA A FIR",
                 "StateCode": "YEM",
                 "centlat": 14.96948107,
                 "ICAOCODE": "OYSC"
@@ -61195,7 +61195,7 @@
                 "centlong": 54.20588014,
                 "REGION": "MID",
                 "StateName": "Iran (Islamic Republic of)",
-                "FIRname": "FIR TEHRAN",
+                "FIRname": "TEHRAN FIR",
                 "StateCode": "IRN",
                 "centlat": 32.33099833,
                 "ICAOCODE": "OIIX"
@@ -61442,7 +61442,7 @@
                 "centlong": 17.92121564,
                 "REGION": "MID",
                 "StateName": "Libya",
-                "FIRname": "FIR TRIPOLI",
+                "FIRname": "TRIPOLI FIR",
                 "StateCode": "LBY",
                 "centlat": 27.82123017,
                 "ICAOCODE": "HLLL"
@@ -61541,7 +61541,7 @@
                 "centlong": 0,
                 "REGION": "MID",
                 "StateName": "Bahrain",
-                "FIRname": "FIR BAHRAIN",
+                "FIRname": "BAHRAIN FIR",
                 "StateCode": "BHR",
                 "centlat": 0,
                 "ICAOCODE": "OBBB"
@@ -61836,7 +61836,7 @@
                 "centlong": 0,
                 "REGION": "MID",
                 "StateName": "Saudi Arabia",
-                "FIRname": "FIR JEDDAH",
+                "FIRname": "JEDDAH FIR",
                 "StateCode": "SAU",
                 "centlat": 0,
                 "ICAOCODE": "OEJD"
@@ -61971,7 +61971,7 @@
                 "centlong": 36.69246793,
                 "REGION": "MID",
                 "StateName": "Jordan",
-                "FIRname": "FIR AMMAN",
+                "FIRname": "AMMAN FIR",
                 "StateCode": "JOR",
                 "centlat": 31.29557688,
                 "ICAOCODE": "OJAC"
@@ -62050,7 +62050,7 @@
                 "centlong": 48.21177354,
                 "REGION": "MID",
                 "StateName": "Kuwait",
-                "FIRname": "FIR KUWAIT",
+                "FIRname": "KUWAIT FIR",
                 "StateCode": "KWT",
                 "centlat": 29.23242216,
                 "ICAOCODE": "OKAC"
@@ -62289,7 +62289,7 @@
                 "centlong": -107.06842605,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR ALBUQUERQUE",
+                "FIRname": "ALBUQUERQUE FIR",
                 "StateCode": "USA",
                 "centlat": 33.77364947,
                 "ICAOCODE": "KZAB"
@@ -62508,7 +62508,7 @@
                 "centlong": -84.03284777,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "UIR ATLANTA",
+                "FIRname": "ATLANTA UIR",
                 "StateCode": "USA",
                 "centlat": 34.17944147,
                 "ICAOCODE": "KZTL"
@@ -62639,7 +62639,7 @@
                 "centlong": -104.9020332,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR DENVER",
+                "FIRname": "DENVER FIR",
                 "StateCode": "USA",
                 "centlat": 40.28158294,
                 "ICAOCODE": "KZDV"
@@ -63266,7 +63266,7 @@
                 "centlong": -104.79740488,
                 "REGION": "NAM",
                 "StateName": "Canada",
-                "FIRname": "FIR EDMONTON",
+                "FIRname": "EDMONTON FIR",
                 "StateCode": "CAN",
                 "centlat": 74.05664547,
                 "ICAOCODE": "CZEG"
@@ -63437,7 +63437,7 @@
                 "centlong": -98.07799041,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR FT WORTH",
+                "FIRname": "FT WORTH FIR",
                 "StateCode": "USA",
                 "centlat": 33.24983919,
                 "ICAOCODE": "KZFW"
@@ -63684,7 +63684,7 @@
                 "centlong": -82.33656675,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "UIR JACKSONVILLE",
+                "FIRname": "JACKSONVILLE UIR",
                 "StateCode": "USA",
                 "centlat": 30.74210454,
                 "ICAOCODE": "KZJX"
@@ -63819,7 +63819,7 @@
                 "centlong": -95.02723989,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR KANSAS CITY",
+                "FIRname": "KANSAS CITY FIR",
                 "StateCode": "USA",
                 "centlat": 38.16343807,
                 "ICAOCODE": "KZKC"
@@ -63986,7 +63986,7 @@
                 "centlong": -117.30439004,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR LOS ANGELES",
+                "FIRname": "LOS ANGELES FIR",
                 "StateCode": "USA",
                 "centlat": 34.69467285,
                 "ICAOCODE": "KZLA"
@@ -64165,7 +64165,7 @@
                 "centlong": -90.18052182,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR MEMPHIS",
+                "FIRname": "MEMPHIS FIR",
                 "StateCode": "USA",
                 "centlat": 34.95741769,
                 "ICAOCODE": "KZME"
@@ -64416,7 +64416,7 @@
                 "centlong": -94.33056078,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR MINNEAPOLIS",
+                "FIRname": "MINNEAPOLIS FIR",
                 "StateCode": "USA",
                 "centlat": 45.26079292,
                 "ICAOCODE": "KZMP"
@@ -64575,7 +64575,7 @@
                 "centlong": -62.83892704,
                 "REGION": "NAM",
                 "StateName": "Canada",
-                "FIRname": "FIR MONCTON SOUTHERN",
+                "FIRname": "MONCTON SOUTHERN FIR",
                 "StateCode": "CAN",
                 "centlat": 45.43067443,
                 "ICAOCODE": "CZQM"
@@ -64996,7 +64996,7 @@
                 "centlong": 0,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR NEW YORK",
+                "FIRname": "NEW YORK FIR",
                 "StateCode": "USA",
                 "centlat": 0,
                 "ICAOCODE": "KZNY"
@@ -65461,7 +65461,7 @@
                 "centlong": -155.43219242,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR ANCHORAGE ARCTIC",
+                "FIRname": "ANCHORAGE ARCTIC FIR",
                 "StateCode": "USA",
                 "centlat": 80.56780804,
                 "ICAOCODE": "PAZA"
@@ -65932,7 +65932,7 @@
                 "centlong": -71.11610069,
                 "REGION": "NAM",
                 "StateName": "Canada",
-                "FIRname": "FIR MONTREAL",
+                "FIRname": "MONTREAL FIR",
                 "StateCode": "CAN",
                 "centlat": 55.43254599,
                 "ICAOCODE": "CZUL"
@@ -66059,7 +66059,7 @@
                 "centlong": -122.29450355,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR OAKLAND",
+                "FIRname": "OAKLAND FIR",
                 "StateCode": "USA",
                 "centlat": 38.21453919,
                 "ICAOCODE": "KZOA"
@@ -66226,7 +66226,7 @@
                 "centlong": -111.70714082,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR SALT LAKE",
+                "FIRname": "SALT LAKE FIR",
                 "StateCode": "USA",
                 "centlat": 43.84762654,
                 "ICAOCODE": "KZLC"
@@ -66369,7 +66369,7 @@
                 "centlong": -121.83806076,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR SEATTLE",
+                "FIRname": "SEATTLE FIR",
                 "StateCode": "USA",
                 "centlat": 45.30382406,
                 "ICAOCODE": "KZSE"
@@ -66664,7 +66664,7 @@
                 "centlong": -81.47809697,
                 "REGION": "NAM",
                 "StateName": "Canada",
-                "FIRname": "FIR TORONTO",
+                "FIRname": "TORONTO FIR",
                 "StateCode": "CAN",
                 "centlat": 47.53401858,
                 "ICAOCODE": "CZYZ"
@@ -66859,7 +66859,7 @@
                 "centlong": -125.71906802,
                 "REGION": "NAM",
                 "StateName": "Canada",
-                "FIRname": "FIR VANCOUVER",
+                "FIRname": "VANCOUVER FIR",
                 "StateCode": "CAN",
                 "centlat": 52.21000972,
                 "ICAOCODE": "CZVR"
@@ -67146,7 +67146,7 @@
                 "centlong": -93.04810241,
                 "REGION": "NAM",
                 "StateName": "Canada",
-                "FIRname": "FIR WINNIPEG",
+                "FIRname": "WINNIPEG FIR",
                 "StateCode": "CAN",
                 "centlat": 54.71778127,
                 "ICAOCODE": "CZWG"
@@ -67285,7 +67285,7 @@
                 "centlong": 0,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR CHICAGO",
+                "FIRname": "CHICAGO FIR",
                 "StateCode": "USA",
                 "centlat": 0,
                 "ICAOCODE": "KZAU"
@@ -67452,7 +67452,7 @@
                 "centlong": 0,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR INDIANAPOLIS",
+                "FIRname": "INDIANAPOLIS FIR",
                 "StateCode": "USA",
                 "centlat": 0,
                 "ICAOCODE": "KZID"
@@ -67767,7 +67767,7 @@
                 "centlong": 0,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR CLEVELAND",
+                "FIRname": "CLEVELAND FIR",
                 "StateCode": "USA",
                 "centlat": 0,
                 "ICAOCODE": "KZOB"
@@ -67974,7 +67974,7 @@
                 "centlong": 0,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR WASHINGTON",
+                "FIRname": "WASHINGTON FIR",
                 "StateCode": "USA",
                 "centlat": 0,
                 "ICAOCODE": "KZDC"
@@ -68377,7 +68377,7 @@
                 "centlong": -71.22219544,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR BOSTON",
+                "FIRname": "BOSTON FIR",
                 "StateCode": "USA",
                 "centlat": 43.35100323,
                 "ICAOCODE": "KZBW"
@@ -68698,7 +68698,7 @@
                 "centlong": -80.62143944,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR MIAMI",
+                "FIRname": "MIAMI FIR",
                 "StateCode": "USA",
                 "centlat": 26.9069884,
                 "ICAOCODE": "KZMA"
@@ -69011,7 +69011,7 @@
                 "centlong": -94.96058629,
                 "REGION": "NAM",
                 "StateName": "United States of America",
-                "FIRname": "FIR HOUSTON",
+                "FIRname": "HOUSTON FIR",
                 "StateCode": "USA",
                 "centlat": 29.48967443,
                 "ICAOCODE": "KZHU"
@@ -69390,7 +69390,7 @@
                 "centlong": -29.22307893,
                 "REGION": "NAT",
                 "StateName": "Greenland",
-                "FIRname": "FIR SONDRESTROM",
+                "FIRname": "SONDRESTROM FIR",
                 "StateCode": "GRL",
                 "centlat": 78.70456604,
                 "ICAOCODE": "BGGL"
@@ -69469,7 +69469,7 @@
                 "centlong": 13.19005505,
                 "REGION": "NAT",
                 "StateName": "Norway",
-                "FIRname": "FIR BODO OCEANIC",
+                "FIRname": "BODO OCEANIC FIR",
                 "StateCode": "NOR",
                 "centlat": 74.8486972,
                 "ICAOCODE": "ENOB"
@@ -69778,7 +69778,7 @@
                 "centlong": -43.58620309,
                 "REGION": "NAT",
                 "StateName": "Canada",
-                "FIRname": "FIR GANDER OCEANIC",
+                "FIRname": "GANDER OCEANIC FIR",
                 "StateCode": "CAN",
                 "centlat": 54.22762923,
                 "ICAOCODE": "CZQX"
@@ -69925,7 +69925,7 @@
                 "centlong": -14.85897436,
                 "REGION": "NAT",
                 "StateName": "Iceland",
-                "FIRname": "FIR REYKJAVIK",
+                "FIRname": "REYKJAVIK FIR",
                 "StateCode": "ISL",
                 "centlat": 66.26085003,
                 "ICAOCODE": "BIRD"
@@ -70060,7 +70060,7 @@
                 "centlong": -29.36657575,
                 "REGION": "NAT",
                 "StateName": "Portugal",
-                "FIRname": "FIR SANTA MARIA OCEANIC",
+                "FIRname": "SANTA MARIA OCEANIC FIR",
                 "StateCode": "PRT",
                 "centlat": 34.16072888,
                 "ICAOCODE": "LPPO"
@@ -70123,7 +70123,7 @@
                 "centlong": -19.97561828,
                 "REGION": "NAT",
                 "StateName": "United Kingdom of Great Britain and Northern Ireland",
-                "FIRname": "FIR SHANWICK OCEANIC",
+                "FIRname": "SHANWICK OCEANIC FIR",
                 "StateCode": "GBR",
                 "centlat": 52.82830635,
                 "ICAOCODE": "EGGX"
@@ -70414,7 +70414,7 @@
                 "centlong": -58.39070022,
                 "REGION": "SAM",
                 "StateName": "Paraguay",
-                "FIRname": "FIR ASUNCION",
+                "FIRname": "ASUNCION FIR",
                 "StateCode": "PRY",
                 "centlat": -23.23907562,
                 "ICAOCODE": "SGFA"
@@ -70513,7 +70513,7 @@
                 "centlong": -74.98012436,
                 "REGION": "SAM",
                 "StateName": "Colombia",
-                "FIRname": "FIR BARRANQUILLA",
+                "FIRname": "BARRANQUILLA FIR",
                 "StateCode": "COL",
                 "centlat": 11.48899951,
                 "ICAOCODE": "SKEC"
@@ -71800,7 +71800,7 @@
                 "centlong": -74.30764267,
                 "REGION": "SAM",
                 "StateName": "Colombia",
-                "FIRname": "FIR BOGOTA",
+                "FIRname": "BOGOTA FIR",
                 "StateCode": "COL",
                 "centlat": 3.25110361,
                 "ICAOCODE": "SKED"
@@ -72067,7 +72067,7 @@
                 "centlong": -39.90246729,
                 "REGION": "SAM",
                 "StateName": "Argentina",
-                "FIRname": "FIR COMODORO RIVADAVIA",
+                "FIRname": "COMODORO RIVADAVIA FIR",
                 "StateCode": "ARG",
                 "centlat": -66.87168935,
                 "ICAOCODE": "SAVF"
@@ -72974,7 +72974,7 @@
                 "centlong": -64.78059377,
                 "REGION": "SAM",
                 "StateName": "Argentina",
-                "FIRname": "FIR CORDOBA",
+                "FIRname": "CORDOBA FIR",
                 "StateCode": "ARG",
                 "centlat": -27.77649677,
                 "ICAOCODE": "SACF"
@@ -73021,7 +73021,7 @@
                 "centlong": -109.64948454,
                 "REGION": "SAM",
                 "StateName": "Chile",
-                "FIRname": "FIR ISLA DE PASCUA",
+                "FIRname": "ISLA DE PASCUA FIR",
                 "StateCode": "CHL",
                 "centlat": -54.20103093,
                 "ICAOCODE": "SCIZ"
@@ -73292,7 +73292,7 @@
                 "centlong": -39.54230634,
                 "REGION": "SAM",
                 "StateName": "Argentina",
-                "FIRname": "FIR EZEIZA",
+                "FIRname": "EZEIZA FIR",
                 "StateCode": "ARG",
                 "centlat": -41.08454757,
                 "ICAOCODE": "SAEF"
@@ -73507,7 +73507,7 @@
                 "centlong": -58.7743392,
                 "REGION": "SAM",
                 "StateName": "Guyana",
-                "FIRname": "FIR GEORGETOWN",
+                "FIRname": "GEORGETOWN FIR",
                 "StateCode": "GUY",
                 "centlat": 5.49053159,
                 "ICAOCODE": "SYGC"
@@ -74438,7 +74438,7 @@
                 "centlong": -84.09228326,
                 "REGION": "SAM",
                 "StateName": "Ecuador",
-                "FIRname": "FIR GUAYAQUIL",
+                "FIRname": "GUAYAQUIL FIR",
                 "StateCode": "ECU",
                 "centlat": -1.09110446,
                 "ICAOCODE": "SEFG"
@@ -75821,7 +75821,7 @@
                 "centlong": -64.6732092,
                 "REGION": "SAM",
                 "StateName": "Bolivia (Plurinational State of)",
-                "FIRname": "FIR LA PAZ",
+                "FIRname": "LA PAZ FIR",
                 "StateCode": "BOL",
                 "centlat": -16.71592743,
                 "ICAOCODE": "SLLF"
@@ -76256,7 +76256,7 @@
                 "centlong": -66.1677518,
                 "REGION": "SAM",
                 "StateName": "Venezuela (Bolivarian Republic of)",
-                "FIRname": "FIR MAIQUETIA",
+                "FIRname": "MAIQUETIA FIR",
                 "StateCode": "VEN",
                 "centlat": 8.35536584,
                 "ICAOCODE": "SVZM"
@@ -76459,7 +76459,7 @@
                 "centlong": -68.1512806,
                 "REGION": "SAM",
                 "StateName": "Argentina",
-                "FIRname": "FIR MENDOZA",
+                "FIRname": "MENDOZA FIR",
                 "StateCode": "ARG",
                 "centlat": -34.01263171,
                 "ICAOCODE": "SAMF"
@@ -76646,7 +76646,7 @@
                 "centlong": -33.43446291,
                 "REGION": "SAM",
                 "StateName": "Uruguay",
-                "FIRname": "FIR MONTEVIDEO",
+                "FIRname": "MONTEVIDEO FIR",
                 "StateCode": "URY",
                 "centlat": -36.17156217,
                 "ICAOCODE": "SUEO"
@@ -76757,7 +76757,7 @@
                 "centlong": -80.2511117,
                 "REGION": "SAM",
                 "StateName": "Panama",
-                "FIRname": "FIR PANAMA",
+                "FIRname": "PANAMA FIR",
                 "StateCode": "PAN",
                 "centlat": 10.05024742,
                 "ICAOCODE": "MPZL"
@@ -76912,7 +76912,7 @@
                 "centlong": -55.71169162,
                 "REGION": "SAM",
                 "StateName": "Suriname",
-                "FIRname": "FIR PARAMARIBO",
+                "FIRname": "PARAMARIBO FIR",
                 "StateCode": "SUR",
                 "centlat": 5.65246433,
                 "ICAOCODE": "SMPM"
@@ -77131,7 +77131,7 @@
                 "centlong": -50.77212677,
                 "REGION": "SAM",
                 "StateName": "Trinidad and Tobago",
-                "FIRname": "FIR PIARCO",
+                "FIRname": "PIARCO FIR",
                 "StateCode": "TTO",
                 "centlat": 14.46356142,
                 "ICAOCODE": "TTZP"
@@ -77282,7 +77282,7 @@
                 "centlong": -80.85310318,
                 "REGION": "SAM",
                 "StateName": "Chile",
-                "FIRname": "FIR PUERTO MONTT",
+                "FIRname": "PUERTO MONTT FIR",
                 "StateCode": "CHL",
                 "centlat": -42.74213226,
                 "ICAOCODE": "SCTZ"
@@ -77457,7 +77457,7 @@
                 "centlong": -78.90121452,
                 "REGION": "SAM",
                 "StateName": "Chile",
-                "FIRname": "FIR PUNTA ARENAS",
+                "FIRname": "PUNTA ARENAS FIR",
                 "StateCode": "CHL",
                 "centlat": -69.0809054,
                 "ICAOCODE": "SCCZ"
@@ -77754,7 +77754,7 @@
                 "centlong": -58.96607475,
                 "REGION": "SAM",
                 "StateName": "Argentina",
-                "FIRname": "FIR RESISTENCIA",
+                "FIRname": "RESISTENCIA FIR",
                 "StateCode": "ARG",
                 "centlat": -27.21720249,
                 "ICAOCODE": "SARR"
@@ -78057,7 +78057,7 @@
                 "centlong": -44.72139005,
                 "REGION": "SAM",
                 "StateName": "French Guiana",
-                "FIRname": "FIR CAYENNE",
+                "FIRname": "CAYENNE FIR",
                 "StateCode": "GUF",
                 "centlat": 7.98289044,
                 "ICAOCODE": "SOOO"
@@ -78236,7 +78236,7 @@
                 "centlong": -80.17216611,
                 "REGION": "SAM",
                 "StateName": "Chile",
-                "FIRname": "FIR SANTIAGO",
+                "FIRname": "SANTIAGO FIR",
                 "StateCode": "CHL",
                 "centlat": -33.45046379,
                 "ICAOCODE": "SCEZ"
@@ -78631,7 +78631,7 @@
                 "centlong": -51.46595114,
                 "REGION": "SAM",
                 "StateName": "Brazil",
-                "FIRname": "FIR CURITIBA",
+                "FIRname": "CURITIBA FIR",
                 "StateCode": "BRA",
                 "centlat": -25.87857766,
                 "ICAOCODE": "SBCW"
@@ -78822,7 +78822,7 @@
                 "centlong": 0,
                 "REGION": "SAM",
                 "StateName": "Brazil",
-                "FIRname": "FIR BRASILIA",
+                "FIRname": "BRASILIA FIR",
                 "StateCode": "BRA",
                 "centlat": 0,
                 "ICAOCODE": "SBBS"
@@ -79017,7 +79017,7 @@
                 "centlong": 0,
                 "REGION": "SAM",
                 "StateName": "Brazil",
-                "FIRname": "FIR RECIFE",
+                "FIRname": "RECIFE FIR",
                 "StateCode": "BRA",
                 "centlat": 0,
                 "ICAOCODE": "SBRE"
@@ -80884,7 +80884,7 @@
                 "centlong": 0,
                 "REGION": "SAM",
                 "StateName": "Brazil",
-                "FIRname": "FIR AMAZONICA",
+                "FIRname": "AMAZONICA FIR",
                 "StateCode": "BRA",
                 "centlat": 0,
                 "ICAOCODE": "SBAZ"
@@ -81115,7 +81115,7 @@
                 "centlong": 0,
                 "REGION": "SAM",
                 "StateName": "Brazil",
-                "FIRname": "FIR ATLANTICO",
+                "FIRname": "ATLANTICO FIR",
                 "StateCode": "BRA",
                 "centlat": 0,
                 "ICAOCODE": "SBAO"
@@ -84662,7 +84662,7 @@
                 "centlong": -80.09795877,
                 "REGION": "SAM",
                 "StateName": "Peru",
-                "FIRname": "FIR LIMA",
+                "FIRname": "LIMA FIR",
                 "StateCode": "PER",
                 "centlat": -10.89089664,
                 "ICAOCODE": "SPIM"
@@ -85669,7 +85669,7 @@
                 "centlong": -79.16234164,
                 "REGION": "SAM",
                 "StateName": "Chile",
-                "FIRname": "FIR ANTOFAGASTA",
+                "FIRname": "ANTOFAGASTA FIR",
                 "StateCode": "CHL",
                 "centlat": -23.40306882,
                 "ICAOCODE": "SCFZ"

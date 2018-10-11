@@ -11,43 +11,44 @@ import fi.fmi.avi.converter.AviMessageSpecificConverter;
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionIssue;
 import fi.fmi.avi.converter.ConversionResult;
-import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
+//import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.sigmet.SIGMET;
 import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
 @Configuration
-@Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter.class})
+@Import({/*fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, */ nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter.class})
 public class SigmetConverter implements ProductConverter<Sigmet>{
-	@Autowired
+//	@Autowired
 	private AviMessageSpecificConverter<SIGMET, String> sigmetIWXXMStringSerializer;
 	
-	@Autowired
+//	@Autowired
 	private AviMessageSpecificConverter<SIGMET, Document> sigmetIWXXMDOMSerializer;
 	
-	@Autowired
+//	@Autowired
 	private AviMessageSpecificConverter<Sigmet,SIGMET> geoWebSigmetImporter;
 	
 	@Bean
 	public AviMessageConverter aviMessageConverter() {
 		AviMessageConverter p = new AviMessageConverter();
-		p.setMessageSpecificConverter(GeoWebConverterConfig.GEOWEBSIGMET_TO_SIGMET_POJO, geoWebSigmetImporter);
-		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_DOM, sigmetIWXXMDOMSerializer);
-		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_STRING, sigmetIWXXMStringSerializer);
+//		p.setMessageSpecificConverter(GeoWebConverterConfig.GEOWEBSIGMET_TO_SIGMET_POJO, geoWebSigmetImporter);
+//		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_DOM, sigmetIWXXMDOMSerializer);
+//		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_STRING, sigmetIWXXMStringSerializer);
 		return p;
 	}
 	
 	public String ToIWXXM_2_1(Sigmet geoWebSigmet) {
 
+
 		ConversionResult<SIGMET> result = geoWebSigmetImporter.convertMessage(geoWebSigmet, ConversionHints.SIGMET);
 		if (ConversionResult.Status.SUCCESS == result.getStatus()) {
 			System.err.println("SUCCESS");
-			SIGMET pojo = result.getConvertedMessage();
+			SIGMET pojo = result.getConvertedMessage().get();
 			System.err.println("POJO:"+pojo);
 			ConversionResult<String>iwxxmResult=sigmetIWXXMStringSerializer.convertMessage(pojo, ConversionHints.SIGMET);
 			if (ConversionResult.Status.SUCCESS == iwxxmResult.getStatus()) {
-				return iwxxmResult.getConvertedMessage();
+				return iwxxmResult.getConvertedMessage().get();
 			} else {
 				System.err.println("ERR: "+iwxxmResult.getStatus());
 				for (ConversionIssue iss:iwxxmResult.getConversionIssues()) {
@@ -61,6 +62,7 @@ public class SigmetConverter implements ProductConverter<Sigmet>{
 				System.err.println("iss: "+iss.getMessage());
 			}
 		}
+
 		return "FAIL";
 	}
 }

@@ -4,6 +4,7 @@ import fi.fmi.avi.converter.AviMessageSpecificConverter;
 import fi.fmi.avi.model.AviationWeatherMessage;
 import nl.knmi.geoweb.backend.product.taf.Taf;
 
-public interface GeoWebConverter <T extends AviationWeatherMessage> extends AviMessageSpecificConverter<Taf, T>{
+public interface GeoWebTafInConverterIntf<T extends AviationWeatherMessage> extends AviMessageSpecificConverter<T, Taf> {
 
 }
+
