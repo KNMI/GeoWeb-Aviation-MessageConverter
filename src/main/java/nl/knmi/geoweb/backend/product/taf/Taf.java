@@ -536,7 +536,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 				if (direction.toString().equals("VRB")) {
 					sb.append("VRB");
 				} else {
-					sb.append(String.format("%03d", Integer.parseInt(direction.toString())));
+					sb.append(String.format("%03.0f", Double.parseDouble(direction.toString())));
 				}
 				if (speedOperator != null) {
 					if (speedOperator.equals(TAFWindSpeedOperator.above)) {

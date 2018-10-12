@@ -2,24 +2,30 @@ package nl.knmi.geoweb.iwxxm_2_1.converter;
 
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionResult;
+import fi.fmi.avi.model.CloudForecast;
+import fi.fmi.avi.model.CloudLayer;
 import fi.fmi.avi.model.taf.TAF;
+import fi.fmi.avi.model.taf.TAFBaseForecast;
+import fi.fmi.avi.model.taf.TAFChangeForecast;
 import fi.fmi.avi.model.taf.TAFSurfaceWind;
 import nl.knmi.geoweb.backend.product.taf.Taf;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
     @Override
     public ConversionResult<Taf> convertMessage(TAF input, ConversionHints hints) {
         ConversionResult<Taf> retval = new ConversionResult<>();
-        Taf taf=new Taf();
-        Taf.Metadata metadata=new Taf.Metadata();
+        Taf taf = new Taf();
+        Taf.Metadata metadata = new Taf.Metadata();
         metadata.setUuid(UUID.randomUUID().toString());
         metadata.setIssueTime(OffsetDateTime.ofInstant(input.getIssueTime().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
-        metadata.setValidityStart(OffsetDateTime.ofInstant(input.getValidityTime().get().getStartTime().get().getCompleteTime().get().toInstant(),ZoneId.of("Z")));
-        metadata.setValidityEnd(OffsetDateTime.ofInstant(input.getValidityTime().get().getEndTime().get().getCompleteTime().get().toInstant(),ZoneId.of("Z")));
+        metadata.setValidityStart(OffsetDateTime.ofInstant(input.getValidityTime().get().getStartTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
+        metadata.setValidityEnd(OffsetDateTime.ofInstant(input.getValidityTime().get().getEndTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
         metadata.setLocation(input.getAerodrome().getDesignator());
         metadata.setStatus(Taf.TAFReportPublishedConcept.inactive);
 
@@ -42,21 +48,113 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
         }
         taf.setMetadata(metadata);
 
-        Taf.Forecast forecast=new Taf.Forecast();
-        forecast.setCaVOK(input.getBaseForecast().get().isCeilingAndVisibilityOk());
-        Taf.Forecast.TAFWind wind=new Taf.Forecast.TAFWind();
-        TAFSurfaceWind inWind=input.getBaseForecast().get().getSurfaceWind().get();
-        wind.setSpeed(inWind.getMeanWindSpeed().getValue().intValue());
-        wind.setDirection(inWind.isVariableDirection()?"VRB":inWind.getMeanWindDirection().get().getValue());
-        if (inWind.getWindGust().isPresent()) {
-            wind.setGusts(inWind.getWindGust().get().getValue().intValue());
+        Taf.Forecast forecast = new Taf.Forecast();
+        if (input.getBaseForecast().isPresent()) {
+            forecast.setCaVOK(input.getBaseForecast().get().isCeilingAndVisibilityOk());
+            updateForecastWind(forecast, input.getBaseForecast().get(), retval);
+            updateForecastTemperature(forecast,input.getBaseForecast().get(), retval);
+            updateForecastCloud(forecast,input.getBaseForecast().get(), retval);
+            updateForecastWeather(forecast,input.getBaseForecast().get(), retval);
         }
-        forecast.setWind(wind);
-
         taf.setForecast(forecast);
+
+        List<Taf.ChangeForecast> changeForecasts = new ArrayList<>();
+        for (TAFChangeForecast changeForecast : input.getChangeForecasts().get()) {
+            Taf.ChangeForecast ch = new Taf.ChangeForecast();
+            Taf.Forecast chFc = new Taf.Forecast();
+            switch (changeForecast.getChangeIndicator()) {
+                case FROM:
+                    ch.setChangeType("FM");
+                    break;
+                case BECOMING:
+                    ch.setChangeType("BECMG");
+                    break;
+                default:
+            }
+            chFc.setCaVOK(changeForecast.isCeilingAndVisibilityOk());
+            Taf.Forecast.TAFWind chwind = new Taf.Forecast.TAFWind();
+            TAFSurfaceWind chInWind = input.getBaseForecast().get().getSurfaceWind().get();
+            wind.setSpeed(chInWind.getMeanWindSpeed().getValue().intValue());
+            if (chInWind.getMeanWindSpeed().getUom().equals("[kn_i]")) {
+                chwind.setUnit("KT");
+            } else if (inWind.getMeanWindSpeed().getUom().equals("m/s")) {
+                chwind.setUnit("MPS");
+            } else {
+                chwind.setUnit("KT");
+            }
+            chwind.setDirection(chInWind.isVariableDirection() ? "VRB" : chInWind.getMeanWindDirection().get().getValue());
+            if (chInWind.getWindGust().isPresent()) {
+                chwind.setGusts(chInWind.getWindGust().get().getValue().intValue());
+            }
+            chFc.setWind(chwind);
+            changeForecasts.add(ch);
+
+        }
+        taf.setChangegroups(changeForecasts);
 
         retval.setStatus(ConversionResult.Status.SUCCESS);
         retval.setConvertedMessage(taf);
-        return null;
+        return retval;
     }
+
+    private String getUomFromUnit(String unit) {
+        if (unit.equals("[kn_i]")) {
+            return "KT";
+        } else if (unit.equals("m/s")) {
+            return "MPS";
+        } else {
+            return "KT";
+        }
+    }
+
+    private void updateForecastWind(Taf.Forecast fc, TAFBaseForecast tafBaseForecast, ConversionResult<Taf> result) {
+        Taf.Forecast.TAFWind wind = new Taf.Forecast.TAFWind();
+        TAFSurfaceWind inWind = tafBaseForecast.getSurfaceWind().get();
+        wind.setSpeed(inWind.getMeanWindSpeed().getValue().intValue());
+        wind.setUnit(getUomFromUnit(inWind.getMeanWindSpeed().getUom()));
+        wind.setDirection(inWind.isVariableDirection() ? "VRB" : inWind.getMeanWindDirection().get().getValue());
+        if (inWind.getWindGust().isPresent()) {
+            wind.setGusts(inWind.getWindGust().get().getValue().intValue());
+        }
+        fc.setWind(wind);
+
+
+    }
+
+    private void updateForecastCloud(Taf.Forecast fc, TAFBaseForecast tafBaseForecast, ConversionResult<Taf> result) {
+        if (tafBaseForecast.getCloud().isPresent()) {
+            List<Taf.Forecast.TAFCloudType> cloudTypes=new ArrayList<>();
+
+            CloudForecast cf=tafBaseForecast.getCloud().get();
+            if (cf.isNoSignificantCloud()) {
+
+            } else {
+                for (CloudLayer cloudLayer: cf.getLayers().get()) {
+                    Taf.Forecast.TAFCloudType ct=new Taf.Forecast.TAFCloudType();
+                    if (cloudLayer.getAmount().isPresent()) {
+                      switch (cloudLayer.getAmount().)
+                    }
+                }
+            }
+        }
+        for (Taf.Forecast.TAFCloudType cl: fc.getClouds()) {
+
+        }
+        TAFSurfaceWind inWind = tafBaseForecast.getSurfaceWind().get();
+        wind.setSpeed(inWind.getMeanWindSpeed().getValue().intValue());
+        wind.setUnit(getUomFromUnit(inWind.getMeanWindSpeed().getUom()));
+        wind.setDirection(inWind.isVariableDirection() ? "VRB" : inWind.getMeanWindDirection().get().getValue());
+        if (inWind.getWindGust().isPresent()) {
+            wind.setGusts(inWind.getWindGust().get().getValue().intValue());
+        }
+        fc.setWind(wind);
+    }
+
+    private void updateForecastWeather(Taf.Forecast fc, TAFBaseForecast tafBaseForecast, ConversionResult<Taf> result) {
+    }
+
+    private void updateForecastTemperature(Taf.Forecast fc, TAFBaseForecast tafBaseForecast, ConversionResult<Taf> result) {
+    }
+
+
 }

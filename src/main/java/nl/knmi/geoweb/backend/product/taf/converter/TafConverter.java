@@ -5,6 +5,7 @@ import fi.fmi.avi.model.immutable.GeoPositionImpl;
 import fi.fmi.avi.model.taf.immutable.TAFImpl;
 import fi.fmi.avi.model.taf.immutable.TAFReferenceImpl;
 import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTAFConverter;
+import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTafInConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 import org.w3c.dom.Document;
 
 @Configuration
-@Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, GeoWebTAFConverter.class})
+@Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, GeoWebTAFConverter.class, GeoWebTafInConverter.class})
 public class TafConverter implements ProductConverter<Taf> {
 
 	@Autowired
@@ -38,12 +39,16 @@ public class TafConverter implements ProductConverter<Taf> {
     @Autowired
     private AviMessageSpecificConverter<Taf, TAF> geoWebTafImporter;
 
+    @Autowired
+    private AviMessageSpecificConverter<TAF, Taf> geoWebTafInImporter;
+
     @Bean
     public AviMessageConverter aviMessageConverter() {
         AviMessageConverter p = new AviMessageConverter();
 		p.setMessageSpecificConverter(IWXXMConverter.TAF_POJO_TO_IWXXM21_DOM, tafIWXXMDOMSerializer);
 		p.setMessageSpecificConverter(IWXXMConverter.TAF_POJO_TO_IWXXM21_STRING, tafIWXXMStringSerializer);
         p.setMessageSpecificConverter(GeoWebConverterConfig.GEOWEBTAF_TO_TAF_POJO, geoWebTafImporter);
+        p.setMessageSpecificConverter(GeoWebConverterConfig.TAF_TO_GEOWEBTAF_POJO, geoWebTafInImporter);
         return p;
     }
 
