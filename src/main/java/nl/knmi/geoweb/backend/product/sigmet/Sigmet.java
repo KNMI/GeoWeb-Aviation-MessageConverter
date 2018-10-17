@@ -76,6 +76,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	private String location_indicator_mwo;
 	private String uuid;
 	private SigmetStatus status;
+	private SigmetType type;
 	private int sequence;
 
 	@JsonInclude(Include.NON_NULL)
@@ -108,7 +109,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			String name;
 			List <Number> position;
 			public String toTAC() {
-				String volcanoName = this.name.length() > 0 ? " MT " + this.name : "";
+				String volcanoName = (this.name != null && this.name.length() > 0) ? " MT " + this.name : "";
 				String location = "";
 				try {
 					location = (position != null && position.size() == 2) ?
@@ -416,7 +417,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 	@Getter
 	public enum SigmetStatus {
-		concept("concept"), canceled("canceled"), published("published"), test("test");
+		concept("concept"), canceled("canceled"), published("published");//, test("test"); TODO: Check, should be in Type now.
 		private String status;
 		private SigmetStatus (String status) {
 			this.status = status;
@@ -427,6 +428,26 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			for (SigmetStatus sstatus: SigmetStatus.values()) {
 				if (status.equals(sstatus.toString())){
 					return sstatus;
+				}
+			}
+			return null;
+		}
+
+	}
+	
+	@Getter
+	public enum SigmetType {
+		normal("normal"), test("test"), exercise("exercise");
+		private String type;
+		private SigmetType (String type) {
+			this.type = type;
+		}
+		public static SigmetType getSigmetType(String itype){
+			Debug.println("SIGMET type: " + itype);
+
+			for (SigmetType stype: SigmetType.values()) {
+				if (itype.equals(stype.toString())){
+					return stype;
 				}
 			}
 			return null;
@@ -478,6 +499,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
 		this.status=SigmetStatus.concept;
+		this.type=SigmetType.test;
 	}
 
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
@@ -496,6 +518,9 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		// .... value from constructor is lost here, set it explicitly. (Why?)
 		if(this.status == null) {
 			this.status = SigmetStatus.concept;
+		}
+		if(this.type == null) {
+			this.type = SigmetType.test;
 		}
 		try {
 			om.writeValue(new File(fn), this);
@@ -740,6 +765,9 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			String validdateCancelled = String.format("%02d", this.cancelsStart.getDayOfMonth()) + String.format("%02d", this.cancelsStart.getHour()) + String.format("%02d", this.cancelsStart.getMinute());
 
 			sb.append(' ').append("CNL SIGMET ").append(this.cancels).append(" ").append(validdateCancelled).append('/').append(validdateEndFormatted);
+			if (va_extra_fields != null && va_extra_fields.move_to != null && va_extra_fields.move_to.size() > 0) {
+				sb.append(' ').append("VA MOV TO ").append(va_extra_fields.move_to.get(0)).append(" FIR");
+			}
 			return sb.toString();
 		}
 		sb.append('\n');
