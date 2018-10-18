@@ -37,7 +37,7 @@ public class GeoWebConverterConfig {
 
     @Bean
     AviMessageSpecificConverter<Sigmet, SIGMET> geowebSIGMETConverter() {
-        GeoWebSigmetConverter<SIGMET> p = new GeoWebSIGMETConverter();
+        GeoWebSIGMETConverterIntf<SIGMET> p = new GeoWebSIGMETConverter();
         return p;
     }
 

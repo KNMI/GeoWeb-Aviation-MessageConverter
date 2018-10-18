@@ -2,6 +2,7 @@ package nl.knmi.geoweb.iwxxm_2_1.converter;
 
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionResult;
+import fi.fmi.avi.model.AviationCodeListUser;
 import fi.fmi.avi.model.CloudForecast;
 import fi.fmi.avi.model.CloudLayer;
 import fi.fmi.avi.model.taf.TAF;
@@ -13,6 +14,7 @@ import nl.knmi.geoweb.backend.product.taf.Taf;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -52,9 +54,9 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
         if (input.getBaseForecast().isPresent()) {
             forecast.setCaVOK(input.getBaseForecast().get().isCeilingAndVisibilityOk());
             updateForecastWind(forecast, input.getBaseForecast().get(), retval);
-            updateForecastTemperature(forecast,input.getBaseForecast().get(), retval);
-            updateForecastCloud(forecast,input.getBaseForecast().get(), retval);
-            updateForecastWeather(forecast,input.getBaseForecast().get(), retval);
+            updateForecastTemperature(forecast, input.getBaseForecast().get(), retval);
+            updateForecastCloud(forecast, input.getBaseForecast().get(), retval);
+            updateForecastWeather(forecast, input.getBaseForecast().get(), retval);
         }
         taf.setForecast(forecast);
 
@@ -74,10 +76,10 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
             chFc.setCaVOK(changeForecast.isCeilingAndVisibilityOk());
             Taf.Forecast.TAFWind chwind = new Taf.Forecast.TAFWind();
             TAFSurfaceWind chInWind = input.getBaseForecast().get().getSurfaceWind().get();
-            wind.setSpeed(chInWind.getMeanWindSpeed().getValue().intValue());
+            chwind.setSpeed(chInWind.getMeanWindSpeed().getValue().intValue());
             if (chInWind.getMeanWindSpeed().getUom().equals("[kn_i]")) {
                 chwind.setUnit("KT");
-            } else if (inWind.getMeanWindSpeed().getUom().equals("m/s")) {
+            } else if (chInWind.getMeanWindSpeed().getUom().equals("m/s")) {
                 chwind.setUnit("MPS");
             } else {
                 chwind.setUnit("KT");
@@ -123,23 +125,53 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
 
     private void updateForecastCloud(Taf.Forecast fc, TAFBaseForecast tafBaseForecast, ConversionResult<Taf> result) {
         if (tafBaseForecast.getCloud().isPresent()) {
-            List<Taf.Forecast.TAFCloudType> cloudTypes=new ArrayList<>();
+            List<Taf.Forecast.TAFCloudType> cloudTypes = new ArrayList<>();
 
-            CloudForecast cf=tafBaseForecast.getCloud().get();
+            CloudForecast cf = tafBaseForecast.getCloud().get();
             if (cf.isNoSignificantCloud()) {
+              Taf.Forecast.TAFCloudType ct = new Taf.Forecast.TAFCloudType();
+              ct.setIsNSC(true);
 
+              fc.setClouds(Arrays.asList(ct));
             } else {
-                for (CloudLayer cloudLayer: cf.getLayers().get()) {
-                    Taf.Forecast.TAFCloudType ct=new Taf.Forecast.TAFCloudType();
-                    if (cloudLayer.getAmount().isPresent()) {
-                      switch (cloudLayer.getAmount().)
+                if (cf.getVerticalVisibility().isPresent()) {
+                    fc.setVertical_visibility(cf.getVerticalVisibility().get().getValue().intValue());
+                } else {
+                    List<Taf.Forecast.TAFCloudType> clouds=new ArrayList<>();
+                    for (CloudLayer cloudLayer : cf.getLayers().get()) {
+                        Taf.Forecast.TAFCloudType ct = new Taf.Forecast.TAFCloudType();
+                        if (cloudLayer.getAmount().isPresent()) {
+                            switch (cloudLayer.getAmount().get()) {
+                                case FEW:
+                                    ct.setAmount("FEW");
+                                    break;
+                                case BKN:
+                                    ct.setAmount("BKN");
+                                    break;
+                                case SCT:
+                                    ct.setAmount("SCT");
+                                    break;
+                                case OVC:
+                                    ct.setAmount("OVC");
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        if (cloudLayer.getBase().isPresent()) {
+                            ct.setHeight(cloudLayer.getBase().get().getValue().intValue());
+                        }
+                        if (cloudLayer.getCloudType().isPresent()) {
+                            ct.setMod(cloudLayer.getCloudType().get().toString());
+                        }
+                        clouds.add(ct);
                     }
+                    fc.setClouds(clouds);
                 }
             }
         }
-        for (Taf.Forecast.TAFCloudType cl: fc.getClouds()) {
 
-        }
+        Taf.Forecast.TAFWind wind = new Taf.Forecast.TAFWind();
         TAFSurfaceWind inWind = tafBaseForecast.getSurfaceWind().get();
         wind.setSpeed(inWind.getMeanWindSpeed().getValue().intValue());
         wind.setUnit(getUomFromUnit(inWind.getMeanWindSpeed().getUom()));
