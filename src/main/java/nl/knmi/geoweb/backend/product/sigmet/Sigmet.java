@@ -1041,12 +1041,34 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		//		String s=converter.ToIWXXM_2_1(this);
 		List<String> toDeleteIfError=new ArrayList<>(); //List of products to delete in case of error
 		try {
-			String time = OffsetDateTime.now(ZoneId.of("Z")).format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+			OffsetDateTime now = OffsetDateTime.now(ZoneId.of("Z"));
+			String time = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
 			String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 
-			String TACName = "WSNL31" + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
+			String bulletinHeader = "";
+			if (this.getPhenomenon() == Phenomenon.VA_CLD) {
+				bulletinHeader = "WVNL31";
+			} else if (this.getPhenomenon() == Phenomenon.TROPICAL_CYCLONE) {
+				bulletinHeader = "WCNL31";  // TODO CHECK if WS is OK for TC
+			} else {
+				bulletinHeader = "WSNL31";
+			}
+			
+			String TACName = bulletinHeader + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
 			String tacFileName=path.getPath() + "/" + TACName + ".tac";
-			Tools.writeFile(tacFileName, this.toTAC(this.getFirFeature()));
+			String TACHeaderTime = now.format(DateTimeFormatter.ofPattern("ddHHmm"));
+			String TACHeaderLocation = this.getLocation_indicator_mwo();
+			/* Create TAC header */
+			String TACHeader = "ZCZC\n" + bulletinHeader + " " + TACHeaderLocation+" "+TACHeaderTime+"\n";	
+			/* Create TAC message */
+			String TACCode = this.toTAC(this.getFirFeature());
+			// Remove all empty lines			
+			TACCode  = TACCode.replaceAll("(?m)^[ \t]*\r?\n", "");
+			// Replace last \n if available
+			if (TACCode.length() > 1 && TACCode.endsWith("\n")) { TACCode = TACCode.substring(0, TACCode.length() - 1); }
+			/* Create TAC footer */
+			String TACFooter = "=\nNNNN\n";
+			Tools.writeFile(tacFileName, TACHeader + TACCode +  TACFooter);
 			toDeleteIfError.add(tacFileName);
 
 			String name = "SIGMET_" + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
