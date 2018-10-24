@@ -144,7 +144,7 @@ public class FIRStore implements Cloneable{
 		if (worldFIRInfos.containsKey(name)) {
 				feature=cloneThroughSerialize(worldFIRInfos.get(name));
 		}
-		Debug.println("Feature lookup("+name+") "+feature+" ["+delegatedAirspaces.containsKey(name)+"]");
+//		Debug.println("Feature lookup("+name+") "+feature+" ["+delegatedAirspaces.containsKey(name)+"]");
 		
 		if (delegatedAirspaces.containsKey(name)) {
 			for (Feature f: delegatedAirspaces.get(name)) {
