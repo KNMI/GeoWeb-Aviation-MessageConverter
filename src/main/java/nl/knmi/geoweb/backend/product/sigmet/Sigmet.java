@@ -434,7 +434,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		}
 
 	}
-	
+
 	@Getter
 	public enum SigmetType {
 		normal("normal"), test("test"), exercise("exercise");
@@ -504,7 +504,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
 		Sigmet sm=om.readValue(f, Sigmet.class);
-		Debug.println("Sigmet from "+f.getName());
+		//		Debug.println("Sigmet from "+f.getName());
 		//		Debug.println(sm.dumpSigmetGeometryInfo());
 		return sm;
 	}
@@ -625,7 +625,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				double maxX=env.getMaxX();
 				double minY=env.getMinY();
 				double maxY=env.getMaxY();
-				Debug.println("BBOX (++);: "+minX+"-"+maxX+","+minY+"-"+maxY);
+				//				Debug.println("BBOX (++);: "+minX+"-"+maxX+","+minY+"-"+maxY);
 
 				org.locationtech.jts.geom.Geometry firBorder=geom_fir.getBoundary();
 
@@ -658,8 +658,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 					if (side.intersects(geom_fir)) { //TODO or: firBorder
 						boxSidesIntersecting[i]=true;
 						boxSidesIntersectingCount++;
-						Debug.println("Intersecting on side "+i);
-						Debug.println("I:"+side.intersection(geom_fir));
+						//						Debug.println("Intersecting on side "+i);
+						//						Debug.println("I:"+side.intersection(geom_fir));
 					} else {
 						boxSidesIntersecting[i]=false;
 					}
@@ -710,7 +710,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				// Intersect the box with the FIR
 				org.locationtech.jts.geom.Geometry intersection = drawnGeometry.intersection(geom_fir);
 
-				Debug.println("intersection: "+intersection);
+				//				Debug.println("intersection: "+intersection);
 
 				if (intersection.equalsTopo(geom_fir)) {
 					return "ENTIRE FIR";
@@ -719,7 +719,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				Coordinate[] drawn=drawnGeometry.getCoordinates();
 				Coordinate[] intersected=intersection.getCoordinates();
 				coords = ((Polygon)(f.getGeometry())).getCoordinates().get(0);
-				Debug.println("SIZES: "+drawn.length+"  "+intersected.length);
+				//				Debug.println("SIZES: "+drawn.length+"  "+intersected.length);
 				if (intersected.length>7) {
 					Debug.println("More than 7 in intersection!!");
 					return "WI "+ this.latlonToDMS(drawn);
@@ -758,9 +758,14 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth()) + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
 		String validdateEndFormatted = String.format("%02d", this.validdate_end.getDayOfMonth()) + String.format("%02d", this.validdate_end.getHour()) + String.format("%02d", this.validdate_end.getMinute());
 
+
+
 		sb.append(this.location_indicator_icao).append(" SIGMET ").append(this.sequence).append(" VALID ").append(validdateFormatted).append('/').append(validdateEndFormatted).append(' ').append(this.location_indicator_mwo).append('-');
 		sb.append('\n');
+
 		sb.append(this.location_indicator_icao).append(' ').append(this.firname);
+
+	
 		if (this.cancels != null && this.cancelsStart != null) {
 			String validdateCancelled = String.format("%02d", this.cancelsStart.getDayOfMonth()) + String.format("%02d", this.cancelsStart.getHour()) + String.format("%02d", this.cancelsStart.getMinute());
 
@@ -771,11 +776,22 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			return sb.toString();
 		}
 		sb.append('\n');
-		
+		/* Test or exercise */
+		SigmetType type = this.type == null ? SigmetType.normal :this.type;
+		switch(type) {
+		case test:
+			sb.append("TEST ");
+			break;
+		case exercise:
+			sb.append("EXER ");
+			break;			
+		default:
+		}
 
 		if (va_extra_fields != null) {
 			sb.append(va_extra_fields.toTAC());
 		}
+
 		
 		sb.append(this.phenomenon.getShortDescription());
 
@@ -823,7 +839,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			sb.append("FCST AT ").append(String.format("%02d", fpaTime.getHour())).append(String.format("%02d", fpaTime.getMinute())).append("Z");
 			sb.append('\n');
 			sb.append(this.featureToTAC((Feature)this.findEndGeometry(((Feature)findStartGeometry()).getId()), FIR));
-			
+
 		} else {
 			if (va_extra_fields !=null && va_extra_fields.no_va_expected) {
 				OffsetDateTime fpaTime=this.validdate_end;
@@ -831,7 +847,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				sb.append(" NO VA EXP");
 			} 
 		}
-		
+
 
 		return sb.toString();
 	}
@@ -1053,7 +1069,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			} else {
 				bulletinHeader = "WSNL31";
 			}
-			
+
 			String TACName = bulletinHeader + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
 			String tacFileName=path.getPath() + "/" + TACName + ".tac";
 			String TACHeaderTime = now.format(DateTimeFormatter.ofPattern("ddHHmm"));

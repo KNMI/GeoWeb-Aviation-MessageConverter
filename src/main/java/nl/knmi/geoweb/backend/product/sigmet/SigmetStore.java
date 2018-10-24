@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
 
 @Component
@@ -64,25 +65,53 @@ public class SigmetStore {
 		sigmet.serializeSigmet(sigmetObjectMapper, fn);	
 	}
 
-	public synchronized int getNextSequence() {
+	public synchronized int getNextSequence(Sigmet sigmetToPublish) {
 		// Day zero means all sigmets of today since midnight UTC
-		Sigmet[] sigmets = getPublishedSigmetsSinceDay(0);
+		Sigmet[] allSigmets = getPublishedSigmetsOnDay(sigmetToPublish);
+		Sigmet[] sigmets = null;
+		Phenomenon sigmetPhenomenon = sigmetToPublish.getPhenomenon();
+		if (sigmetPhenomenon == Phenomenon.VA_CLD) {
+			sigmets = (Sigmet[]) Arrays.stream(allSigmets).filter(
+					x -> x.getPhenomenon() == Sigmet.Phenomenon.VA_CLD).toArray(Sigmet[]::new);
+			
+		} else if (sigmetPhenomenon == Phenomenon.TROPICAL_CYCLONE) {
+			sigmets = (Sigmet[]) Arrays.stream(allSigmets).filter(
+					x -> x.getPhenomenon() == Sigmet.Phenomenon.TROPICAL_CYCLONE).toArray(Sigmet[]::new);
+		} else {
+			sigmets = (Sigmet[]) Arrays.stream(allSigmets).filter(
+					x -> (x.getPhenomenon() != Sigmet.Phenomenon.VA_CLD && 
+					x.getPhenomenon() != Sigmet.Phenomenon.TROPICAL_CYCLONE)).toArray(Sigmet[]::new);
+		}
+		
 		int seq = 1;
-
 		if (sigmets.length > 0){
 			Arrays.sort(sigmets, (rhs, lhs) -> rhs.getSequence() < lhs.getSequence() ? 1 :
                     (rhs.getSequence() == lhs.getSequence() ? 0 : -1));
 			seq = sigmets[0].getSequence() + 1;
 		}
+		Debug.println("SEQUENCE NR: Created sequence number " + seq + " for sigmet phenomenon " + sigmetPhenomenon.toString());
 		return seq;
 	}
 
-	public Sigmet[] getPublishedSigmetsSinceDay (int daysOffset) {
+	private Sigmet[] getPublishedSigmetsOnDay(Sigmet sigmetToPublish) {
+		Sigmet[] sigmets = getSigmets(false, SigmetStatus.published);
+		OffsetDateTime offsetSinceMidnight = sigmetToPublish.getIssuedate().withHour(0).withMinute(1).withSecond(0).withNano(0);
+
+		return Arrays.stream(sigmets).filter(sigmet -> (
+				sigmet.getValiddate().isAfter(offsetSinceMidnight) ||
+				sigmet.getValiddate().isEqual(offsetSinceMidnight)
+				)).toArray(Sigmet[]::new);
+	}
+
+	public Sigmet[] __getPublishedSigmetsSinceDay (int daysOffset) {
 		Sigmet[] sigmets = getSigmets(false, SigmetStatus.published);
 		OffsetDateTime offset = OffsetDateTime.now(ZoneId.of("Z")).minusDays(daysOffset);
-		OffsetDateTime offsetSinceMidnight = offset.withHour(0).withMinute(0).withSecond(0).withNano(0);
+		OffsetDateTime offsetSinceMidnight = offset.withHour(0).withMinute(1).withSecond(0).withNano(0);
 
-		return Arrays.stream(sigmets).filter(sigmet -> sigmet.getValiddate().isAfter(offsetSinceMidnight)).toArray(Sigmet[]::new);
+		return Arrays.stream(sigmets).filter(sigmet -> (
+				sigmet.getValiddate().isAfter(offsetSinceMidnight) ||
+				sigmet.getValiddate().isEqual(offsetSinceMidnight)
+				)).toArray(Sigmet[]::new);
 	}
 
 	public Sigmet[] getSigmets(boolean selectActive, SigmetStatus selectStatus) {
@@ -113,7 +142,7 @@ public class SigmetStore {
 				try {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
-						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
+//						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
 						if ((sm.getStatus()==SigmetStatus.published)&&
 								(sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);
