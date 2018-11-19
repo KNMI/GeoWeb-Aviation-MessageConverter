@@ -101,13 +101,17 @@ public class AugmentMaxVisibility {
 				forecast.put("visibilityAndFogWithoutDescriptorWithinLimit", visibility < 1000);
 			} else {
 				String descriptor = weatherGroup.get("descriptor").asText();
-				Debug.println(descriptor);
+//				Debug.println(descriptor);
 				if (descriptor.equals("freezing")) {
 					forecast.put("visibilityWithinLimit", visibility < 1000);
+/*
 				} else if (descriptor.equals("shallow")) {
-					/* Shallow fog MIFG */
+					*/
+/* Shallow fog MIFG *//*
+
 					Debug.println("TODO: MIFG is now always OK (MBG, 2018-09-05");
 					// forecast.put("visibilityWithinLimit", visibility > 1000); 
+*/
 				} else {
 					forecast.put("visibilityWithinLimit", true);
 				}

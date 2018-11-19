@@ -2,6 +2,7 @@ package nl.knmi.geoweb.backend.aviation;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.NotDirectoryException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,12 +25,22 @@ public class AirportStore {
 	@Autowired
 	@Qualifier("geoWebObjectMapper")
 	private ObjectMapper om;
-	
+
 	private String airportFile;
 	private String directory;
 	private Map<String, AirportInfo> airportInfos;
-	public AirportStore(@Value(value = "${productstorelocation}") String productstorelocation){
-		this.directory=productstorelocation+"/admin/config";
+	public AirportStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException{
+		String dir = productstorelocation +"/admin/config";
+		File f = new File(dir);
+		if(f.exists() == false){
+			Tools.mksubdirs(f.getAbsolutePath());
+			Debug.println("Creating taf schema store at ["+f.getAbsolutePath()+"]");
+		}
+		if(f.isDirectory() == false){
+			Debug.errprintln("Taf directory location is not a directory");
+			throw new NotDirectoryException("Taf directory location is not a directory");
+		}
+		this.directory=dir;
 		this.airportFile="BREM_20160310.json";
 	}
 
@@ -46,12 +57,12 @@ public class AirportStore {
 			Tools.writeFile(airportText, s);
 		}
 		
-		ObjectMapper om=new ObjectMapper();
 		try {
 			AirportJsonRecord[] airports = om.readValue(fn, AirportJsonRecord[].class);
 			for (AirportJsonRecord airport: airports) {
 				try {
-					AirportInfo airportInfo=new AirportInfo(airport.getIcao(), airport.getName(), Float.parseFloat(airport.getLat()), Float.parseFloat(airport.getLon()), Float.parseFloat(airport.getHeight()));
+					AirportInfo airportInfo=new AirportInfo(airport.getIcao(), airport.getName(), Float.parseFloat(airport.getLat()),
+                            Float.parseFloat(airport.getLon()), (airport.getHeight().length()>0)?Float.parseFloat(airport.getHeight()):0);
 					airportInfos.put(airport.getIcao(), airportInfo);
 				} catch (NumberFormatException e) {
 					Debug.println("Error parsing airport record "+airport.getIcao());

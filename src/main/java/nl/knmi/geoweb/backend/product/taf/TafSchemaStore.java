@@ -33,7 +33,7 @@ public class TafSchemaStore {
 	@Autowired
 	private TafValidator tafValidator;
 	
-	TafSchemaStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
+	public TafSchemaStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
 	
 		String dir = productstorelocation + "/tafs/schemas";
 		Debug.println("TAF SCHEMA STORE at " + dir);

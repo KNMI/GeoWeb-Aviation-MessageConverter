@@ -13,6 +13,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -44,7 +45,7 @@ public class GeoWebTafToIWXXMTestConfig {
 
 	@Bean
 	@Primary
-	public static AirportStore getAirportStore() {
+	public static AirportStore getAirportStore() throws IOException {
 		AirportStore airportStore=new AirportStore("/tmp/test");
 		return airportStore;
 	}

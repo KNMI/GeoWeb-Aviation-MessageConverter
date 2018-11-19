@@ -20,7 +20,7 @@ public class GeoWebConverterConfig {
     public static final ConversionSpecification<Sigmet, SIGMET> GEOWEBSIGMET_TO_SIGMET_POJO = new ConversionSpecification<>(Sigmet.class, SIGMET.class, "ICAO Annex 3 SIGMET",
             null);
 
-    public static final ConversionSpecification<TAF, Taf> TAF_TO_GEOWEBTAF_POJO = new ConversionSpecification<>(TAF.class, Taf.class, "ICAO Annex 3 SIGMET",
+    public static final ConversionSpecification<TAF, Taf> TAF_TO_GEOWEBTAF_POJO = new ConversionSpecification<>(TAF.class, Taf.class, "GeoWeb TAF",
             null);
 
     @Bean
