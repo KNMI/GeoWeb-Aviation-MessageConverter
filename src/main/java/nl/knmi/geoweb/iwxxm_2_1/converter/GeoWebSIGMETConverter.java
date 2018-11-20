@@ -39,7 +39,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
         unit.setPropertyGroup(input.getFirname(), input.getLocation_indicator_icao(), "FIR");
         sigmet.setIssuingAirTrafficServicesUnit(unit.build());
         UnitPropertyGroupImpl.Builder mwo = new UnitPropertyGroupImpl.Builder();
-        unit.setPropertyGroup(input.getLocation_indicator_mwo(), input.getLocation_indicator_mwo(), "MWO");
+        mwo.setPropertyGroup(input.getLocation_indicator_mwo(), input.getLocation_indicator_mwo(), "MWO");
         sigmet.setMeteorologicalWatchOffice(mwo.build());
 
         if (input.getIssuedate() == null) {
@@ -157,6 +157,22 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
         List<SigmetAnalysis> sigmetAnalysisList=new ArrayList<>();
         sigmetAnalysisList.add(sa.build());
         sigmet.setAnalysis(sigmetAnalysisList);
+
+        //Not translated
+        sigmet.setTranslated(false);
+        Sigmet.SigmetStatus st=input.getStatus();
+        if (input.getStatus().getStatus().equals(Sigmet.SigmetStatus.canceled)) {
+            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.CANCELLATION);
+            sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.OPERATIONAL);
+        } else {
+            if ( input.getStatus().getStatus().equals(Sigmet.SigmetStatus.test)) {
+                sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.NON_OPERATIONAL);
+                sigmet.setPermissibleUsageReason(AviationCodeListUser.PermissibleUsageReason.EXERCISE);
+            } else {
+                sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.OPERATIONAL);
+            }
+            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.NORMAL);
+        }
 
         retval.setConvertedMessage(sigmet.build());
 

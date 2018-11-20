@@ -53,6 +53,7 @@ public class SigmetToIWXXMTest {
 			+"\"validdate\":\"2017-03-24T16:00:00Z\","
 			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
 			+"\"firname\":\"AMSTERDAM FIR\","
+			+"\"status\":\"published\","
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
 
@@ -163,6 +164,7 @@ public class SigmetToIWXXMTest {
 			+"\"validdate\":\"2017-03-24T16:00:00Z\","
 			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
 			+"\"firname\":\"AMSTERDAM FIR\","
+			+"\"status\":\"published\","
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
 	
@@ -177,10 +179,11 @@ public class SigmetToIWXXMTest {
 			+"\"validdate\":\"2017-03-24T16:00:00Z\","
 			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
 			+"\"firname\":\"AMSTERDAM FIR\","
+			+"\"status\":\"published\","
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
 	
-	static String[] testSigmets= {/* testSigmet, testSigmet2, testSigmet3,*/ testSigmet4};
+	static String[] testSigmets= { testSigmet, testSigmet2, testSigmet3, testSigmet4};
 	
 	public void setGeoFromString2(Sigmet sm, String json) {
 		Debug.println("setGeoFromString2 "+json);

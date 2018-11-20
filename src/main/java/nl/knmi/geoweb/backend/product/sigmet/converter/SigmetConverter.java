@@ -12,29 +12,30 @@ import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionIssue;
 import fi.fmi.avi.converter.ConversionResult;
 //import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
+import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.sigmet.SIGMET;
 import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
 @Configuration
-@Import({/*fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, */ nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter.class})
+@Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter.class})
 public class SigmetConverter implements ProductConverter<Sigmet>{
-//	@Autowired
+	@Autowired
 	private AviMessageSpecificConverter<SIGMET, String> sigmetIWXXMStringSerializer;
 	
-//	@Autowired
+	@Autowired
 	private AviMessageSpecificConverter<SIGMET, Document> sigmetIWXXMDOMSerializer;
 	
-//	@Autowired
+	@Autowired
 	private AviMessageSpecificConverter<Sigmet,SIGMET> geoWebSigmetImporter;
 	
 	@Bean
 	public AviMessageConverter aviMessageConverter() {
 		AviMessageConverter p = new AviMessageConverter();
-//		p.setMessageSpecificConverter(GeoWebConverterConfig.GEOWEBSIGMET_TO_SIGMET_POJO, geoWebSigmetImporter);
-//		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_DOM, sigmetIWXXMDOMSerializer);
-//		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_STRING, sigmetIWXXMStringSerializer);
+		p.setMessageSpecificConverter(GeoWebConverterConfig.GEOWEBSIGMET_TO_SIGMET_POJO, geoWebSigmetImporter);
+		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_DOM, sigmetIWXXMDOMSerializer);
+		p.setMessageSpecificConverter(IWXXMConverter.SIGMET_POJO_TO_IWXXM21_STRING, sigmetIWXXMStringSerializer);
 		return p;
 	}
 	
