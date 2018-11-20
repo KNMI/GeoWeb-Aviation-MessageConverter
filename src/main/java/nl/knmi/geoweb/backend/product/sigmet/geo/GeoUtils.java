@@ -79,7 +79,7 @@ public class GeoUtils {
 		try {
 			ObjectMapper om=getObjectMapper();
 			String json=getWriter().write(g);
-			Debug.println(">>>>JSON:"+json);
+//			Debug.println(">>>>JSON:"+json);
 			org.geojson.Geometry<Double> geo= om.readValue(json, org.geojson.Geometry.class);
 			f=new Feature();
 			f.setGeometry(geo);

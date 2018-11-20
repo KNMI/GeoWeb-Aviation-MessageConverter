@@ -25,6 +25,7 @@ import fi.fmi.avi.model.AviationCodeListUser;
 import fi.fmi.avi.model.NumericMeasure;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
+import nl.knmi.geoweb.backend.product.sigmet.SigmetPhenomenaMapping.SigmetPhenomenon;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
 
 public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET> {
