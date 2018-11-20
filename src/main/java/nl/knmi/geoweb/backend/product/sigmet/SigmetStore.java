@@ -120,7 +120,7 @@ public class SigmetStore {
 						}
 					}else if (selectStatus != null) {
 						if (selectStatus==SigmetStatus.canceled) {
-							if ((sm.getValiddate_end().isBefore(now))||(sm.getStatus()==SigmetStatus.canceled)) {
+							if (((sm.getStatus()==SigmetStatus.published)&&sm.getValiddate_end().isBefore(now))||(sm.getStatus()==SigmetStatus.canceled)) {
 								sigmets.add(sm);
 							}
 						} else {
