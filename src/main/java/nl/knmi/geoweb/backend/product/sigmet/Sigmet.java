@@ -443,8 +443,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			this.type = type;
 		}
 		public static SigmetType getSigmetType(String itype){
-			Debug.println("SIGMET type: " + itype);
-
 			for (SigmetType stype: SigmetType.values()) {
 				if (itype.equals(stype.toString())){
 					return stype;

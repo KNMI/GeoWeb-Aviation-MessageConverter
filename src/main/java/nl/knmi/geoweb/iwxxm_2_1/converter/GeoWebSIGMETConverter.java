@@ -161,18 +161,23 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 
         //Not translated
         sigmet.setTranslated(false);
-        Sigmet.SigmetStatus st=input.getStatus();
-        if (input.getStatus().getStatus().equals(Sigmet.SigmetStatus.canceled)) {
+        if (input.getStatus().equals(Sigmet.SigmetStatus.canceled)) {
             sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.CANCELLATION);
+        } else if (input.getStatus().equals(Sigmet.SigmetStatus.published)) {
+            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.NORMAL);
+        } else { //TODO in case of concept???
+            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.NORMAL);
+        }
+        if (input.getType().equals(Sigmet.SigmetType.normal)) {
             sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.OPERATIONAL);
-        } else {
-            if ( input.getStatus().getStatus().equals(Sigmet.SigmetStatus.test)) {
+        } else{
+            if (input.getType().equals(Sigmet.SigmetType.exercise)) {
                 sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.NON_OPERATIONAL);
                 sigmet.setPermissibleUsageReason(AviationCodeListUser.PermissibleUsageReason.EXERCISE);
             } else {
-                sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.OPERATIONAL);
+                sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.NON_OPERATIONAL);
+                sigmet.setPermissibleUsageReason(AviationCodeListUser.PermissibleUsageReason.TEST);
             }
-            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.NORMAL);
         }
 
         retval.setConvertedMessage(sigmet.build());

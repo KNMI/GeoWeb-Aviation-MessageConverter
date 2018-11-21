@@ -54,6 +54,7 @@ public class SigmetToIWXXMTest {
 			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
 			+"\"firname\":\"AMSTERDAM FIR\","
 			+"\"status\":\"published\","
+			+"\"type\":\"normal\","
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
 
@@ -148,8 +149,9 @@ public class SigmetToIWXXMTest {
 			"  \"location_indicator_icao\": \"EHAA\"," + 
 			"  \"location_indicator_mwo\": \"EHDB\"," + 
 			"  \"uuid\": \"5372bd90-e17d-4824-bc18-7fee25413161\"," + 
-			"  \"status\": \"concept\"," + 
-			"  \"sequence\": 0" + 
+			"  \"status\": \"concept\"," +
+			"  \"type\":\"normal\","+
+		 	"  \"sequence\": 0" +
 			"}";
 	static String testSigmet3="{\"geojson\":"
 			+"{\"type\":\"FeatureCollection\",\"features\":"
@@ -165,6 +167,7 @@ public class SigmetToIWXXMTest {
 			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
 			+"\"firname\":\"AMSTERDAM FIR\","
 			+"\"status\":\"published\","
+			+"\"type\":\"normal\","
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
 	
@@ -180,6 +183,7 @@ public class SigmetToIWXXMTest {
 			+"\"validdate_end\":\"2017-03-24T22:00:00Z\","
 			+"\"firname\":\"AMSTERDAM FIR\","
 			+"\"status\":\"published\","
+			+"\"type\":\"normal\","
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
 	
