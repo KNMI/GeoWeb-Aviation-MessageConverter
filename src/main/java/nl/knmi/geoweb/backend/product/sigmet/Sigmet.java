@@ -297,17 +297,15 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				if ((this.levels[0] != null)  && (this.levels[1] != null)) {
 					if (this.levels[0].getUnit().equals(this.levels[1].getUnit())) {
 						switch (this.levels[0].getUnit()) {
-						case FL:
-							return this.levels[0].toTAC() + "/" + this.levels[1].toTACValue();
-						case FT:
-							return this.levels[0].toTACValue() + "/" + this.levels[1].toTAC();
-						case M:
-							return this.levels[0].toTACValue() + "/" + this.levels[1].toTAC();
+							case FL:
+								return this.levels[0].toTAC() + "/" + this.levels[1].toTACValue();
+							case FT:
+								return this.levels[0].toTACValue() + "/" + this.levels[1].toTAC();
+							case M:
+								return this.levels[0].toTACValue() + "/" + this.levels[1].toTAC();
 						}
 						return "";
-					} else if (this.levels[0].getUnit().equals(SigmetLevelUnit.M) && this.levels[1].getUnit().equals(SigmetLevelUnit.FL)){
-						return this.levels[0].toTAC() + "/" + this.levels[1].toTAC();
-					} else if (this.levels[0].getUnit().equals(SigmetLevelUnit.FT) && this.levels[1].getUnit().equals(SigmetLevelUnit.FL)){
+					} else {
 						return this.levels[0].toTAC() + "/" + this.levels[1].toTAC();
 					}
 				}
