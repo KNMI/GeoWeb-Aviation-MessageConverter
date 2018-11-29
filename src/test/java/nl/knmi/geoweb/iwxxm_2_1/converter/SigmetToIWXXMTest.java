@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.knmi.adaguc.tools.Debug;
+import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.aviation.FIRStore;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.converter.SigmetConverter;
@@ -194,12 +195,7 @@ public class SigmetToIWXXMTest {
 			"nl/knmi/geoweb/iwxxm_2_1/converter/failingsigmet.json") };
 
 	public static String getStringFromFile(String fn) {
-        try {
-            return new String(Files.readAllBytes(Paths.get("/tmp/failingsigmet.json")));
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "{}";
-        }
+		return Tools.readResource(fn);
     }
 
 	public void setGeoFromString2(Sigmet sm, String json) {
