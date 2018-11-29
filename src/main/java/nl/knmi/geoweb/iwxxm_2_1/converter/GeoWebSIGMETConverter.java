@@ -1,17 +1,24 @@
 package nl.knmi.geoweb.iwxxm_2_1.converter;
 
-import java.time.OffsetDateTime;
+import static fi.fmi.avi.model.AviationCodeListUser.AeronauticalSignificantWeatherPhenomenon.VA;
+import static nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon.VA_CLD;
+
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import fi.fmi.avi.model.GeoPosition;
 import fi.fmi.avi.model.PartialOrCompleteTimeInstant;
 import fi.fmi.avi.model.PartialOrCompleteTimePeriod;
+import fi.fmi.avi.model.immutable.GeoPositionImpl;
 import fi.fmi.avi.model.immutable.UnitPropertyGroupImpl;
+import fi.fmi.avi.model.immutable.VolcanoDescriptionImpl;
 import fi.fmi.avi.model.sigmet.SigmetAnalysis;
 import fi.fmi.avi.model.sigmet.SigmetAnalysisType;
+import fi.fmi.avi.model.sigmet.SigmetReference;
+import fi.fmi.avi.model.sigmet.VASIGMET;
 import fi.fmi.avi.model.sigmet.immutable.SIGMETImpl;
 import fi.fmi.avi.model.sigmet.immutable.SigmetAnalysisImpl;
 import org.geojson.Feature;
@@ -23,9 +30,10 @@ import fi.fmi.avi.model.immutable.NumericMeasureImpl;
 import fi.fmi.avi.model.sigmet.SIGMET;
 import fi.fmi.avi.model.AviationCodeListUser;
 import fi.fmi.avi.model.NumericMeasure;
+import fi.fmi.avi.model.sigmet.immutable.SigmetReferenceImpl;
+import fi.fmi.avi.model.sigmet.immutable.VASIGMETImpl;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
-import nl.knmi.geoweb.backend.product.sigmet.SigmetPhenomenaMapping.SigmetPhenomenon;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
 
 public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET> {
@@ -48,8 +56,17 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
         } else {
             sigmet.setIssueTime(PartialOrCompleteTimeInstant.of(input.getIssuedate().atZoneSameInstant(ZoneId.of("UTC")))); //TODO
         }
-        AviationCodeListUser.AeronauticalSignificantWeatherPhenomenon at = AviationCodeListUser.AeronauticalSignificantWeatherPhenomenon.valueOf(input.getPhenomenon().toString());
-        sigmet.setSigmetPhenomenon(at);
+        AviationCodeListUser.AeronauticalSignificantWeatherPhenomenon at;
+        switch (input.getPhenomenon()) {
+            case VA_CLD:
+                sigmet.setSigmetPhenomenon(VA);
+                break;
+            case TROPICAL_CYCLONE:
+                sigmet.setSigmetPhenomenon(AviationCodeListUser.AeronauticalSignificantWeatherPhenomenon.TC);
+                break;
+            default:
+                sigmet.setSigmetPhenomenon(AviationCodeListUser.AeronauticalSignificantWeatherPhenomenon.valueOf(input.getPhenomenon().toString()));
+        }
         sigmet.setSequenceNumber(Integer.toString(input.getSequence())); //TODO Should be a String??
 
         PartialOrCompleteTimePeriod.Builder validPeriod=new PartialOrCompleteTimePeriod.Builder();
@@ -161,15 +178,26 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 
         //Not translated
         sigmet.setTranslated(false);
-        if (input.getStatus().equals(Sigmet.SigmetStatus.canceled)) {
-            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.CANCELLATION);
-        } else if (input.getStatus().equals(Sigmet.SigmetStatus.published)) {
-            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.NORMAL);
-        } else { //TODO in case of concept???
-            sigmet.setStatus(AviationCodeListUser.SigmetReportStatus.NORMAL);
+        if (input.getStatus().equals(Sigmet.SigmetStatus.published)) {
+            if (input.getCancels()!=null){
+                sigmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.CANCELLATION);
+                SigmetReferenceImpl.Builder sigmetReferenceBuilder=new SigmetReferenceImpl.Builder();
+                sigmetReferenceBuilder.setIssuingAirTrafficServicesUnit(sigmet.getIssuingAirTrafficServicesUnit());
+                sigmetReferenceBuilder.setMeteorologicalWatchOffice(sigmet.getMeteorologicalWatchOffice());
+                sigmetReferenceBuilder.setPhenomenon(sigmet.getSigmetPhenomenon());
+                sigmetReferenceBuilder.setValidityPeriod(sigmet.getValidityPeriodBuilder());
+                sigmetReferenceBuilder.setSequenceNumber(input.getCancels().toString());
+                sigmet.setCancelledReference(sigmetReferenceBuilder.build());
+            } else {
+                sigmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.NORMAL);
+            }
+        } else { //TODO in case of concept or canceled???
+            sigmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.NORMAL);
         }
+
         if (input.getType().equals(Sigmet.SigmetType.normal)) {
             sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.OPERATIONAL);
+            sigmet.setPermissibleUsageReason(Optional.empty());
         } else{
             if (input.getType().equals(Sigmet.SigmetType.exercise)) {
                 sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.NON_OPERATIONAL);
@@ -180,7 +208,33 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
             }
         }
 
-        retval.setConvertedMessage(sigmet.build());
+        if (input.getPhenomenon().equals(VA_CLD)) {
+            VASIGMETImpl.Builder vaSigmet= VASIGMETImpl.Builder.from(sigmet.build());
+            if (input.getVa_extra_fields()!=null) {
+                VolcanoDescriptionImpl.Builder volcanoBuilder=new VolcanoDescriptionImpl.Builder();
+                if (input.getVa_extra_fields().getVolcano()!=null) {
+                    if (input.getVa_extra_fields().getVolcano().getName() != null) {
+                        volcanoBuilder.setVolcanoName(input.getVa_extra_fields().getVolcano().getName());
+                    }
+                    if (input.getVa_extra_fields().getVolcano().getPosition()!=null) {
+                        GeoPositionImpl.Builder geoPositionBuilder = new GeoPositionImpl.Builder().setCoordinateReferenceSystemId(AviationCodeListUser.CODELIST_VALUE_EPSG_4326);
+                        Double[] pos = new Double[2];
+                        pos[0] = input.getVa_extra_fields().getVolcano().getPosition().get(0).doubleValue();
+                        pos[1] = input.getVa_extra_fields().getVolcano().getPosition().get(1).doubleValue();
+                        geoPositionBuilder.setCoordinates(pos);
+
+                        volcanoBuilder.setVolcanoPosition(geoPositionBuilder.build());
+                    }
+                }
+                vaSigmet.setVolcano(volcanoBuilder.build());
+                if ((input.getVa_extra_fields().getMove_to()!=null)&&(input.getVa_extra_fields().getMove_to().get(0)!=null)) {
+                    vaSigmet.setVolcanicAshMovedToFIR(input.getVa_extra_fields().getMove_to().get(0));
+                }
+            }
+            retval.setConvertedMessage(vaSigmet.build());
+        } else {
+            retval.setConvertedMessage(sigmet.build());
+        }
 
         return retval;
     }

@@ -5,6 +5,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Objects;
 
 import org.geojson.GeoJsonObject;
 import org.junit.Test;
@@ -14,18 +18,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.unitils.thirdparty.org.apache.commons.io.IOUtils;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import fi.fmi.avi.model.sigmet.SIGMET;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.aviation.FIRStore;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.converter.SigmetConverter;
-import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
-
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -176,7 +178,8 @@ public class SigmetToIWXXMTest {
 			+"\"phenomenon\":\"OBSC_TS\","
 			+"\"obs_or_forecast\":{\"obs\":true, \"obsFcTime\":\"2017-03-24T15:50:00Z\"},"
 			+"\"levelinfo\":{\"mode\": \"BETW\", \"levels\":[{\"value\":100.0,\"unit\":\"FL\"},{\"value\":300.0,\"unit\":\"FL\"}]},"
-			+"\"movement_type\":\"STATIONARY\","
+			+"\"movement_type\":\"MOVEMENT\","
+			+"\"movement\":{\"speed\":15.0, \"speeduom\": \"m/s\", \"dir\":\"S\"},"
 			+"\"change\":\"NC\","
 			+"\"issuedate\":\"2017-03-24T15:56:16Z\","
 			+"\"validdate\":\"2017-03-24T16:00:00Z\","
@@ -187,8 +190,18 @@ public class SigmetToIWXXMTest {
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
 	
-	static String[] testSigmets= { testSigmet, testSigmet2, testSigmet3, testSigmet4};
-	
+	static String[] testSigmets= new String[] { /* testSigmet, testSigmet2, testSigmet3, testSigmet4 */ getStringFromFile(
+			"nl/knmi/geoweb/iwxxm_2_1/converter/failingsigmet.json") };
+
+	public static String getStringFromFile(String fn) {
+        try {
+            return new String(Files.readAllBytes(Paths.get("/tmp/failingsigmet.json")));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "{}";
+        }
+    }
+
 	public void setGeoFromString2(Sigmet sm, String json) {
 		Debug.println("setGeoFromString2 "+json);
 		GeoJsonObject geo;	

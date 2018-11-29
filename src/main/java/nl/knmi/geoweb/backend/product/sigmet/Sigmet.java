@@ -482,6 +482,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		this.validdate_end = otherSigmet.getValiddate_end();
 		this.issuedate = otherSigmet.getIssuedate();
 		this.firFeature = otherSigmet.firFeature;
+		this.type=otherSigmet.type;
 		this.va_extra_fields = otherSigmet.va_extra_fields;
 		this.tc_extra_fields = otherSigmet.tc_extra_fields;
 	}
@@ -587,6 +588,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	public String featureToTAC(Feature f, Feature FIR) {
 		List<LngLatAlt> coords;
 
+		if (f==null) return " ERR ";
+
 		switch(f.getProperty("selectionType").toString().toLowerCase()) {
 		case "poly":
 			// This assumes that one feature contains one set of coordinates
@@ -607,123 +610,138 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			GeometryFactory gf=new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING));
 			GeoJsonReader reader=new GeoJsonReader(gf);
 
+			if (FIR.getGeometry()==null) {
+			    Debug.println("FIR is null!!");
+			    return "";
+            }
 			try {
 				ObjectMapper om = new ObjectMapper();
 				String FIRs=om.writeValueAsString(FIR.getGeometry()); //FIR as String
 
-				org.locationtech.jts.geom.Geometry drawnGeometry = reader.read(om.writeValueAsString(f.getGeometry()));
+                try {
+                    org.locationtech.jts.geom.Geometry drawnGeometry = reader.read(om.writeValueAsString(f.getGeometry()));
 
-				org.locationtech.jts.geom.Geometry geom_fir=reader.read(FIRs);
+                    org.locationtech.jts.geom.Geometry geom_fir = reader.read(FIRs);
 
-				//Sort box's coordinates
-				Envelope env=drawnGeometry.getEnvelopeInternal();
-				double minX=env.getMinX();
-				double maxX=env.getMaxX();
-				double minY=env.getMinY();
-				double maxY=env.getMaxY();
-				//				Debug.println("BBOX (++);: "+minX+"-"+maxX+","+minY+"-"+maxY);
+                    //Sort box's coordinates
+                    Envelope env = drawnGeometry.getEnvelopeInternal();
+                    double minX = env.getMinX();
+                    double maxX = env.getMaxX();
+                    double minY = env.getMinY();
+                    double maxY = env.getMaxY();
+                    //				Debug.println("BBOX (++);: "+minX+"-"+maxX+","+minY+"-"+maxY);
 
-				org.locationtech.jts.geom.Geometry firBorder=geom_fir.getBoundary();
+                    if ((minX==maxX)||(minY==maxY)) return " POINT "; //Box is one point!!
 
-				//Find intersections with box's sides
-				CoordinateArraySequenceFactory caf=CoordinateArraySequenceFactory.instance();
-				boolean[] boxSidesIntersecting=new boolean[4];
-				int boxSidesIntersectingCount=0;
+                    org.locationtech.jts.geom.Geometry firBorder = geom_fir.getBoundary();
 
-				//Sort the rectangle points counterclockwise, starting at lower left
-				Coordinate[] drawnCoords=new Coordinate[5];
-				for (int i=0; i<4; i++) {
-					if (drawnGeometry.getCoordinates()[i].x==minX) {
-						if (drawnGeometry.getCoordinates()[i].y==minY) {
-							drawnCoords[0]=drawnGeometry.getCoordinates()[i];
-						} else {
-							drawnCoords[3]=drawnGeometry.getCoordinates()[i];
-						}
-					} else {
-						if (drawnGeometry.getCoordinates()[i].y==minY) {
-							drawnCoords[1]=drawnGeometry.getCoordinates()[i];
-						} else {
-							drawnCoords[2]=drawnGeometry.getCoordinates()[i];
-						}
-					}
-				}
-				drawnCoords[4]=drawnCoords[0];
+                    //Find intersections with box's sides
+                    CoordinateArraySequenceFactory caf = CoordinateArraySequenceFactory.instance();
+                    boolean[] boxSidesIntersecting = new boolean[4];
+                    int boxSidesIntersectingCount = 0;
 
-				for (int i=0; i<4; i++) {
-					LineString side=new LineString(caf.create(Arrays.copyOfRange(drawnCoords, i, i+2)), gf);
-					if (side.intersects(geom_fir)) { //TODO or: firBorder
-						boxSidesIntersecting[i]=true;
-						boxSidesIntersectingCount++;
-						//						Debug.println("Intersecting on side "+i);
-						//						Debug.println("I:"+side.intersection(geom_fir));
-					} else {
-						boxSidesIntersecting[i]=false;
-					}
-				}
+                    //Sort the rectangle points counterclockwise, starting at lower left
+                    Coordinate[] drawnCoords = new Coordinate[5];
+                    for (int i = 0; i < 4; i++) {
+                        if (drawnGeometry.getCoordinates()[i].x == minX) {
+                            if (drawnGeometry.getCoordinates()[i].y == minY) {
+                                drawnCoords[0] = drawnGeometry.getCoordinates()[i];
+                            } else {
+                                drawnCoords[3] = drawnGeometry.getCoordinates()[i];
+                            }
+                        } else {
+                            if (drawnGeometry.getCoordinates()[i].y == minY) {
+                                drawnCoords[1] = drawnGeometry.getCoordinates()[i];
+                            } else {
+                                drawnCoords[2] = drawnGeometry.getCoordinates()[i];
+                            }
+                        }
+                    }
+                    drawnCoords[4] = drawnCoords[0]; //Copy first point to last
+                    Debug.println("drawnCoords: "+drawnCoords[0]+" "
+                            +drawnCoords[1]+" "+drawnCoords[2]+" "+drawnCoords[3]+" "+drawnCoords[4]);
 
-				if (boxSidesIntersectingCount==1) {
-					Debug.println("Intersecting box on 1 side");
-					if (boxSidesIntersecting[0]) {
-						//N of
-						return String.format("N OF %s", convertLat(minY));
-					} else if (boxSidesIntersecting[1]) {
-						//W of
-						return String.format("W OF %s", convertLon(maxX));
-					}else if (boxSidesIntersecting[2]) {
-						//S of
-						return String.format("S OF %s", convertLat(maxY));
-					}else if (boxSidesIntersecting[3]) {
-						//E of
-						return String.format("E OF %s", convertLon(minX));
-					}
-				} else if (boxSidesIntersectingCount==2) {
-					Debug.println("Intersecting box on 2 sides");
-					if (boxSidesIntersecting[0]&&boxSidesIntersecting[1]) {
-						//N of and W of
-						return String.format("N OF %s AND W OF %s", convertLat(minY), convertLon(maxX));
-					} else if (boxSidesIntersecting[1]&&boxSidesIntersecting[2]) {
-						//S of and W of
-						return String.format("S OF %s AND W OF %s", convertLat(maxY), convertLon(maxX));
-					} else if (boxSidesIntersecting[2]&&boxSidesIntersecting[3]) {
-						//S of and E of
-						return String.format("S OF %s AND E OF %s", convertLat(maxY), convertLon(minX));
-					}else if (boxSidesIntersecting[3]&&boxSidesIntersecting[0]) {
-						//N of and E of
-						return String.format("N OF %s AND E OF %s", convertLat(minY), convertLon(minX));
-					}else if (boxSidesIntersecting[0]&&boxSidesIntersecting[2]) {
-						//N of and S of
-						return String.format("N OF %s AND S OF %s", convertLat(minY), convertLat(maxY));
-					}else if (boxSidesIntersecting[1]&&boxSidesIntersecting[3]) {
-						//E of  and W of
-						return String.format("E OF %s AND W OF %s", convertLon(minX), convertLon(maxX));
-					}
-				} else if (boxSidesIntersectingCount==3) {
-					Debug.println("Intersecting box on 3 sides");
-				} else if (boxSidesIntersectingCount==4) {
-					Debug.println("Intersecting box on 4 sides");
-				}
+                    for (int i = 0; i < 4; i++) {
+                        LineString side = new LineString(caf.create(Arrays.copyOfRange(drawnCoords, i, i + 2)), gf);
+                        if (side==null) return " ERR (side) ";
+                        if (geom_fir==null) return " ERR (geom_fir) ";
+                        if (side.intersects(geom_fir)) { //TODO or: firBorder
+                            boxSidesIntersecting[i] = true;
+                            boxSidesIntersectingCount++;
+                            //						Debug.println("Intersecting on side "+i);
+                            //						Debug.println("I:"+side.intersection(geom_fir));
+                        } else {
+                            boxSidesIntersecting[i] = false;
+                        }
+                    }
 
-				// Intersect the box with the FIR
-				org.locationtech.jts.geom.Geometry intersection = drawnGeometry.intersection(geom_fir);
+                    if (boxSidesIntersectingCount == 1) {
+                        Debug.println("Intersecting box on 1 side");
+                        if (boxSidesIntersecting[0]) {
+                            //N of
+                            return String.format("N OF %s", convertLat(minY));
+                        } else if (boxSidesIntersecting[1]) {
+                            //W of
+                            return String.format("W OF %s", convertLon(maxX));
+                        } else if (boxSidesIntersecting[2]) {
+                            //S of
+                            return String.format("S OF %s", convertLat(maxY));
+                        } else if (boxSidesIntersecting[3]) {
+                            //E of
+                            return String.format("E OF %s", convertLon(minX));
+                        }
+                    } else if (boxSidesIntersectingCount == 2) {
+                        Debug.println("Intersecting box on 2 sides");
+                        if (boxSidesIntersecting[0] && boxSidesIntersecting[1]) {
+                            //N of and W of
+                            return String.format("N OF %s AND W OF %s", convertLat(minY), convertLon(maxX));
+                        } else if (boxSidesIntersecting[1] && boxSidesIntersecting[2]) {
+                            //S of and W of
+                            return String.format("S OF %s AND W OF %s", convertLat(maxY), convertLon(maxX));
+                        } else if (boxSidesIntersecting[2] && boxSidesIntersecting[3]) {
+                            //S of and E of
+                            return String.format("S OF %s AND E OF %s", convertLat(maxY), convertLon(minX));
+                        } else if (boxSidesIntersecting[3] && boxSidesIntersecting[0]) {
+                            //N of and E of
+                            return String.format("N OF %s AND E OF %s", convertLat(minY), convertLon(minX));
+                        } else if (boxSidesIntersecting[0] && boxSidesIntersecting[2]) {
+                            //N of and S of
+                            return String.format("N OF %s AND S OF %s", convertLat(minY), convertLat(maxY));
+                        } else if (boxSidesIntersecting[1] && boxSidesIntersecting[3]) {
+                            //E of  and W of
+                            return String.format("E OF %s AND W OF %s", convertLon(minX), convertLon(maxX));
+                        }
+                    } else if (boxSidesIntersectingCount == 3) {
+                        Debug.println("Intersecting box on 3 sides");
+                    } else if (boxSidesIntersectingCount == 4) {
+                        Debug.println("Intersecting box on 4 sides");
+                    }
 
-				//				Debug.println("intersection: "+intersection);
+                    // Intersect the box with the FIR
+                    org.locationtech.jts.geom.Geometry intersection = drawnGeometry.intersection(geom_fir);
 
-				if (intersection.equalsTopo(geom_fir)) {
-					return "ENTIRE FIR";
-				}
+                    //				Debug.println("intersection: "+intersection);
 
-				Coordinate[] drawn=drawnGeometry.getCoordinates();
-				Coordinate[] intersected=intersection.getCoordinates();
-				coords = ((Polygon)(f.getGeometry())).getCoordinates().get(0);
-				//				Debug.println("SIZES: "+drawn.length+"  "+intersected.length);
-				if (intersected.length>7) {
-					Debug.println("More than 7 in intersection!!");
-					return "WI "+ this.latlonToDMS(drawn);
-				}
-				return "WI " + this.latlonToDMS(intersected);
-			} catch (ParseException | JsonProcessingException e) {
+                    if (intersection.equalsTopo(geom_fir)) {
+                        return "ENTIRE FIR";
+                    }
+
+                    Coordinate[] drawn = drawnGeometry.getCoordinates();
+                    Coordinate[] intersected = intersection.getCoordinates();
+                    coords = ((Polygon) (f.getGeometry())).getCoordinates().get(0);
+                    //				Debug.println("SIZES: "+drawn.length+"  "+intersected.length);
+                    if (intersected.length > 7) {
+                        Debug.println("More than 7 in intersection!!");
+                        return "WI " + this.latlonToDMS(drawn);
+                    }
+                    return "WI " + this.latlonToDMS(intersected);
+                } catch (ParseException pe) {
+                   //pe.printStackTrace();
+                }
+			} catch (JsonProcessingException e) {
 				e.printStackTrace();
 			}
+			return " ERR ";
 		default:
 			return "";
 		}
@@ -743,7 +761,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		}
 		if (!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("box")&&
 				!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("fir")&&
-				!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("point"))	{
+				!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("point")) {
 			GeoJsonObject intersected=this.extractSingleStartGeometry();
 			int sz=((Polygon)((Feature)intersected).getGeometry()).getCoordinates().get(0).size();
 			if (sz<=7)  {
@@ -788,7 +806,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			sb.append(va_extra_fields.toTAC());
 		}
 
-		
+		Debug.println("phen: "+this.phenomenon);
 		sb.append(this.phenomenon.getShortDescription());
 
 
