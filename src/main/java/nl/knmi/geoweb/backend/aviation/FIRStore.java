@@ -137,7 +137,7 @@ public class FIRStore implements Cloneable{
 			}
 		}
 		if (addDelegated) {
-			Debug.println("Should add delegated airspaces here for "+name);
+//			Debug.println("Should add delegated airspaces here for "+name);
 			
 		}
 		Feature feature=null;
@@ -149,7 +149,7 @@ public class FIRStore implements Cloneable{
 		if (delegatedAirspaces.containsKey(name)) {
 			for (Feature f: delegatedAirspaces.get(name)) {
 				//Merge f with feature
-				Debug.println("Adding delegated area for "+name);
+//				Debug.println("Adding delegated area for "+name);
 				feature=GeoUtils.merge(feature, f);
 			}
 		}
