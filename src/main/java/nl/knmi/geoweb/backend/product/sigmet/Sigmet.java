@@ -541,7 +541,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		int degrees = (int)Math.floor(lat);
 		latDM += String.format("%02d", degrees);
 		double fracPart = lat - degrees;
-		int minutes = (int)Math.floor(fracPart * 60.0);
+		int minutes = (int)Math.round(fracPart * 60.0);
 		latDM += String.format("%02d", minutes);
 		return latDM;
 	}
@@ -557,7 +557,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		int degreesLon = (int)Math.floor(lon);
 		lonDM += String.format("%03d", degreesLon);
 		double fracPartLon = lon - degreesLon;
-		int minutesLon = (int)Math.floor(fracPartLon * 60.0);
+		int minutesLon = (int)Math.round(fracPartLon * 60.0);
 		lonDM += String.format("%02d", minutesLon);
 		return lonDM;
 	}
@@ -771,8 +771,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		StringBuilder sb = new StringBuilder();
 		String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth()) + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
 		String validdateEndFormatted = String.format("%02d", this.validdate_end.getDayOfMonth()) + String.format("%02d", this.validdate_end.getHour()) + String.format("%02d", this.validdate_end.getMinute());
-
-
 
 		sb.append(this.location_indicator_icao).append(" SIGMET ").append(this.sequence).append(" VALID ").append(validdateFormatted).append('/').append(validdateEndFormatted).append(' ').append(this.location_indicator_mwo).append('-');
 		sb.append('\n');
@@ -1107,12 +1105,21 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			toDeleteIfError.add(jsonFileName);
 
 			String iwxxmName="A_"+"LSNL31"+this.getLocation_indicator_mwo()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
+			if (status.equals(SigmetStatus.canceled)){
+				iwxxmName+="CNL";
+			}
 			iwxxmName+="_C_"+this.getLocation_indicator_mwo()+"_"+time;
 			String s=converter.ToIWXXM_2_1(this);
-			Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
+			if ("FAIL".equals(s)) {
+			  Debug.println(" ToIWXXM_2_1 failed");
+			  toDeleteIfError.stream().forEach(f ->  {Debug.println("REMOVING "+f); Tools.rm(f); });
+			  return "ERROR: sigmet.ToIWXXM_2_1() failed";
+			} else {
+				Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
+			}
 		} catch (IOException | NullPointerException e) {
 			toDeleteIfError.stream().forEach(f ->  {Debug.println("REMOVING "+f); Tools.rm(f); });
-			return "ERROR "+e.getMessage();
+			return "ERROR: "+e.getMessage();
 		}
 		return "OK";
 	}
