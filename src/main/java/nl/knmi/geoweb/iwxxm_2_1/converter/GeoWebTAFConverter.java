@@ -243,7 +243,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
             cloud.setLayers(layers);
             fct.setCloud(cloud.build());
         } else {
-            fct.setCloud(Optional.empty());
+            fct.setCloud(cloud.build());
             //cloud.setLayers(Optional.empty()); //TODO add empty layers???
         }
         return retval;

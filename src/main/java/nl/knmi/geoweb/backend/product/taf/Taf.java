@@ -653,7 +653,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 				}
 
 				if (getVertical_visibility() != null) {
-					sb.append(String.format(" VV%03d", getVertical_visibility()/100));
+					sb.append(String.format(" VV%03d", getVertical_visibility()));
 				}
 				
 				if (getClouds() != null) {
@@ -792,16 +792,21 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 			break;
 		}
 
-		/* Add date */
-		sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.validityStart) + "/"
-				+ TAFtoTACMaps.toDDHH24(this.metadata.validityEnd));
-
 		if (this.metadata.type !=null) switch (this.metadata.type) {
 		case canceled:
+			/* Add date */
+			if (this.metadata.previousMetadata != null) {
+				sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.previousMetadata.validityStart) + "/" + TAFtoTACMaps.toDDHH24(this.metadata.validityEnd));
+			} else {
+				sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.validityStart) + "/" + TAFtoTACMaps.toDDHH24(this.metadata.validityEnd));
+			}
 			// In case of a cancel there are no change groups so we're done here
 			sb.append(" CNL");
 			return sb.toString();
 		default:
+			/* Add date */
+			sb.append(" " + TAFtoTACMaps.toDDHH(this.metadata.validityStart) + "/"
+					+ TAFtoTACMaps.toDDHH24(this.metadata.validityEnd));
 			// do nothing
 			break;
 		}
