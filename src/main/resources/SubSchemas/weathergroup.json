@@ -287,7 +287,9 @@
                         },
                         "qualifier": {
                             "enum": [
-                                "moderate"
+                                "light",
+                                "moderate",
+                                "heavy"
                             ],
                             "type": "string"
                         }

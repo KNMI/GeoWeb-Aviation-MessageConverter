@@ -16,7 +16,7 @@ public class AugmentVisibilityWeatherRequired {
 		JsonNode visibilityNode = forecastNode.findValue("visibility");
 
 		if (visibilityNode != null && visibilityNode.get("value") != null
-				&& visibilityNode.get("value").asInt() <= 5000)
+				&& visibilityNode.get("value").asInt() < 5000)
 			forecastNode.put("visibilityWeatherRequiredAndPresent",
 					forecastWeather != null && forecastWeather.isArray());
 

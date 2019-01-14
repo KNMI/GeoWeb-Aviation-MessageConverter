@@ -15,6 +15,9 @@ public class AugmentEndTimes {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		formatter.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+		JsonNode validityEnd = input.findValue("validityEnd");
+		Date validityEndDate = formatter.parse(validityEnd.asText());
+
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
 			return;
@@ -34,6 +37,7 @@ public class AugmentEndTimes {
 					continue;
 				changeEnd = formatter.parse(end.asText());
 				changegroup.put("endAfterStart", changeStart.compareTo(changeEnd) < 1);
+				changegroup.put("changeEndAfterEnd", validityEndDate.compareTo(changeEnd)>=0);
 			} catch (ParseException e) {
 				continue;
 			}
