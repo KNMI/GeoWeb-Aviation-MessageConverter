@@ -102,6 +102,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
                         }
 
                         if (changeForecast.isCeilingAndVisibilityOk()) {
+                            System.err.println("SETTING CHANGEFORECAST CAVOK");
                             chFc.setCaVOK(true);
                         }
 
@@ -181,7 +182,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
                 fc.setClouds(Arrays.asList(ct));
             } else {
                 if (cf.getVerticalVisibility().isPresent()) {
-                    fc.setVertical_visibility(cf.getVerticalVisibility().get().getValue().intValue());
+                    fc.setVertical_visibility(cf.getVerticalVisibility().get().getValue().intValue()/100);
                 } else {
                     List<Taf.Forecast.TAFCloudType> clouds = new ArrayList<>();
                     for (CloudLayer cloudLayer : cf.getLayers().get()) {

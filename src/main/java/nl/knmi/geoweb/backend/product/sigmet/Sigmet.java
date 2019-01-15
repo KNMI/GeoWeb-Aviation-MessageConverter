@@ -1074,12 +1074,16 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 
 			String bulletinHeader = "";
+			String iwxxmBulletinHeader = "";
 			if (this.getPhenomenon() == Phenomenon.VA_CLD) {
 				bulletinHeader = "WVNL31";
+				iwxxmBulletinHeader = "LVNL31";
 			} else if (this.getPhenomenon() == Phenomenon.TROPICAL_CYCLONE) {
 				bulletinHeader = "WCNL31";  // TODO CHECK if WS is OK for TC
+				iwxxmBulletinHeader = "LCNL31";
 			} else {
 				bulletinHeader = "WSNL31";
+				iwxxmBulletinHeader = "LSNL31";
 			}
 
 			String TACName = bulletinHeader + this.getLocation_indicator_mwo() + "_" + validTime + "_" + time;
@@ -1104,7 +1108,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			Tools.writeFile(jsonFileName, this.toJSON(om));
 			toDeleteIfError.add(jsonFileName);
 
-			String iwxxmName="A_"+"LSNL31"+this.getLocation_indicator_mwo()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
+			String iwxxmName="A_"+iwxxmBulletinHeader+this.getLocation_indicator_mwo()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
 			if (status.equals(SigmetStatus.canceled)){
 				iwxxmName+="CNL";
 			}

@@ -71,6 +71,15 @@
                             ],
                             "type": "boolean"
                         },
+                        "changeEndAfterEnd": {
+                            "$geoweb::messages": {
+                                "enum": "The end of the change must be before or on end of validity"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
                         "forecast": {
                             "$ref": "#/definitions/forecast"
                         },
@@ -178,6 +187,15 @@
                             ],
                             "type": "boolean"
                         },
+                        "changeEndAfterEnd": {
+                            "$geoweb::messages": {
+                                "enum": "The end of the change must be before or on end of validity"
+                            },
+                            "enum": [
+                                true
+                            ],
+                            "type": "boolean"
+                        },
                         "forecast": {
                             "$ref": "#/definitions/forecast"
                         },
@@ -215,15 +233,6 @@
                 "cloudsHeightAscending": {
                     "$geoweb::messages": {
                         "enum": "Cloud groups must be ascending in height"
-                    },
-                    "enum": [
-                        true
-                    ],
-                    "type": "boolean"
-                },
-                "cloudsAmountAscending":{
-                    "$geoweb::messages": {
-                        "enum": "Cloud groups must be ascending in coverage (FEW -> SCT -> BKN -> OVC)"
                     },
                     "enum": [
                         true

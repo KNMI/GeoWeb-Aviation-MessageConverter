@@ -16,7 +16,7 @@ public class AugmentAscendingHeightClouds {
 		for (JsonNode forecast : forecasts) {
 			if (forecast == null || forecast.isNull() || forecast.isMissingNode())
 				continue;
-			int prevHeight = 0;
+			int prevHeight = -1;
 			JsonNode cloudsNode=forecast.findValue("clouds");
 			if (cloudsNode.getClass().equals(String.class) || cloudsNode.getClass().equals(TextNode.class)) {
 				continue;

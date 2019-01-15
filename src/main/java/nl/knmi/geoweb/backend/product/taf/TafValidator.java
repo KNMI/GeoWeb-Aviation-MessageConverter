@@ -397,7 +397,7 @@ public class TafValidator {
 		AugmentChangegroupDuration.augment(input);					
 		AugmentWindGust.augment(input);								
 		AugmentAscendingHeightClouds.augment(input);				//Done
-		AugmentAmountCoverageClouds.augment(input);
+		//AugmentAmountCoverageClouds.augment(input);
 		AugmentEndTimes.augment(input);
 		AugmentVisibilityWeatherRequired.augment(input);
 		AugmentWindEnoughChange.augment(input);						// FM Done

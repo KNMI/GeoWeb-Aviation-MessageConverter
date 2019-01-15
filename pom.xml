@@ -13,8 +13,7 @@
 	<description>Aviation weather message conversions - GeoWeb module</description>
 	<groupId>com.github.KNMI</groupId>
 	<artifactId>geoweb-aviation-messageconverter</artifactId>
-	<version>1.45.1-SNAPSHOT</version>
-
+	<version>1.46.1-SNAPSHOT</version>
 
 	<scm>
 		<connection>${scm-url}</connection>
@@ -81,14 +80,14 @@
 		<dependency>
 			<groupId>fi.fmi.avi.converter</groupId>
 			<artifactId>fmi-avi-messageconverter</artifactId>
-			<version>2.1.5-SNAPSHOT</version>
+			<version>2.1.6-SNAPSHOT</version>
 		</dependency>
 
 
 		<dependency>
 			<groupId>fi.fmi.avi.converter</groupId>
 			<artifactId>fmi-avi-messageconverter-iwxxm</artifactId>
-			<version>0.9.6-SNAPSHOT</version>
+			<version>0.9.7-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 

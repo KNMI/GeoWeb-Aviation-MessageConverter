@@ -243,7 +243,8 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
             cloud.setLayers(layers);
             fct.setCloud(cloud.build());
         } else {
-            fct.setCloud(cloud.build());
+            fct.setCloud(Optional.empty());
+            //fct.setCloud(cloud.build());
             //cloud.setLayers(Optional.empty()); //TODO add empty layers???
         }
         return retval;
@@ -254,10 +255,14 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
         List<Weather> weatherList = new ArrayList<>();
         for (TAFWeather w : input.getForecast().getWeather()) {
             String code = w.toString();
-            WeatherImpl.Builder weather = new WeatherImpl.Builder();
-            weather.setCode(code);
-            weather.setDescription("Longtext for " + code);
-            weatherList.add(weather.build());
+            if (code.equals("NSW")) {
+              fct.setNoSignificantWeather(true);
+            } else {
+                WeatherImpl.Builder weather = new WeatherImpl.Builder();
+                weather.setCode(code);
+                weather.setDescription("Longtext for " + code);
+                weatherList.add(weather.build());
+            }
         }
         if (!weatherList.isEmpty()) {
             fct.setForecastWeather(weatherList);
@@ -349,6 +354,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
             fct.setCeilingAndVisibilityOk(input.getForecast().getCaVOK());
             retval.addAll(updateChangeForecastSurfaceWind(fct, input, hints));
         } else if ((input.getForecast().getCaVOK() == null) || (!input.getForecast().getCaVOK())) {
+            fct.setCeilingAndVisibilityOk(false);
             retval.addAll(updateChangeForecastSurfaceWind(fct, input, hints));
             retval.addAll(updateChangeVisibility(fct, input, hints));
             retval.addAll(updateChangeWeather(fct, input, hints));
@@ -439,10 +445,14 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
         if (input.getForecast().getWeather() != null) {
             for (TAFWeather w : input.getForecast().getWeather()) {
                 String code = w.toString();
-                WeatherImpl.Builder weather = new WeatherImpl.Builder();
-                weather.setCode(code);
-                weather.setDescription("Longtext for " + code);
-                weatherList.add(weather.build());
+                if (code.equals("NSW")) {
+                   fct.setNoSignificantWeather(true);
+                } else {
+                    WeatherImpl.Builder weather = new WeatherImpl.Builder();
+                    weather.setCode(code);
+                    weather.setDescription("Longtext for " + code);
+                    weatherList.add(weather.build());
+                }
             }
         } else {
             if (debug) Debug.println("updateChangeWeather() found null weather");
