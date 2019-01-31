@@ -24,8 +24,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetChange;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetChange;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -62,7 +62,7 @@ public class SigmetStoreTest {
 		Sigmet sm=new Sigmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
 		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));
 		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")).minusHours(1));
-		sm.setChange(SigmetChange.NC);
+		sm.setChange(SigmetAirmetChange.NC);
 		setGeoFromString(sm, testGeoJson);
 		return sm;
 	}
@@ -102,7 +102,7 @@ public class SigmetStoreTest {
 		Tools.rmdir(sigmetStoreLocation);
 		Tools.mksubdirs(sigmetStoreLocation);
 		testSigmetStore.setLocation(sigmetStoreLocation);
-		Sigmet[] sigmets=testSigmetStore.getSigmets(false, SigmetStatus.concept);
+		Sigmet[] sigmets=testSigmetStore.getSigmets(false, SigmetAirmetStatus.concept);
 		assertThat(sigmets.length, is(0));
 		return testSigmetStore;
 	}
@@ -114,7 +114,7 @@ public class SigmetStoreTest {
 		assertThat(store.getOM(),notNullValue());
 		
 		store.storeSigmet(sm);
-		assertThat(store.getSigmets(false, SigmetStatus.concept).length, is(1));
+		assertThat(store.getSigmets(false, SigmetAirmetStatus.concept).length, is(1));
 	}
 	
 	@Test
@@ -124,7 +124,7 @@ public class SigmetStoreTest {
 		assertThat(store.getOM(),notNullValue());
 		store.storeSigmet(sm);
 		
-		Sigmet[] sigmets=store.getSigmets(false, SigmetStatus.concept);
+		Sigmet[] sigmets=store.getSigmets(false, SigmetAirmetStatus.concept);
 		assertThat(sigmets.length, is(1));
 		validateSigmet(sigmets[0]);
 	}

@@ -15,14 +15,6 @@ import lombok.Getter;
         "areapreset": "NL_FIR",
         "maxhoursofvalidity": 4,
         "hoursbeforevalidity": 1,
-        "adjacent_firs": [
-          "EKDK",
-          "EDWW",
-          "EDGG",
-          "EBBU",
-          "EGTT",
-          "EGPX" 
-        ]
       }
     },
     "active_firs": [ "EHAA" ]
@@ -38,7 +30,6 @@ public class AirmetParameters {
     	String areapreset;
     	float maxhoursofvalidity;
     	float hoursbeforevalidity;
-    	private List<String> adjacent_firs;
     }
 	
 	private Map<String, FirArea> firareas;

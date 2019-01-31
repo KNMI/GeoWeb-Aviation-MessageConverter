@@ -25,10 +25,9 @@ import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.aviation.FIRStore;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetChange;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetLevelMode;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetLevelUnit;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetChange;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetLevel;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -77,9 +76,10 @@ public class SigmetToTACTest {
 		sm.setPhenomenon(Phenomenon.getPhenomenon("OBSC_TS"));
 		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")).minusHours(1));
 		sm.setValiddate_end(OffsetDateTime.now(ZoneId.of("Z")).plusHours(3));
-		sm.setChange(SigmetChange.NC);
+		sm.setChange(SigmetAirmetChange.NC);
 		sm.setMovement_type(Sigmet.SigmetMovementType.STATIONARY);
-		sm.setLevelinfo(new Sigmet.SigmetLevel(new Sigmet.SigmetLevelPart(SigmetLevelUnit.FL, 300), SigmetLevelMode.TOPS_ABV));
+		sm.setLevelinfo(new SigmetAirmetLevel(new SigmetAirmetLevel.SigmetAirmetPart(SigmetAirmetLevel.SigmetLevelUnit.FL, 300),
+				SigmetAirmetLevel.SigmetAirmetLevelMode.TOPS_ABV));
 		setGeoFromString(sm, s);
 		return sm;
 	}
@@ -119,7 +119,7 @@ public class SigmetToTACTest {
 		Tools.rmdir(sigmetStoreLocation);
 		Tools.mksubdirs(sigmetStoreLocation);
 		testSigmetStore.setLocation(sigmetStoreLocation);
-		Sigmet[] sigmets=testSigmetStore.getSigmets(false, SigmetStatus.concept);
+		Sigmet[] sigmets=testSigmetStore.getSigmets(false, SigmetAirmetStatus.concept);
 		assertThat(sigmets.length, is(0));
 		return testSigmetStore;
 	}
@@ -131,7 +131,7 @@ public class SigmetToTACTest {
 		assertThat(store.getOM(),notNullValue());
 		
 		store.storeSigmet(sm);
-		assertThat(store.getSigmets(false, SigmetStatus.concept).length, is(1));
+		assertThat(store.getSigmets(false, SigmetAirmetStatus.concept).length, is(1));
 	}
 	
 	@Test
@@ -141,7 +141,7 @@ public class SigmetToTACTest {
 		assertThat(store.getOM(),notNullValue());
 		store.storeSigmet(sm);
 		
-		Sigmet[] sigmets=store.getSigmets(false, SigmetStatus.concept);
+		Sigmet[] sigmets=store.getSigmets(false, SigmetAirmetStatus.concept);
 		assertThat(sigmets.length, is(1));
 		validateSigmet(sigmets[0]);
 		Debug.println("SIGMET: "+sigmets[0].toString());

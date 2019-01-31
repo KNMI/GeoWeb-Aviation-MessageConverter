@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.airmet.Airmet.AirmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 
 @Component
 public class AirmetStore {
@@ -81,7 +82,7 @@ public class AirmetStore {
 	}
 
 	private Airmet[] getPublishedAirmetsOnDay(Airmet airmetToPublish) {
-		Airmet[] airmets = getAirmets(false, Airmet.AirmetStatus.published);
+		Airmet[] airmets = getAirmets(false, SigmetAirmetStatus.published);
 		OffsetDateTime offsetSinceMidnight = airmetToPublish.getIssuedate().withHour(0).withMinute(1).withSecond(0).withNano(0);
 
 		return Arrays.stream(airmets).filter(airmet -> (
@@ -91,7 +92,7 @@ public class AirmetStore {
 	}
 
 	public Airmet[] __getPublishedAirmetsSinceDay (int daysOffset) {
-		Airmet[] airmets = getAirmets(false, Airmet.AirmetStatus.published);
+		Airmet[] airmets = getAirmets(false, SigmetAirmetStatus.published);
 		OffsetDateTime offset = OffsetDateTime.now(ZoneId.of("Z")).minusDays(daysOffset);
 		OffsetDateTime offsetSinceMidnight = offset.withHour(0).withMinute(1).withSecond(0).withNano(0);
 
@@ -101,7 +102,7 @@ public class AirmetStore {
 				)).toArray(Airmet[]::new);
 	}
 
-	public Airmet[] getAirmets(boolean selectActive, AirmetStatus selectStatus) {
+	public Airmet[] getAirmets(boolean selectActive, SigmetAirmetStatus selectStatus) {
 		Comparator<Airmet> comp = new Comparator<Airmet>() {
 			public int compare(Airmet lhs, Airmet rhs) {
 				if (rhs.getIssuedate() != null && lhs.getIssuedate() != null)
@@ -130,13 +131,13 @@ public class AirmetStore {
 					sm = Airmet.getAirmetFromFile(airmetObjectMapper, f);
 					if (selectActive) {
 //						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
-						if ((sm.getStatus()==AirmetStatus.published)&&
+						if ((sm.getStatus()==SigmetAirmetStatus.published)&&
 								(sm.getValiddate_end().isAfter(now))) {
 							airmets.add(sm);
 						}
 					}else if (selectStatus != null) {
-						if (selectStatus==AirmetStatus.canceled) {
-							if (((sm.getStatus()==AirmetStatus.published)&&sm.getValiddate_end().isBefore(now))||(sm.getStatus()==AirmetStatus.canceled)) {
+						if (selectStatus==SigmetAirmetStatus.canceled) {
+							if (((sm.getStatus()==SigmetAirmetStatus.published)&&sm.getValiddate_end().isBefore(now))||(sm.getStatus()==SigmetAirmetStatus.canceled)) {
 								airmets.add(sm);
 							}
 						} else {
@@ -181,7 +182,7 @@ public class AirmetStore {
 	public boolean isPublished(String uuid) {
 		Airmet airmet=getByUuid(uuid);
 		if (airmet!=null) {
-			return (airmet.getStatus()==AirmetStatus.published);
+			return (airmet.getStatus()== SigmetAirmetStatus.published);
 		}
 		return false;
 	}
@@ -189,7 +190,7 @@ public class AirmetStore {
 	public boolean isCanceled(String uuid) {
 		Airmet airmet=getByUuid(uuid);
 		if (airmet!=null) {
-			return (airmet.getStatus()==AirmetStatus.canceled);
+			return (airmet.getStatus()==SigmetAirmetStatus.canceled);
 		}
 		return false;
 	}

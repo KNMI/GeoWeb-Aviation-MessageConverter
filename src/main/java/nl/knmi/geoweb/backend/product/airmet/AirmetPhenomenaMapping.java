@@ -54,5 +54,4 @@ public class AirmetPhenomenaMapping {
 		this.phenomena.add(new AirmetPhenomenon("Surface visibility",  "SFC_VIS", "Airmet_layer_VIS", AirmetPhenomenonParamInfo.NEEDS_OBSCURATION));
 		this.phenomena.add(new AirmetPhenomenon("Widespread mean surface wind",  "SFC_WIND", "Airmet_layer_WIND", AirmetPhenomenonParamInfo.NEEDS_WIND));
 	}
-
 }

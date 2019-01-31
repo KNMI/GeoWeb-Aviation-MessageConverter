@@ -3,10 +3,16 @@ package nl.knmi.geoweb.backend.product.airmet;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.geojson.GeoJsonObject;
 import org.junit.Test;
@@ -29,6 +35,9 @@ import nl.knmi.geoweb.backend.product.airmet.Airmet.Phenomenon;
 import nl.knmi.geoweb.backend.product.airmet.Airmet.AirmetStatus;
 import nl.knmi.geoweb.backend.product.airmet.AirmetStore;
 import nl.knmi.geoweb.backend.product.airmet.AirmetStoreTestConfig;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -55,7 +64,85 @@ public class AirmetStoreTest {
 			+"\"firname\":\"AMSTERDAM FIR\","
 			+"\"location_indicator_icao\":\"EHAA\","
 			+"\"location_indicator_mwo\":\"EHDB\"}";
-	
+
+	static String cloudAirmet="";
+	static String windAirmet="";
+	static String visibilityAirmet="";
+
+	private Airmet getVisibilityAirmet() throws  IOException {
+	  Airmet am=new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "vis-"+UUID.randomUUID().toString());
+	  am.setStatus(SigmetAirmetStatus.concept);
+	  am.setType(SigmetAirmetType.normal);
+	  am.setPhenomenon(Phenomenon.SFC_VIS);
+	  am.setVisibility(new Airmet.AirmetValue(2000, "m"));
+	  List<ObscuringPhenomenonList.ObscuringPhenomenon> obs=new ArrayList<>();
+	  obs.add(ObscuringPhenomenonList.of("DZ"));
+	  am.setObscuring(obs);
+	  am.setIssuedate(OffsetDateTime.now(ZoneId.of("Z")));
+	  am.setSequence(2);
+	  OffsetDateTime st=OffsetDateTime.now(ZoneId.of("Z")).plusHours(1).truncatedTo(ChronoUnit.HOURS);
+	  am.setValiddate(st);
+	  am.setValiddate_end(st.plusHours(4));
+	  am.setMovement_type(Airmet.AirmetMovementType.MOVEMENT);
+	  am.setMovement(new SigmetAirmetMovement("N", 20, "KT"));
+	  am.setGeojson(airmetObjectMapper.readValue(testGeoJson, GeoJsonObject.class));
+
+	  return am;
+	}
+
+	private Airmet getWindAirmet() throws  IOException {
+		Airmet am=new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "wind-"+UUID.randomUUID().toString());
+		am.setPhenomenon(Phenomenon.SFC_WIND);
+		am.setWind(new Airmet.AirmetWindInfo(20, 180));
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.normal);
+		am.setIssuedate(OffsetDateTime.now(ZoneId.of("Z")));
+		am.setSequence(2);
+		OffsetDateTime st=OffsetDateTime.now(ZoneId.of("Z")).plusHours(1).truncatedTo(ChronoUnit.HOURS);
+		am.setValiddate(st);
+		am.setValiddate_end(st.plusHours(4));
+		am.setMovement_type(Airmet.AirmetMovementType.MOVEMENT);
+		am.setMovement(new SigmetAirmetMovement("N", 20, "KT"));
+		am.setGeojson(airmetObjectMapper.readValue(testGeoJson, GeoJsonObject.class));
+		return am;
+	}
+
+	private Airmet getCloudAirmet() throws  IOException {
+		Airmet am=new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "cloud-"+UUID.randomUUID().toString());
+		am.setPhenomenon(Phenomenon.BKN_CLD);
+		am.setCloudLevels(new Airmet.AirmetCloudLevelInfo(4900));
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.normal);
+		am.setIssuedate(OffsetDateTime.now(ZoneId.of("Z")));
+		am.setSequence(2);
+		OffsetDateTime st=OffsetDateTime.now(ZoneId.of("Z")).plusHours(1).truncatedTo(ChronoUnit.HOURS);
+		am.setValiddate(st);
+		am.setValiddate_end(st.plusHours(4));
+		am.setMovement_type(Airmet.AirmetMovementType.MOVEMENT);
+		am.setMovement(new SigmetAirmetMovement("N", 20, "KT"));
+		am.setGeojson(airmetObjectMapper.readValue(testGeoJson, GeoJsonObject.class));
+		return am;
+	}
+
+	@Test
+	public void testVisibilityAirmet() throws Exception{
+		Airmet am=getVisibilityAirmet();
+		AirmetStore store=createNewStore();
+		assertThat(store.getOM(),notNullValue());
+		store.storeAirmet(am);
+
+		Airmet windAirmet=getWindAirmet();
+		store.storeAirmet(windAirmet);
+
+		Airmet cloudAirmet=getCloudAirmet();
+		store.storeAirmet(cloudAirmet);
+
+		Airmet[] airmets=store.getAirmets(false, SigmetAirmetStatus.concept);
+		assertThat(airmets.length, is(3));
+		System.err.println(airmets[0].getCloudLevels().getLower().surface+" "+airmets[0].getCloudLevels().getLower().getVal());
+//		assertEquals(airmets[0], am);
+	}
+
 	@Test
 	public void contextLoads() throws Exception {
 		assertThat(airmetObjectMapper,notNullValue());
@@ -105,7 +192,7 @@ public class AirmetStoreTest {
 		Tools.rmdir(airmetStoreLocation);
 		Tools.mksubdirs(airmetStoreLocation);
 		testAirmetStore.setLocation(airmetStoreLocation);
-		Airmet[] airmets=testAirmetStore.getAirmets(false, AirmetStatus.concept);
+		Airmet[] airmets=testAirmetStore.getAirmets(false, SigmetAirmetStatus.concept);
 		assertThat(airmets.length, is(0));
 		return testAirmetStore;
 	}
@@ -117,7 +204,7 @@ public class AirmetStoreTest {
 		assertThat(store.getOM(),notNullValue());
 		
 		store.storeAirmet(sm);
-		assertThat(store.getAirmets(false, AirmetStatus.concept).length, is(1));
+		assertThat(store.getAirmets(false, SigmetAirmetStatus.concept).length, is(1));
 	}
 	
 	@Test
@@ -127,9 +214,9 @@ public class AirmetStoreTest {
 		assertThat(store.getOM(),notNullValue());
 		store.storeAirmet(sm);
 		
-		Airmet[] sigmets=store.getAirmets(false, AirmetStatus.concept);
-		assertThat(sigmets.length, is(1));
-		validateAirmet(sigmets[0]);
+		Airmet[] airmets=store.getAirmets(false, SigmetAirmetStatus.concept);
+		assertThat(airmets.length, is(1));
+		validateAirmet(airmets[0]);
 	}
 	
 }

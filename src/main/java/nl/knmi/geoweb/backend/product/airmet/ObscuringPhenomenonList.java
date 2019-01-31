@@ -6,10 +6,12 @@ import java.util.List;
 import lombok.Getter;
 
 public class ObscuringPhenomenonList {
-    private List<ObscuringPhenomenon> obscuringPhenomena;
+ //   private List<ObscuringPhenomenon> obscuringPhenomena;
+
+    private static List<ObscuringPhenomenon> allPhenomena;
 
     @Getter
-    public class ObscuringPhenomenon {
+    public static class ObscuringPhenomenon {
 
         private String name;
         private String code;
@@ -18,23 +20,36 @@ public class ObscuringPhenomenonList {
             this.name = name;
             this.code = code;
         }
+        public ObscuringPhenomenon(){}
     }
 
     public ObscuringPhenomenonList() {
-        this.obscuringPhenomena = new ArrayList<>();
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Drizzle", "DZ"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Dust", "DU"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Dust/sand whirls", "DP"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Duststorm", "DS"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Fog", "FG"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Funnel cloud", "FC"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Hail", "GR"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Haze", "HZ"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Ice pellets", "PL"));
-        this.obscuringPhenomena.add(new ObscuringPhenomenon("Mist", "BR"));
+//        this.obscuringPhenomena = new ArrayList<>();
     }
 
-    public List<ObscuringPhenomenon> getObscuringPhenomena() {
-        return obscuringPhenomena;
+    public static List<ObscuringPhenomenon> getAllObscuringPhenomena() {
+        if (allPhenomena==null) {
+            allPhenomena = new ArrayList<>();
+            allPhenomena.add(new ObscuringPhenomenon("Drizzle", "DZ"));
+            allPhenomena.add(new ObscuringPhenomenon("Dust", "DU"));
+            allPhenomena.add(new ObscuringPhenomenon("Dust/sand whirls", "DP"));
+            allPhenomena.add(new ObscuringPhenomenon("Duststorm", "DS"));
+            allPhenomena.add(new ObscuringPhenomenon("Fog", "FG"));
+            allPhenomena.add(new ObscuringPhenomenon("Funnel cloud", "FC"));
+            allPhenomena.add(new ObscuringPhenomenon("Hail", "GR"));
+            allPhenomena.add(new ObscuringPhenomenon("Haze", "HZ"));
+            allPhenomena.add(new ObscuringPhenomenon("Ice pellets", "PL"));
+            allPhenomena.add(new ObscuringPhenomenon("Mist", "BR"));
+        }
+        return allPhenomena;
     }
+
+    public static ObscuringPhenomenon of(String s) {
+        for (ObscuringPhenomenon ph: getAllObscuringPhenomena()){
+            if (s.equals(ph.code)) return ph;
+        }
+        return null;
+    }
+
+
 }

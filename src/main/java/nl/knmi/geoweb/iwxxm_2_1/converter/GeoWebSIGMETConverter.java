@@ -35,6 +35,8 @@ import fi.fmi.avi.model.sigmet.immutable.VASIGMETImpl;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
 
 public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET> {
 
@@ -196,7 +198,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
             }
         }
 
-        if (input.getStatus().equals(Sigmet.SigmetStatus.published)) {
+        if (input.getStatus().equals(SigmetAirmetStatus.published)) {
             if (input.getCancels() == null) {
                 phenBuilder.setGeometry(TacOrGeoGeometryImpl.of(GeoUtils.jsonFeature2jtsGeometry((Feature) input.extractSingleStartGeometry())));
                 if ((input.getObs_or_forecast() != null)&& (input.getObs_or_forecast().getObsFcTime() != null)){
@@ -219,7 +221,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 
          //Not translated
         sigmet.setTranslated(false);
-        if (input.getStatus().equals(Sigmet.SigmetStatus.published)) {
+        if (input.getStatus().equals(SigmetAirmetStatus.published)) {
             if (input.getCancels() != null) {
                 sigmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.CANCELLATION);
                 SigmetReferenceImpl.Builder sigmetReferenceBuilder = new SigmetReferenceImpl.Builder();
@@ -239,11 +241,11 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
             sigmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.NORMAL);
         }
 
-        if (input.getType().equals(Sigmet.SigmetType.normal)) {
+        if (input.getType().equals(SigmetAirmetType.normal)) {
             sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.OPERATIONAL);
             sigmet.setPermissibleUsageReason(Optional.empty());
         } else {
-            if (input.getType().equals(Sigmet.SigmetType.exercise)) {
+            if (input.getType().equals(SigmetAirmetType.exercise)) {
                 sigmet.setPermissibleUsage(AviationCodeListUser.PermissibleUsage.NON_OPERATIONAL);
                 sigmet.setPermissibleUsageReason(AviationCodeListUser.PermissibleUsageReason.EXERCISE);
             } else {
