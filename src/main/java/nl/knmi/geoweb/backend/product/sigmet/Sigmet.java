@@ -20,21 +20,12 @@ import org.geojson.FeatureCollection;
 import org.geojson.GeoJsonObject;
 import org.geojson.LngLatAlt;
 import org.geojson.Polygon;
-import org.geojson.Point;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.PrecisionModel;
-import org.locationtech.jts.geom.impl.CoordinateArraySequenceFactory;
-import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.geojson.GeoJsonReader;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.As;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -54,6 +45,7 @@ import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetLevel;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetUtils;
 
 @JsonInclude(Include.NON_NULL)
 @Getter
@@ -107,7 +99,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	public static class VAExtraFields {
 		/* https://www.icao.int/APAC/Documents/edocs/WV-SIGMET.pdf */
 		// TODO: Add TAC for CANCEL move_to
-		// TODO TAC should be truncated on 69 characters.
+		// TODO: TAC should be truncated on 69 characters.
 		public Volcano volcano;
 		boolean no_va_expected;
 		List <String> move_to;
@@ -331,168 +323,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		return Arrays.stream(coords).map(coord -> this.pointToDMSString(coord)).collect(Collectors.joining(" - "));
 	}
 
-	public String featureToTAC(Feature f, Feature FIR) {
-		List<LngLatAlt> coords;
-
-		if (f==null) return " ERR ";
-
-		switch(f.getProperty("selectionType").toString().toLowerCase()) {
-		case "poly":
-			// This assumes that one feature contains one set of coordinates
-			coords = ((Polygon)(f.getGeometry())).getCoordinates().get(0);
-			return "WI " + this.latlonToDMS(coords);
-		case "fir":
-			return "ENTIRE FIR";
-		case "point":
-			Point p=(Point)f.getGeometry();
-			return this.pointToDMSString(p.getCoordinates());
-		case "box":
-			// A box is drawn which can mean multiple things whether how many intersections there are.
-			// If one line segment intersects, the phenomenon happens in the area opposite of the line intersection
-			// e.g. if the south border of the box intersects, the phenomenon happens north of this line.
-			// If there are multiple intersections -- we assume two currently -- the phenomenon happens in the quadrant
-			// opposite of the intersection lines.
-			// E.g. the south and west border of the box intersect, the phenomenon happens north of the south intersection line and east of the west intersection line
-			GeometryFactory gf=new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING));
-			GeoJsonReader reader=new GeoJsonReader(gf);
-
-			if (FIR.getGeometry()==null) {
-			    Debug.println("FIR is null!!");
-			    return "";
-            }
-			try {
-				ObjectMapper om = new ObjectMapper();
-				String FIRs=om.writeValueAsString(FIR.getGeometry()); //FIR as String
-
-                try {
-                    org.locationtech.jts.geom.Geometry drawnGeometry = reader.read(om.writeValueAsString(f.getGeometry()));
-
-                    org.locationtech.jts.geom.Geometry geom_fir = reader.read(FIRs);
-
-                    //Sort box's coordinates
-                    Envelope env = drawnGeometry.getEnvelopeInternal();
-                    double minX = env.getMinX();
-                    double maxX = env.getMaxX();
-                    double minY = env.getMinY();
-                    double maxY = env.getMaxY();
-                    //				Debug.println("BBOX (++);: "+minX+"-"+maxX+","+minY+"-"+maxY);
-
-                    if ((minX==maxX)||(minY==maxY)) return " POINT "; //Box is one point!!
-
-                    org.locationtech.jts.geom.Geometry firBorder = geom_fir.getBoundary();
-
-                    //Find intersections with box's sides
-                    CoordinateArraySequenceFactory caf = CoordinateArraySequenceFactory.instance();
-                    boolean[] boxSidesIntersecting = new boolean[4];
-                    int boxSidesIntersectingCount = 0;
-
-                    //Sort the rectangle points counterclockwise, starting at lower left
-                    Coordinate[] drawnCoords = new Coordinate[5];
-                    for (int i = 0; i < 4; i++) {
-                        if (drawnGeometry.getCoordinates()[i].x == minX) {
-                            if (drawnGeometry.getCoordinates()[i].y == minY) {
-                                drawnCoords[0] = drawnGeometry.getCoordinates()[i];
-                            } else {
-                                drawnCoords[3] = drawnGeometry.getCoordinates()[i];
-                            }
-                        } else {
-                            if (drawnGeometry.getCoordinates()[i].y == minY) {
-                                drawnCoords[1] = drawnGeometry.getCoordinates()[i];
-                            } else {
-                                drawnCoords[2] = drawnGeometry.getCoordinates()[i];
-                            }
-                        }
-                    }
-                    drawnCoords[4] = drawnCoords[0]; //Copy first point to last
-                    Debug.println("drawnCoords: "+drawnCoords[0]+" "
-                            +drawnCoords[1]+" "+drawnCoords[2]+" "+drawnCoords[3]+" "+drawnCoords[4]);
-
-                    for (int i = 0; i < 4; i++) {
-                        LineString side = new LineString(caf.create(Arrays.copyOfRange(drawnCoords, i, i + 2)), gf);
-                        if (side==null) return " ERR (side) ";
-                        if (geom_fir==null) return " ERR (geom_fir) ";
-                        if (side.intersects(geom_fir)) { //TODO or: firBorder
-                            boxSidesIntersecting[i] = true;
-                            boxSidesIntersectingCount++;
-                            //						Debug.println("Intersecting on side "+i);
-                            //						Debug.println("I:"+side.intersection(geom_fir));
-                        } else {
-                            boxSidesIntersecting[i] = false;
-                        }
-                    }
-
-                    if (boxSidesIntersectingCount == 1) {
-                        Debug.println("Intersecting box on 1 side");
-                        if (boxSidesIntersecting[0]) {
-                            //N of
-                            return String.format("N OF %s", convertLat(minY));
-                        } else if (boxSidesIntersecting[1]) {
-                            //W of
-                            return String.format("W OF %s", convertLon(maxX));
-                        } else if (boxSidesIntersecting[2]) {
-                            //S of
-                            return String.format("S OF %s", convertLat(maxY));
-                        } else if (boxSidesIntersecting[3]) {
-                            //E of
-                            return String.format("E OF %s", convertLon(minX));
-                        }
-                    } else if (boxSidesIntersectingCount == 2) {
-                        Debug.println("Intersecting box on 2 sides");
-                        if (boxSidesIntersecting[0] && boxSidesIntersecting[1]) {
-                            //N of and W of
-                            return String.format("N OF %s AND W OF %s", convertLat(minY), convertLon(maxX));
-                        } else if (boxSidesIntersecting[1] && boxSidesIntersecting[2]) {
-                            //S of and W of
-                            return String.format("S OF %s AND W OF %s", convertLat(maxY), convertLon(maxX));
-                        } else if (boxSidesIntersecting[2] && boxSidesIntersecting[3]) {
-                            //S of and E of
-                            return String.format("S OF %s AND E OF %s", convertLat(maxY), convertLon(minX));
-                        } else if (boxSidesIntersecting[3] && boxSidesIntersecting[0]) {
-                            //N of and E of
-                            return String.format("N OF %s AND E OF %s", convertLat(minY), convertLon(minX));
-                        } else if (boxSidesIntersecting[0] && boxSidesIntersecting[2]) {
-                            //N of and S of
-                            return String.format("N OF %s AND S OF %s", convertLat(minY), convertLat(maxY));
-                        } else if (boxSidesIntersecting[1] && boxSidesIntersecting[3]) {
-                            //E of  and W of
-                            return String.format("E OF %s AND W OF %s", convertLon(minX), convertLon(maxX));
-                        }
-                    } else if (boxSidesIntersectingCount == 3) {
-                        Debug.println("Intersecting box on 3 sides");
-                    } else if (boxSidesIntersectingCount == 4) {
-                        Debug.println("Intersecting box on 4 sides");
-                    }
-
-                    // Intersect the box with the FIR
-                    org.locationtech.jts.geom.Geometry intersection = drawnGeometry.intersection(geom_fir);
-
-                    //				Debug.println("intersection: "+intersection);
-
-                    if (intersection.equalsTopo(geom_fir)) {
-                        return "ENTIRE FIR";
-                    }
-
-                    Coordinate[] drawn = drawnGeometry.getCoordinates();
-                    Coordinate[] intersected = intersection.getCoordinates();
-                    coords = ((Polygon) (f.getGeometry())).getCoordinates().get(0);
-                    //				Debug.println("SIZES: "+drawn.length+"  "+intersected.length);
-                    if (intersected.length > 7) {
-                        Debug.println("More than 7 in intersection!!");
-                        return "WI " + this.latlonToDMS(drawn);
-                    }
-                    return "WI " + this.latlonToDMS(intersected);
-                } catch (ParseException pe) {
-                   //pe.printStackTrace();
-                }
-			} catch (JsonProcessingException e) {
-				e.printStackTrace();
-			}
-			return " ERR ";
-		default:
-			return "";
-		}
-	}
-
 	public String toTAC() {
 		if (this.firFeature!=null) {
 			return this.toTAC(this.firFeature);
@@ -501,14 +331,14 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	}
 
 	public String toTAC(Feature FIR) {
-		GeoJsonObject effectiveStartGeometry = this.findStartGeometry() ; //findStartGeometry();
+		GeoJsonObject effectiveStartGeometry = SigmetAirmetUtils.findStartGeometry(this.geojson);
 		if ((effectiveStartGeometry==null)||(((Feature)effectiveStartGeometry).getProperty("selectionType")==null)) {
 			return "Missing geometry";
 		}
 		if (!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("box")&&
 				!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("fir")&&
 				!((Feature)effectiveStartGeometry).getProperty("selectionType").equals("point")) {
-			GeoJsonObject intersected=this.extractSingleStartGeometry();
+			GeoJsonObject intersected= SigmetAirmetUtils.extractSingleStartGeometry(this.geojson);
 			int sz=((Polygon)((Feature)intersected).getGeometry()).getCoordinates().get(0).size();
 			if (sz<=7)  {
 				effectiveStartGeometry = intersected; // Use intersection result
@@ -559,7 +389,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			sb.append(this.obs_or_forecast.toTAC());
 			sb.append('\n');
 		}
-		sb.append(this.featureToTAC((Feature)effectiveStartGeometry, FIR));
+		sb.append(SigmetAirmetUtils.featureToTAC((Feature)effectiveStartGeometry, FIR));
 		sb.append('\n');
 
 		String levelInfoText=this.levelinfo.toTAC();
@@ -596,7 +426,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			OffsetDateTime fpaTime=this.validdate_end;
 			sb.append("FCST AT ").append(String.format("%02d", fpaTime.getHour())).append(String.format("%02d", fpaTime.getMinute())).append("Z");
 			sb.append('\n');
-			sb.append(this.featureToTAC((Feature)this.findEndGeometry(((Feature)findStartGeometry()).getId()), FIR));
+			sb.append(SigmetAirmetUtils.featureToTAC((Feature)this.findEndGeometry(((Feature)SigmetAirmetUtils.findStartGeometry(this.geojson)).getId()), FIR));
 
 		} else {
 			if (va_extra_fields !=null && va_extra_fields.no_va_expected) {
@@ -643,41 +473,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				if ((f.getProperty("relatesTo")!=null)&&f.getProperty("relatesTo").equals(relatesTo)) {
 					return f;
 				}
-			}
-		}
-		return null;
-	}
-
-	public GeoJsonObject findStartGeometry() {
-		FeatureCollection fc=(FeatureCollection)this.geojson;
-		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
-				return f;
-			}
-		}
-		return null;
-	}
-
-	public GeoJsonObject extractSingleStartGeometryORG() {
-		FeatureCollection fc=(FeatureCollection)this.geojson;
-		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
-				return f;
-			}
-		}
-		return null;
-	}
-
-	public GeoJsonObject extractSingleStartGeometry() {
-		FeatureCollection fc=(FeatureCollection)this.geojson;
-		for (Feature f: fc.getFeatures()) {
-			if ((f.getProperty("featureFunction")!=null)&&f.getProperty("featureFunction").equals(START)){
-				for (Feature f2: fc.getFeatures()) {
-					if ((f2.getProperty("featureFunction")!=null)&&f2.getProperty("featureFunction").equals(INTERSECTION)&&f.getId().equals(f2.getProperty("relatesTo"))){
-						return f2;
-					}
-				}
-				return f;
 			}
 		}
 		return null;

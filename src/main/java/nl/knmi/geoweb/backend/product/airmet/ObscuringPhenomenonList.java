@@ -21,6 +21,13 @@ public class ObscuringPhenomenonList {
             this.code = code;
         }
         public ObscuringPhenomenon(){}
+
+        public String toTAC() {
+            if (!this.name.isEmpty() && !this.code.isEmpty()) {
+                return this.code;
+            }
+            return "";
+        }
     }
 
     public ObscuringPhenomenonList() {
@@ -30,16 +37,26 @@ public class ObscuringPhenomenonList {
     public static List<ObscuringPhenomenon> getAllObscuringPhenomena() {
         if (allPhenomena==null) {
             allPhenomena = new ArrayList<>();
-            allPhenomena.add(new ObscuringPhenomenon("Drizzle", "DZ"));
+            allPhenomena.add(new ObscuringPhenomenon("Mist", "BR"));
+            allPhenomena.add(new ObscuringPhenomenon("Dust storm", "DS"));
             allPhenomena.add(new ObscuringPhenomenon("Dust", "DU"));
-            allPhenomena.add(new ObscuringPhenomenon("Dust/sand whirls", "DP"));
-            allPhenomena.add(new ObscuringPhenomenon("Duststorm", "DS"));
-            allPhenomena.add(new ObscuringPhenomenon("Fog", "FG"));
+            allPhenomena.add(new ObscuringPhenomenon("Drizzle", "DZ"));
             allPhenomena.add(new ObscuringPhenomenon("Funnel cloud", "FC"));
+            // allPhenomena.add(new ObscuringPhenomenon("Dust/sand whirls", "DP"));
+            allPhenomena.add(new ObscuringPhenomenon("Fog", "FG"));
+            allPhenomena.add(new ObscuringPhenomenon("Smoke", "FU"));
             allPhenomena.add(new ObscuringPhenomenon("Hail", "GR"));
+            allPhenomena.add(new ObscuringPhenomenon("Soft hail", "GS"));
             allPhenomena.add(new ObscuringPhenomenon("Haze", "HZ"));
             allPhenomena.add(new ObscuringPhenomenon("Ice pellets", "PL"));
-            allPhenomena.add(new ObscuringPhenomenon("Mist", "BR"));
+            allPhenomena.add(new ObscuringPhenomenon("Dust or sand devil", "PO"));
+            allPhenomena.add(new ObscuringPhenomenon("Rain", "RA"));
+            allPhenomena.add(new ObscuringPhenomenon("Sand", "SA"));
+            allPhenomena.add(new ObscuringPhenomenon("Snow grains", "SG"));
+            allPhenomena.add(new ObscuringPhenomenon("Snow", "SN"));
+            allPhenomena.add(new ObscuringPhenomenon("Squall line", "SQ"));
+            allPhenomena.add(new ObscuringPhenomenon("Sand storm", "SS"));
+            allPhenomena.add(new ObscuringPhenomenon("Volcanic Ash", "VA"));
         }
         return allPhenomena;
     }
@@ -50,6 +67,4 @@ public class ObscuringPhenomenonList {
         }
         return null;
     }
-
-
 }
