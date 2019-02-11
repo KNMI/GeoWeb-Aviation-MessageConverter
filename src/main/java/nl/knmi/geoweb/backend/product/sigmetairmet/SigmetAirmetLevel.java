@@ -82,7 +82,7 @@ public  class SigmetAirmetLevel {
         return "";
     }
 
-    public enum SigmetLevelUnit {
+    public enum SigmetAirmetLevelUnit {
         FT, FL, M;
     }
 
@@ -94,14 +94,14 @@ public  class SigmetAirmetLevel {
     @Getter
     public static class SigmetAirmetPart {
         Integer value;
-        SigmetLevelUnit unit;
+        SigmetAirmetLevelUnit unit;
 
         public SigmetAirmetPart() {
         }
 
         ;
 
-        public SigmetAirmetPart(SigmetLevelUnit unit, int val) {
+        public SigmetAirmetPart(SigmetAirmetLevelUnit unit, int val) {
             this.unit = unit;
             this.value = val;
         }
@@ -110,17 +110,17 @@ public  class SigmetAirmetLevel {
             if (value == null) {
                 return "";
             }
-            if (this.unit == SigmetLevelUnit.FL) {
+            if (this.unit == SigmetAirmetLevelUnit.FL) {
                 return String.format("%03d", value);
             }
-            if (this.unit == SigmetLevelUnit.FT) {
+            if (this.unit == SigmetAirmetLevelUnit.FT) {
                 if (value > 9999) {
                     return String.format("%05d", value);
                 } else {
                     return String.format("%04d", value);
                 }
             }
-            if (this.unit == SigmetLevelUnit.M) {
+            if (this.unit == SigmetAirmetLevelUnit.M) {
                 if (value <= 9999) {
                     return String.format("%04d", value);
                 }
@@ -132,13 +132,13 @@ public  class SigmetAirmetLevel {
             if (value == null) {
                 return "";
             }
-            if (this.unit == SigmetLevelUnit.FL) {
+            if (this.unit == SigmetAirmetLevelUnit.FL) {
                 return "FL" + this.toTACValue();
             }
-            if (this.unit == SigmetLevelUnit.FT) {
+            if (this.unit == SigmetAirmetLevelUnit.FT) {
                 return this.toTACValue() + "FT";
             }
-            if (this.unit == SigmetLevelUnit.M) {
+            if (this.unit == SigmetAirmetLevelUnit.M) {
                 return this.toTACValue() + "M";
             }
             return "";

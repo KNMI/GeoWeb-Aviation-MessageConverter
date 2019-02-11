@@ -30,7 +30,6 @@ import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.GeoWebProduct;
 import nl.knmi.geoweb.backend.product.IExportable;
 import nl.knmi.geoweb.backend.product.ProductConverter;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
 import nl.knmi.geoweb.backend.product.sigmetairmet.ObsFc;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetChange;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetLevel;
