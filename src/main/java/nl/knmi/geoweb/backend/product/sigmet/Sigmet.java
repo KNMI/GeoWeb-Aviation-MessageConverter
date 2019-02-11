@@ -48,6 +48,13 @@ import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.GeoWebProduct;
 import nl.knmi.geoweb.backend.product.IExportable;
 import nl.knmi.geoweb.backend.product.ProductConverter;
+import nl.knmi.geoweb.backend.product.sigmetairmet.ObsFc;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetChange;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetLevel;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
+
 @JsonInclude(Include.NON_NULL)
 @Getter
 @Setter
@@ -60,10 +67,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	private ObsFc obs_or_forecast;
 	//	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	//	private OffsetDateTime forecast_position_time;
-	private SigmetLevel levelinfo;
+	private SigmetAirmetLevel levelinfo;
 	private SigmetMovementType movement_type;
-	private SigmetMovement movement;
-	private SigmetChange change;
+	private SigmetAirmetMovement movement;
+	private SigmetAirmetChange change;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING)
 	private OffsetDateTime issuedate;
@@ -75,8 +82,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	private String location_indicator_icao;
 	private String location_indicator_mwo;
 	private String uuid;
-	private SigmetStatus status;
-	private SigmetType type;
+	private SigmetAirmetStatus status;
+	private SigmetAirmetType type;
 	private int sequence;
 
 	@JsonInclude(Include.NON_NULL)
@@ -180,44 +187,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			//throw new Exception("You NOOB: Non existing pheonomenon!!!" + desc);
 		}
 	}
-	@JsonInclude(Include.NON_NULL)
-	@Getter
-	public static class ObsFc {
-		private boolean obs=true ;
-		@JsonFormat(shape = JsonFormat.Shape.STRING)
-		OffsetDateTime obsFcTime;
-		public ObsFc(){};
-		public ObsFc(boolean obs){
-			this.obs=obs;
-			this.obsFcTime=null;
-		}
-		public ObsFc(boolean obs, OffsetDateTime obsTime) {
-			this.obs=obs;
-			this.obsFcTime=obsTime;
-		}
-		public String toTAC () {
-			StringBuilder sb = new StringBuilder();
-
-			if (this.obs) {
-				sb.append("OBS");
-			} else {
-				sb.append("FCST");
-			}
-
-			if (this.obsFcTime != null) {
-				sb.append(" AT ").append(String.format("%02d", this.obsFcTime.getHour())).append(String.format("%02d", this.obsFcTime.getMinute())).append("Z");
-			}
-
-			return sb.toString();
-		}
-	}
-
-	public enum SigmetLevelUnit {
-		FT, FL, M;
-	}
-	public enum SigmetLevelMode {
-		AT, ABV, BETW, BETW_SFC, TOPS, TOPS_ABV, TOPS_BLW;
-	}
 
 	public enum SigmetMovementType {
 		STATIONARY, MOVEMENT, FORECAST_POSITION;
@@ -227,229 +196,6 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 	//		TOP, TOP_ABV;
 	//	}
 
-	@JsonInclude(Include.NON_NULL)
-	@Getter
-	public static class SigmetLevelPart{
-		Integer value;
-		SigmetLevelUnit unit;
-		public SigmetLevelPart(){};
-		public SigmetLevelPart(SigmetLevelUnit unit, int val) {
-			this.unit=unit;
-			this.value=val;
-		}
-
-		public String toTACValue() {
-			if (value==null) return "";
-			if (this.unit==SigmetLevelUnit.FL) {
-				return String.format("%03d", value);
-			}
-			if (this.unit==SigmetLevelUnit.FT) {
-				if (value>9999) {
-					return String.format("%05d", value);
-				} else {
-					return String.format("%04d", value);
-				}
-			}
-			if (this.unit==SigmetLevelUnit.M) {
-				if (value<=9999) {
-					return String.format("%04d", value);
-				}
-			}
-			return "";
-		}
-
-		public String toTAC() {
-			if (value==null) return "";
-			if (this.unit==SigmetLevelUnit.FL) {
-				return "FL"+this.toTACValue();
-			}
-			if (this.unit==SigmetLevelUnit.FT) {
-				return this.toTACValue()+"FT";
-			}
-			if (this.unit==SigmetLevelUnit.M) {
-				return this.toTACValue() + "M";
-			}
-			return "";
-		}
-	}
-
-	@JsonInclude(Include.NON_NULL)
-	@Getter
-	public static class SigmetLevel {
-		SigmetLevelPart[]levels;
-		SigmetLevelMode mode;
-
-		public SigmetLevel(){};
-		public SigmetLevel(SigmetLevelPart lev1, SigmetLevelMode mode) {
-			this.levels=new SigmetLevelPart[1];
-			this.levels[0]=lev1;
-			this.mode=mode;
-		}
-		public SigmetLevel(SigmetLevelPart lev1, SigmetLevelPart lev2, SigmetLevelMode mode) {
-			levels=new SigmetLevelPart[2];
-			this.levels[0]=lev1;
-			this.levels[1]=lev2;
-			this.mode=mode;
-		}
-		public String toTAC() {
-			switch (this.mode) {
-			case BETW:
-				if ((this.levels[0] != null)  && (this.levels[1] != null)) {
-					if (this.levels[0].getUnit().equals(this.levels[1].getUnit())) {
-						switch (this.levels[0].getUnit()) {
-							case FL:
-								return this.levels[0].toTAC() + "/" + this.levels[1].toTACValue();
-							case FT:
-								return this.levels[0].toTACValue() + "/" + this.levels[1].toTAC();
-							case M:
-								return this.levels[0].toTACValue() + "/" + this.levels[1].toTAC();
-						}
-						return "";
-					} else {
-						return this.levels[0].toTAC() + "/" + this.levels[1].toTAC();
-					}
-				}
-				break;
-			case BETW_SFC:
-				if (this.levels[1] != null) {
-					return "SFC/"+this.levels[1].toTAC();
-				}
-				break;
-			case ABV:
-				if (this.levels[0]!=null) {
-					return "ABV "+this.levels[0].toTAC();
-				}
-				break;
-			case AT:
-				if (this.levels[0]!=null) {
-					return ""+this.levels[0].toTAC();
-				}
-				break;
-			case TOPS:
-				if (this.levels[0]!=null) {
-					return "TOP "+this.levels[0].toTAC();
-				}
-				break;
-			case TOPS_ABV:
-				if (this.levels[0]!=null) {
-					return "TOP ABV "+this.levels[0].toTAC();
-				}
-				break;
-			case TOPS_BLW:
-				if (this.levels[0]!=null) {
-					return "TOP BLW "+this.levels[0].toTAC();
-				}
-				break;
-			default:
-			}
-			return "";
-		}
-	}
-
-	public enum SigmetDirection {
-		N(0),NNE(22.5),NE(45),ENE(67.5),E(90),ESE(112.5),SE(135),SSE(157.5),S(180),SSW(202.5),SW(225),WSW(247.5),W(270),WNW(292.5),NW(315),NNW(337.5);
-		public static SigmetDirection getSigmetDirection(String dir) {
-			for (SigmetDirection v: SigmetDirection.values()) {
-				if (dir.equals(v.toString())) return v;
-			}
-			return null;
-		}
-		private double dir;
-
-		public double getDir() {
-			return this.dir;
-		}
-
-		SigmetDirection(double dir) {
-			this.dir=dir;
-		}
-	}
-
-	@JsonInclude(Include.NON_NULL)
-	@Getter
-	public static class SigmetMovement {
-		private Integer speed;
-		private String speeduom;
-		private SigmetDirection dir;
-		public SigmetMovement(){};
-		public SigmetMovement(String dir, int speed, String uoM) {
-			this.speed=speed;
-			this.speeduom=uoM;
-			this.dir=SigmetDirection.getSigmetDirection(dir);
-		}
-
-		public String getSpeeduom() {
-			if (this.speeduom==null) {
-				return "KT";
-			} else {
-				return speeduom;
-			}
-		}
-
-		public String toTAC() {
-			if ((this.dir!=null)&&(this.speed!=null)) {
-				if (this.speeduom==null) {
-					return "MOV " + this.dir.toString() + " " + this.speed + "KT";
-				} else {
-					return "MOV " + this.dir.toString() + " " + this.speed + this.speeduom;
-				}
-			}
-			return "";
-		}
-	}
-
-	@Getter
-	public enum SigmetChange {
-		INTSF("Intensifying"), WKN("Weakening"), NC("No change");
-		private String description;
-		private SigmetChange(String desc) {
-			this.description=desc;
-		}
-		public String toTAC() {
-			return Arrays.stream(values())
-					.filter(sc -> sc.description.equalsIgnoreCase(this.description))
-					.findFirst()
-					.orElse(null).toString();
-		}
-	}
-
-	@Getter
-	public enum SigmetStatus {
-		concept("concept"), canceled("canceled"), published("published");//, test("test"); TODO: Check, should be in Type now.
-		private String status;
-		private SigmetStatus (String status) {
-			this.status = status;
-		}
-		public static SigmetStatus getSigmetStatus(String status){
-			Debug.println("SIGMET status: " + status);
-
-			for (SigmetStatus sstatus: SigmetStatus.values()) {
-				if (status.equals(sstatus.toString())){
-					return sstatus;
-				}
-			}
-			return null;
-		}
-
-	}
-
-	@Getter
-	public enum SigmetType {
-		normal("normal"), test("test"), exercise("exercise");
-		private String type;
-		private SigmetType (String type) {
-			this.type = type;
-		}
-		public static SigmetType getSigmetType(String itype){
-			for (SigmetType stype: SigmetType.values()) {
-				if (itype.equals(stype.toString())){
-					return stype;
-				}
-			}
-			return null;
-		}
-
-	}
 
 	@Override
 	public String toString() {
@@ -495,8 +241,8 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		this.sequence=-1;
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
-		this.status=SigmetStatus.concept;
-		this.type=SigmetType.test;
+		this.status=SigmetAirmetStatus.concept;
+		this.type=SigmetAirmetType.test;
 	}
 
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
@@ -514,10 +260,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		}
 		// .... value from constructor is lost here, set it explicitly. (Why?)
 		if(this.status == null) {
-			this.status = SigmetStatus.concept;
+			this.status = SigmetAirmetStatus.concept;
 		}
 		if(this.type == null) {
-			this.type = SigmetType.test;
+			this.type = SigmetAirmetType.test;
 		}
 		try {
 			om.writeValue(new File(fn), this);
@@ -789,7 +535,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		}
 		sb.append('\n');
 		/* Test or exercise */
-		SigmetType type = this.type == null ? SigmetType.normal :this.type;
+		SigmetAirmetType type = this.type == null ? SigmetAirmetType.normal :this.type;
 		switch(type) {
 		case test:
 			sb.append("TEST ");
@@ -1109,7 +855,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			toDeleteIfError.add(jsonFileName);
 
 			String iwxxmName="A_"+iwxxmBulletinHeader+this.getLocation_indicator_mwo()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
-			if (status.equals(SigmetStatus.canceled)){
+			if (status.equals(SigmetAirmetStatus.canceled)){
 				iwxxmName+="CNL";
 			}
 			iwxxmName+="_C_"+this.getLocation_indicator_mwo()+"_"+time;

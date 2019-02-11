@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon;
-import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 
 @Component
 public class SigmetStore {
@@ -94,7 +94,7 @@ public class SigmetStore {
 	}
 
 	private Sigmet[] getPublishedSigmetsOnDay(Sigmet sigmetToPublish) {
-		Sigmet[] sigmets = getSigmets(false, SigmetStatus.published);
+		Sigmet[] sigmets = getSigmets(false, SigmetAirmetStatus.published);
 		OffsetDateTime offsetSinceMidnight = sigmetToPublish.getIssuedate().withHour(0).withMinute(1).withSecond(0).withNano(0);
 
 		return Arrays.stream(sigmets).filter(sigmet -> (
@@ -104,7 +104,7 @@ public class SigmetStore {
 	}
 
 	public Sigmet[] __getPublishedSigmetsSinceDay (int daysOffset) {
-		Sigmet[] sigmets = getSigmets(false, SigmetStatus.published);
+		Sigmet[] sigmets = getSigmets(false, SigmetAirmetStatus.published);
 		OffsetDateTime offset = OffsetDateTime.now(ZoneId.of("Z")).minusDays(daysOffset);
 		OffsetDateTime offsetSinceMidnight = offset.withHour(0).withMinute(1).withSecond(0).withNano(0);
 
@@ -114,7 +114,7 @@ public class SigmetStore {
 				)).toArray(Sigmet[]::new);
 	}
 
-	public Sigmet[] getSigmets(boolean selectActive, SigmetStatus selectStatus) {
+	public Sigmet[] getSigmets(boolean selectActive, SigmetAirmetStatus selectStatus) {
 		Comparator<Sigmet> comp = new Comparator<Sigmet>() {
 			public int compare(Sigmet lhs, Sigmet rhs) {
 				if (rhs.getIssuedate() != null && lhs.getIssuedate() != null)
@@ -143,13 +143,13 @@ public class SigmetStore {
 					sm = Sigmet.getSigmetFromFile(sigmetObjectMapper, f);
 					if (selectActive) {
 //						Debug.println(sm.getStatus()+" "+now+" "+sm.getValiddate()+" "+sm.getValiddate_end());
-						if ((sm.getStatus()==SigmetStatus.published)&&
+						if ((sm.getStatus()==SigmetAirmetStatus.published)&&
 								(sm.getValiddate_end().isAfter(now))) {
 							sigmets.add(sm);
 						}
 					}else if (selectStatus != null) {
-						if (selectStatus==SigmetStatus.canceled) {
-							if (((sm.getStatus()==SigmetStatus.published)&&sm.getValiddate_end().isBefore(now))||(sm.getStatus()==SigmetStatus.canceled)) {
+						if (selectStatus==SigmetAirmetStatus.canceled) {
+							if (((sm.getStatus()==SigmetAirmetStatus.published)&&sm.getValiddate_end().isBefore(now))||(sm.getStatus()==SigmetAirmetStatus.canceled)) {
 								sigmets.add(sm);
 							}
 						} else {
@@ -194,7 +194,7 @@ public class SigmetStore {
 	public boolean isPublished(String uuid) {
 		Sigmet sigmet=getByUuid(uuid);
 		if (sigmet!=null) {
-			return (sigmet.getStatus()==SigmetStatus.published);
+			return (sigmet.getStatus()==SigmetAirmetStatus.published);
 		}
 		return false;
 	}
@@ -202,7 +202,7 @@ public class SigmetStore {
 	public boolean isCanceled(String uuid) {
 		Sigmet sigmet=getByUuid(uuid);
 		if (sigmet!=null) {
-			return (sigmet.getStatus()==SigmetStatus.canceled);
+			return (sigmet.getStatus()==SigmetAirmetStatus.canceled);
 		}
 		return false;
 	}
