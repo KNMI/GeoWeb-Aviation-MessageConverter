@@ -9,22 +9,24 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geojson.Feature;
-import org.geojson.FeatureCollection;
-import org.geojson.GeoJsonObject;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import org.geojson.Feature;
+import org.geojson.FeatureCollection;
+import org.geojson.GeoJsonObject;
+import org.geojson.Polygon;
 
 import lombok.Getter;
 import lombok.Setter;
 import nl.knmi.adaguc.tools.Debug;
+
 import nl.knmi.geoweb.backend.product.GeoWebProduct;
 import nl.knmi.geoweb.backend.product.IExportable;
 import nl.knmi.geoweb.backend.product.ProductConverter;
@@ -34,6 +36,7 @@ import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetLevel;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetUtils;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 @Getter
@@ -67,8 +70,31 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
     private SigmetAirmetType type;
     private int sequence;
 
+    @JsonInclude(Include.NON_NULL)
+    private Integer cancels;
+    @JsonInclude(Include.NON_NULL)
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private OffsetDateTime cancelsStart;
+
     @JsonIgnore
     private Feature firFeature;
+
+    private String obscuringToTAC() {
+        if (this.obscuring != null && this.obscuring.size() > 0) {
+            ObscuringPhenomenonList.ObscuringPhenomenon obscuring = this.obscuring.get(0);
+            if (obscuring != null && obscuring.getName() != null && obscuring.getCode() != null) {
+                return "(" + obscuring.toTAC() + ")";
+            }
+        }
+        return "";
+    }
+
+    private String visibilityToTAC() {
+        if ((this.visibility != null) && (this.visibility.val != null) && (this.visibility.unit != null)) {
+            return String.format("%04.0f", this.visibility.val) + this.visibility.unit;
+        }
+        return "";
+    }
 
     public enum ParamInfo {
         WITH_CLOUDLEVELS, WITH_OBSCURATION, WITH_WIND;
@@ -91,6 +117,13 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
         public AirmetWindInfo(){
         }
+
+        public String toTAC() {
+            if ((this.speed.val != null) && (this.speed.unit != null) && (this.direction.val != null)) {
+                return String.format("%03.0f", this.direction.val) + " " + String.format("%02.0f",this.speed.val) + this.speed.unit;
+            }
+            return "";
+        }
     }
 
     @Getter
@@ -106,6 +139,18 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         public LowerCloudLevel(double level, String unit) {
             this.setVal(level);
             this.setUnit(unit);
+        }
+
+        public String toTAC() {
+            if (surface == true) {
+                return "SFC";
+            }
+            Double val = this.getVal();
+            String unit = this.getUnit();
+            if ((val != null) && (unit != null)) {
+                return String.format("%04.0f", val);
+            }
+            return "";
         }
     }
 
@@ -129,6 +174,16 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
             }
             this.setVal(level);
             this.setUnit(unit);
+        }
+
+        public String toTAC() {
+            Double val = this.getVal();
+            String unit = this.getUnit();
+            String above = this.above == true ? "ABV" : "";
+            if ((val != null) && (unit != null)) {
+                return  above + String.format("%04.0f", val) + unit;
+            }
+            return "";
         }
     }
 
@@ -159,7 +214,22 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
             this.upper=new UpperCloudLevel(above, upper, unit);
         }
 
+        public AirmetCloudLevelInfo(boolean lower, boolean above, double upper, String unit) {
+            this.lower = new LowerCloudLevel(lower);
+            this.upper = new UpperCloudLevel(above, upper, unit);
+        }
+
         public AirmetCloudLevelInfo(){}
+
+        public String toTAC() {
+            String lowerTAC = this.lower.toTAC();
+            String upperTAC = this.upper.toTAC();
+
+            if ((!lowerTAC.isEmpty()) && (!upperTAC.isEmpty())) {
+                return lowerTAC + "/" + upperTAC;
+            }
+            return "";
+        }
     }
 
     @Getter
@@ -234,7 +304,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
     @Getter
     public enum AirmetStatus {
-        concept("concept"), canceled("canceled"), published("published");//, test("test"); TODO: Check, should be in Type now.
+        concept("concept"), canceled("canceled"), published("published");
         private String status;
         private AirmetStatus (String status) {
             this.status = status;
@@ -282,7 +352,121 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 	}
 
 	public String toTAC(Feature FIR) {
-        return "TAC of AIRMET";
+        GeoJsonObject effectiveStartGeometry = SigmetAirmetUtils.findStartGeometry(this.geojson);
+        if ((effectiveStartGeometry == null)
+                || (((Feature) effectiveStartGeometry).getProperty("selectionType") == null)) {
+            return "Missing geometry";
+        }
+        if (!((Feature) effectiveStartGeometry).getProperty("selectionType").equals("box")
+                && !((Feature) effectiveStartGeometry).getProperty("selectionType").equals("fir")
+                && !((Feature) effectiveStartGeometry).getProperty("selectionType").equals("point")) {
+            GeoJsonObject intersected = SigmetAirmetUtils.extractSingleStartGeometry(this.geojson);
+            int sz = ((Polygon) ((Feature) intersected).getGeometry()).getCoordinates().get(0).size();
+            if (sz <= 7) {
+                effectiveStartGeometry = intersected; // Use intersection result
+            }
+        }
+        StringBuilder sb = new StringBuilder();
+        String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth())
+                + String.format("%02d", this.validdate.getHour()) + String.format("%02d", this.validdate.getMinute());
+        String validdateEndFormatted = String.format("%02d", this.validdate_end.getDayOfMonth())
+                + String.format("%02d", this.validdate_end.getHour())
+                + String.format("%02d", this.validdate_end.getMinute());
+
+        sb.append(this.location_indicator_icao).append(" AIRMET ").append(this.sequence).append(" VALID ")
+                .append(validdateFormatted).append('/').append(validdateEndFormatted).append(' ')
+                .append(this.location_indicator_mwo).append('-');
+        sb.append('\n');
+
+        sb.append(this.location_indicator_icao).append(' ').append(this.firname);
+
+        if (this.cancels != null && this.cancelsStart != null) {
+            String validdateCancelled = String.format("%02d", this.cancelsStart.getDayOfMonth())
+                    + String.format("%02d", this.cancelsStart.getHour())
+                    + String.format("%02d", this.cancelsStart.getMinute());
+
+            sb.append(' ').append("CNL AIRMET ").append(this.cancels).append(" ").append(validdateCancelled).append('/')
+                    .append(validdateEndFormatted);
+            return sb.toString();
+        }
+        sb.append('\n');
+        /* Test or exercise */
+        SigmetAirmetType type = this.type == null ? SigmetAirmetType.normal : this.type;
+        switch (type) {
+        case test:
+            sb.append("TEST ");
+            break;
+        case exercise:
+            sb.append("EXER ");
+            break;
+        default:
+        }
+
+        Debug.println("phen: " + this.phenomenon);
+        sb.append(this.phenomenon.getShortDescription());
+
+        switch (this.phenomenon) {
+            case SFC_WIND:
+                if (this.wind != null) {
+                    sb.append(" ");
+                    sb.append(this.wind.toTAC());
+                }
+                break;
+            case SFC_VIS:
+                sb.append(" ");
+                sb.append(this.visibilityToTAC());
+                sb.append(" ");
+                sb.append(this.obscuringToTAC());
+                break;
+            case BKN_CLD:
+            case OVC_CLD:
+                if (this.cloudLevels != null) {
+                    sb.append(" ");
+                    sb.append(this.cloudLevels.toTAC());
+                }
+                break;
+            default:
+                break;
+        }
+
+        sb.append('\n');
+        if (this.getObs_or_forecast() != null) {
+            sb.append(this.obs_or_forecast.toTAC());
+            sb.append('\n');
+        }
+        sb.append(SigmetAirmetUtils.featureToTAC((Feature) effectiveStartGeometry, FIR));
+        sb.append('\n');
+
+        String levelInfoText = this.levelinfo != null
+            ? this.levelinfo.toTAC()
+            : "";
+        if (!levelInfoText.isEmpty()) {
+            sb.append(levelInfoText);
+            sb.append('\n');
+        }
+
+        if (this.movement_type == null) {
+            this.movement_type = AirmetMovementType.STATIONARY;
+        }
+
+        switch (this.movement_type) {
+        case STATIONARY:
+            sb.append("STNR ");
+            break;
+        case MOVEMENT:
+            if (this.movement != null) {
+                sb.append(this.movement.toTAC());
+                sb.append('\n');
+            }
+            break;
+        }
+
+        if (this.change != null) {
+            sb.append(this.change.toTAC());
+            sb.append('\n');
+        }
+
+        return sb.toString();
     }
 
     public String toJSON(ObjectMapper om) throws JsonProcessingException {

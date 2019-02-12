@@ -78,7 +78,7 @@ public class SigmetToTACTest {
 		sm.setValiddate_end(OffsetDateTime.now(ZoneId.of("Z")).plusHours(3));
 		sm.setChange(SigmetAirmetChange.NC);
 		sm.setMovement_type(Sigmet.SigmetMovementType.STATIONARY);
-		sm.setLevelinfo(new SigmetAirmetLevel(new SigmetAirmetLevel.SigmetAirmetPart(SigmetAirmetLevel.SigmetLevelUnit.FL, 300),
+		sm.setLevelinfo(new SigmetAirmetLevel(new SigmetAirmetLevel.SigmetAirmetPart(SigmetAirmetLevel.SigmetAirmetLevelUnit.FL, 300),
 				SigmetAirmetLevel.SigmetAirmetLevelMode.TOPS_ABV));
 		setGeoFromString(sm, s);
 		return sm;
