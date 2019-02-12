@@ -1,14 +1,14 @@
 package nl.knmi.geoweb.backend.product.airmet;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
+import static java.util.Arrays.asList;
 
 import org.geojson.GeoJsonObject;
+import org.geojson.Feature;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,13 +21,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import nl.knmi.adaguc.tools.Debug;
-import nl.knmi.adaguc.tools.Tools;
-import nl.knmi.geoweb.backend.aviation.FIRStore;
-import nl.knmi.geoweb.backend.product.airmet.Airmet.Phenomenon;
+import nl.knmi.geoweb.backend.product.airmet.Airmet;
+import nl.knmi.geoweb.backend.product.airmet.ObscuringPhenomenonList;
+import nl.knmi.geoweb.backend.product.sigmetairmet.ObsFc;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetChange;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetLevel;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -37,114 +38,213 @@ public class AirmetToTACTest {
 	@Qualifier("airmetObjectMapper")
 	private ObjectMapper airmetObjectMapper;
 	
-	public final String airmetStoreLocation = "/tmp/junit/geowebbackendstore/";
-	
-	static String testGeoJson="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]},\"properties\":{}}]}";
+	private String firFeature="{\"geometry\": {\"type\": \"Polygon\",\"coordinates\": [[" +
+      "[7.065557479000063,52.38582801800004],[7.133054733000051,52.88888740500005],[7.142179873000032,52.898243887000035]," +
+			"[7.191666670000075,53.30000000000007],[6.500000000000057,53.66666667000004],[6.500001907000069,55.00000190700007]," +
+			"[5.000001907000069,55.00000190700007],[4.999987712000063,54.99998690600006],[3.4387616280000657,53.25967899900007]," +
+			"[2.000001907000069,51.50000190700007],[3.370000839000056,51.369722366000076],[3.3705270460000634,51.36866995200006]," +
+			"[3.3622226710000405,51.32000160200005],[3.3638896940000222,51.313608170000066],[3.3736133570000675,51.30999946600008]," +
+			"[3.952501297000026,51.21444129900004],[4.397500992000062,51.45277595500005],[5.078611374000047,51.39166450500005]," +
+			"[5.848333358000048,51.139444351000066],[5.651666641000077,50.82471656800004],[6.011796951000065,50.75727272100005]," +
+			"[5.934167862000038,51.03638649000004],[6.222223282000073,51.36166572600007],[5.946390152000049,51.81166267400005]," +
+			"[6.405000686000051,51.830827713000076],[7.053094864000059,52.23776435800005],[7.031389237000042,52.26888465900004]," +
+			"[7.063611984000033,52.34610939100003],[7.065557479000063,52.38582801800004]]]}, "+
+			"\"type\":\"Feature\",\"properties\":{\"centlong\":4.98042633,\"REGION\":\"EUR\",\"StateName\":\"Netherlands\"," +
+			"\"FIRname\":\"AMSTERDAMFIR\",\"StateCode\":\"NLD\",\"centlat\":52.8618788,\"ICAOCODE\":\"EHAA\"}}";
 
-	static String testGeoJson1="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0,52],[0,60],[10,60],[10,52],[0,52]]]}, \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"box\"} }]}";
+	private String testGeoJsonBox= "{\"type\": \"FeatureCollection\",\"features\":[{\"type\": \"Feature\",\"id\": \"feb7bb38-a341-438d-b8f5-aa83685a0062\"," +
+			" \"properties\": {\"selectionType\": \"box\",\"featureFunction\": \"start\"},\"geometry\": {\"type\": \"Polygon\"," +
+			" \"coordinates\": [[[5.1618,51.4414],[5.1618,51.7424],[5.8444,51.7424],[5.8444,51.4414],[5.1618,51.4414]]]}}]}\"";
 
-	static String testGeoJson2="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0,52],[0,60],[5,60],[5,52],[0,52]]]}, \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"box\"} }]}";
-	
-	static String testGeoJson3="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[0,52],[0,54],[10,54],[10,52],[0,52]]]}, \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"box\"} }]}";
-	
-	static String testGeoJson4="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[0,52]}, \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"point\"} }]}";
-	
-	static String testGeoJson5="{\"type\":\"FeatureCollection\",\"features\":[{\"type\":\"Feature\", \"properties\":{\"featureFunction\":\"start\", \"selectionType\":\"fir\"} }]}";
-
-	static String testAirmet="{\"geojson\":"
-			+"{\"type\":\"FeatureCollection\",\"features\":"+"[{\"type\":\"Feature\",\"properties\":{\"prop0\":\"value0\",\"prop1\":{\"this\":\"that\"}},\"geometry\":{\"type\":\"Polygon\",\"coordinates\":[[[4.44963571205923,52.75852934878266],[1.4462013467168233,52.00458561642831],[5.342222631879865,50.69927379063084],[7.754619712476178,50.59854892065259],[8.731640530117685,52.3196364467871],[8.695454573908739,53.50720041878871],[6.847813968390116,54.08633053026368],[3.086939481359807,53.90252679590722]]]}}]},"
-			+"\"phenomenon\":\"ISOL_TCU\","
-			+"\"obs_or_forecast\":{\"obs\":true},"
-			+"\"level\":{\"lev1\":{\"value\":100.0,\"unit\":\"FL\"}},"
-			+"\"movement_type\":\"stationary\","
-			+"\"change\":\"NC\","
-			+"\"issuedate\":\"2017-03-24T15:56:16Z\","
-			+"\"validdate\":\"2017-03-24T15:56:16Z\","
-			+"\"firname\":\"AMSTERDAM FIR\","
-			+"\"location_indicator_icao\":\"EHAA\","
-			+"\"location_indicator_mwo\":\"EHDB\"}";
-	
-	@Test
-	public void contextLoads() throws Exception {
-		assertThat(airmetObjectMapper,notNullValue());
-	}
-	
-	public Airmet createAirmet (String s) throws Exception {
-		Airmet sm=new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "abcd");
-		sm.setPhenomenon(Phenomenon.getPhenomenon("ISOL_TCU"));
-		sm.setValiddate(OffsetDateTime.now(ZoneId.of("Z")).minusHours(1));
-		sm.setValiddate_end(OffsetDateTime.now(ZoneId.of("Z")).plusHours(3));
-		sm.setChange(SigmetAirmetChange.NC);
-		sm.setMovement_type(Airmet.AirmetMovementType.STATIONARY);
-		sm.setLevelinfo(new SigmetAirmetLevel(new SigmetAirmetLevel.SigmetAirmetPart(SigmetAirmetLevel.SigmetAirmetLevelUnit.FL, 300),
-				SigmetAirmetLevel.SigmetAirmetLevelMode.TOPS_ABV));
-		setGeoFromString(sm, s);
-		return sm;
-	}
-	
-	public void setGeoFromString(Airmet am, String json) {
-		Debug.println("setGeoFromString "+json);
-		GeoJsonObject geo;	
+	private Feature mapJsonToFeature (String json) {
+		Feature result;
 		try {
-			geo = airmetObjectMapper.readValue(json, GeoJsonObject.class);
-			am.setGeojson(geo);
-			Debug.println("setGeoFromString ["+json+"] set");
-			return;
+			result = airmetObjectMapper.readValue(json, Feature.class);
 		} catch (JsonParseException e) {
+			result = null;
 		} catch (JsonMappingException e) {
+			result = null;
 		} catch (IOException e) {
+			result = null;
 		}
-		Debug.errprintln("setGeoFromString on ["+json+"] failed");
-		am.setGeojson(null);
-	}
-	
-	public void validateAirmet (Airmet am) throws Exception {
-		Debug.println("Testing createAndCheckAirmet");
-		Debug.println(am.getValiddate().toString());
-		assertThat(am.getPhenomenon().toString(), is("ISOL_TCU"));
-	}
-	
-	@Test 
-	public void createAndValidateAirmet () throws Exception {
-		Airmet am = createAirmet(testGeoJson1);
-		validateAirmet(am);
+		return result;
 	}
 
-	@Autowired
-	AirmetStore testAirmetStore;
-	
-	public AirmetStore createNewStore () throws IOException {
-		Tools.rmdir(airmetStoreLocation);
-		Tools.mksubdirs(airmetStoreLocation);
-		testAirmetStore.setLocation(airmetStoreLocation);
-		Airmet[] airmets=testAirmetStore.getAirmets(false, SigmetAirmetStatus.concept);
-		assertThat(airmets.length, is(0));
-		return testAirmetStore;
+	private GeoJsonObject mapJsonToGeoObject(String json) {
+		GeoJsonObject result;
+		try {
+			result = airmetObjectMapper.readValue(json, GeoJsonObject.class);
+		} catch (JsonParseException e) {
+			result = null;
+		} catch (JsonMappingException e) {
+			result = null;
+		} catch (IOException e) {
+			result = null;
+		}
+		return result;
 	}
-	
+
 	@Test
-	public void saveOneAirmet () throws Exception {
-		AirmetStore store=createNewStore();
-		Airmet sm = createAirmet(testGeoJson1);
-		assertThat(store.getOM(),notNullValue());
-		
-		store.storeAirmet(sm);
-		assertThat(store.getAirmets(false, SigmetAirmetStatus.concept).length, is(1));
+	public void checkTacForRegularAirmet () throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.normal);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("OCNL_TSGR"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true));
+		am.setChange(SigmetAirmetChange.INTSF);
+		am.setMovement_type(Airmet.AirmetMovementType.MOVEMENT);
+		am.setMovement(new SigmetAirmetMovement("NNE", 4, "KT"));
+		am.setLevelinfo(
+				new SigmetAirmetLevel(new SigmetAirmetLevel.SigmetAirmetPart(SigmetAirmetLevel.SigmetAirmetLevelUnit.FL, 30),
+						SigmetAirmetLevel.SigmetAirmetLevelMode.ABV));
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, 
+				is("EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nOCNL_TSGR\nOBS\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nABV FL030\nMOV NNE 4KT\nINTSF\n"));
 	}
-	
+
 	@Test
-	public void loadAndValidateAirmet () throws Exception {
-		AirmetStore store=createNewStore();
-		Airmet sm = createAirmet(testGeoJson5);
-		assertThat(store.getOM(),notNullValue());
-		store.storeAirmet(sm);
-		
-		Airmet[] airmets=store.getAirmets(false, SigmetAirmetStatus.concept);
-		assertThat(airmets.length, is(1));
-		validateAirmet(airmets[0]);
-		Debug.println("AIRMET: "+airmets[0].toString());
-		FIRStore firStore=new FIRStore("/tmp/FIRSTORE");
-		Debug.println("  TAC:"+airmets[0].toTAC(firStore.lookup("EHAA", true)));
+	public void checkTacForClouds() throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.test);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("BKN_CLD"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true));
+		am.setChange(SigmetAirmetChange.NC);
+		am.setMovement_type(Airmet.AirmetMovementType.STATIONARY);
+		am.setCloudLevels(new Airmet.AirmetCloudLevelInfo(true, true, 300, "FT"));
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, is(
+				"EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nTEST BKN_CLD SFC/ABV0300FT\nOBS\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nSTNR NC\n"));
 	}
-	
+
+	@Test
+	public void checkTacForCloudsMissing() throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.test);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("BKN_CLD"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true));
+		am.setChange(SigmetAirmetChange.NC);
+		am.setMovement_type(Airmet.AirmetMovementType.STATIONARY);
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, is(
+				"EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nTEST BKN_CLD\nOBS\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nSTNR NC\n"));
+	}
+
+	@Test
+	public void checkTacForVisibility() throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.normal);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("SFC_VIS"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true));
+		am.setChange(SigmetAirmetChange.INTSF);
+		am.setMovement_type(Airmet.AirmetMovementType.STATIONARY);
+		am.setVisibility(new Airmet.AirmetValue(400, "M"));
+		am.setObscuring(asList(new ObscuringPhenomenonList.ObscuringPhenomenon("Dust storm", "DS")));
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, is(
+				"EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nSFC_VIS 0400M (DS)\nOBS\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nSTNR INTSF\n"));
+	}
+
+	@Test
+	public void checkTacForVisibilityMissing() throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.normal);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("SFC_VIS"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true));
+		am.setChange(SigmetAirmetChange.INTSF);
+		am.setMovement_type(Airmet.AirmetMovementType.STATIONARY);
+		am.setObscuring(asList(new ObscuringPhenomenonList.ObscuringPhenomenon("Dust storm", "DS")));
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, is(
+				"EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nSFC_VIS  (DS)\nOBS\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nSTNR INTSF\n"));
+	}
+
+	@Test
+	public void checkTacForVisibilityMissingObscuring() throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.normal);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("SFC_VIS"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true));
+		am.setChange(SigmetAirmetChange.INTSF);
+		am.setMovement_type(Airmet.AirmetMovementType.STATIONARY);
+		am.setVisibility(new Airmet.AirmetValue(400, "M"));
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, is(
+				"EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nSFC_VIS 0400M \nOBS\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nSTNR INTSF\n"));
+	}
+
+	@Test
+	public void checkTacForWind() throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.exercise);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("SFC_WIND"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true, OffsetDateTime.parse("2019-02-11T11:00:00Z")));
+		am.setChange(SigmetAirmetChange.NC);
+		am.setWind(new Airmet.AirmetWindInfo(3, "MPS", 3, "degrees"));
+		am.setMovement_type(Airmet.AirmetMovementType.MOVEMENT);
+		am.setMovement(new SigmetAirmetMovement("SW", 3, "KT"));
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, is(
+				"EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nEXER SFC_WIND 003 03MPS\nOBS AT 1100Z\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nMOV SW 3KT\nNC\n"));
+	}
+
+	@Test
+	public void checkTacForWindMissing() throws Exception {
+		OffsetDateTime start = OffsetDateTime.parse("2019-02-12T08:00:00Z");
+		OffsetDateTime end = OffsetDateTime.parse("2019-02-12T11:00:00Z");
+		Airmet am = new Airmet("AMSTERDAM FIR", "EHAA", "EHDB", "b6ea2637-4652-42cc-97ac-4e34548d3cc7");
+		am.setStatus(SigmetAirmetStatus.concept);
+		am.setType(SigmetAirmetType.exercise);
+		am.setPhenomenon(Airmet.Phenomenon.getPhenomenon("SFC_WIND"));
+		am.setValiddate(start);
+		am.setValiddate_end(end);
+		am.setObs_or_forecast(new ObsFc(true, OffsetDateTime.parse("2019-02-11T11:00:00Z")));
+		am.setChange(SigmetAirmetChange.NC);
+		am.setMovement_type(Airmet.AirmetMovementType.MOVEMENT);
+		am.setMovement(new SigmetAirmetMovement("SW", 3, "KT"));
+		am.setGeojson(mapJsonToGeoObject(testGeoJsonBox));
+		String tac = am.toTAC(mapJsonToFeature(firFeature));
+		assertThat(tac, is(
+				"EHAA AIRMET -1 VALID 120800/121100 EHDB-\nEHAA AMSTERDAM FIR\nEXER SFC_WIND\nOBS AT 1100Z\nWI N5126 E00510 - N5145 E00510 - N5145 E00551 - N5126 E00551 - N5126 E00510\nMOV SW 3KT\nNC\n"));
+	}
 }

@@ -90,7 +90,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
     }
 
     private String visibilityToTAC() {
-        if ((this.visibility.val != null) && (this.visibility.unit != null)) {
+        if ((this.visibility != null) && (this.visibility.val != null) && (this.visibility.unit != null)) {
             return String.format("%04.0f", this.visibility.val) + this.visibility.unit;
         }
         return "";
@@ -212,6 +212,11 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         public AirmetCloudLevelInfo(double lower, boolean above, double upper, String unit) {
             this.lower=new LowerCloudLevel(lower, unit);
             this.upper=new UpperCloudLevel(above, upper, unit);
+        }
+
+        public AirmetCloudLevelInfo(boolean lower, boolean above, double upper, String unit) {
+            this.lower = new LowerCloudLevel(lower);
+            this.upper = new UpperCloudLevel(above, upper, unit);
         }
 
         public AirmetCloudLevelInfo(){}
@@ -402,8 +407,10 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
         switch (this.phenomenon) {
             case SFC_WIND:
-                sb.append(" ");
-                sb.append(this.wind.toTAC());
+                if (this.wind != null) {
+                    sb.append(" ");
+                    sb.append(this.wind.toTAC());
+                }
                 break;
             case SFC_VIS:
                 sb.append(" ");
@@ -413,8 +420,10 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
                 break;
             case BKN_CLD:
             case OVC_CLD:
-                sb.append(" ");
-                sb.append(this.cloudLevels.toTAC());
+                if (this.cloudLevels != null) {
+                    sb.append(" ");
+                    sb.append(this.cloudLevels.toTAC());
+                }
                 break;
             default:
                 break;
@@ -428,7 +437,9 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         sb.append(SigmetAirmetUtils.featureToTAC((Feature) effectiveStartGeometry, FIR));
         sb.append('\n');
 
-        String levelInfoText = this.levelinfo.toTAC();
+        String levelInfoText = this.levelinfo != null
+            ? this.levelinfo.toTAC()
+            : "";
         if (!levelInfoText.isEmpty()) {
             sb.append(levelInfoText);
             sb.append('\n');
