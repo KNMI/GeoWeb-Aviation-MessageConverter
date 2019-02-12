@@ -304,7 +304,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
     @Getter
     public enum AirmetStatus {
-        concept("concept"), canceled("canceled"), published("published");//, test("test"); TODO: Check, should be in Type now.
+        concept("concept"), canceled("canceled"), published("published");
         private String status;
         private AirmetStatus (String status) {
             this.status = status;

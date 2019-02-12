@@ -26,7 +26,6 @@ import org.locationtech.jts.io.ParseException;
 
 public class SigmetAirmetUtils {
   private static String START = "start";
-  private static String END = "end";
   private static String INTERSECTION = "intersection";
 
   private static String convertLat(double lat) {
@@ -195,11 +194,9 @@ public class SigmetAirmetUtils {
 
           for (int i = 0; i < 4; i++) {
             LineString side = new LineString(caf.create(Arrays.copyOfRange(drawnCoords, i, i + 2)), gf);
-            if (side == null)
-              return " ERR (side) ";
             if (geom_fir == null)
               return " ERR (geom_fir) ";
-            if (side.intersects(geom_fir)) { // TODO or: firBorder
+            if (side.intersects(geom_fir)) {
               boxSidesIntersecting[i] = true;
               boxSidesIntersectingCount++;
               // Debug.println("Intersecting on side "+i);
