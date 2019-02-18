@@ -120,7 +120,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
         public String toTAC() {
             if ((this.speed.val != null) && (this.speed.unit != null) && (this.direction.val != null)) {
-                return String.format("%03.0f", this.direction.val) + " " + String.format("%02.0f",this.speed.val) + this.speed.unit;
+                return String.format("%03.0f", this.direction.val) + "/" + String.format("%02.0f",this.speed.val) + this.speed.unit;
             }
             return "";
         }
