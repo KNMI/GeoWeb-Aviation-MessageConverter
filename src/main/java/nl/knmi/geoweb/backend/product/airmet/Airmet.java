@@ -120,7 +120,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
         public String toTAC() {
             if ((this.speed.val != null) && (this.speed.unit != null) && (this.direction.val != null)) {
-                return String.format("%03.0f", this.direction.val) + " " + String.format("%02.0f",this.speed.val) + this.speed.unit;
+                return String.format("%03.0f", this.direction.val) + "/" + String.format("%02.0f",this.speed.val) + this.speed.unit;
             }
             return "";
         }
@@ -247,24 +247,24 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
     @Getter
     public enum Phenomenon {
-        BKN_CLD("BKN_CLD", ParamInfo.WITH_CLOUDLEVELS),
-        OVC_CLD("OVC_CLD", ParamInfo.WITH_CLOUDLEVELS),
-        FRQ_CB("FRQ_CB"),
-        FRQ_TCU("FRQ_TCU"),
-        ISOL_CB("ISOL_CB"),
-        ISOL_TCU("ISOL_TCU"),
-        ISOL_TS("ISOL_TS"),
-        ISOL_TSGR("ISOL_TSGR"),
-        MOD_ICE("MOD_ICE"),
-        MOD_MTW("MOD_MTW"),
-        MOD_TURB("MOD_TURB"),
-        MT_OBSC("MT_OBSC"),
-        OCNL_CB("OCNL_CB"),
-        OCNL_TS("OCNL_TS"),
-        OCNL_TSGR("OCNL_TSGR"),
-        OCNL_TCU("OCNL_TCU"),
-        SFC_VIS("SFC_VIS", ParamInfo.WITH_OBSCURATION),
-        SFC_WIND("SFC_WIND", ParamInfo.WITH_WIND);
+        BKN_CLD("BKN CLD", ParamInfo.WITH_CLOUDLEVELS),
+        OVC_CLD("OVC CLD", ParamInfo.WITH_CLOUDLEVELS),
+        FRQ_CB("FRQ CB"),
+        FRQ_TCU("FRQ TCU"),
+        ISOL_CB("ISOL CB"),
+        ISOL_TCU("ISOL TCU"),
+        ISOL_TS("ISOL TS"),
+        ISOL_TSGR("ISOL TSGR"),
+        MOD_ICE("MOD ICE"),
+        MOD_MTW("MOD MTW"),
+        MOD_TURB("MOD TURB"),
+        MT_OBSC("MT OBSC"),
+        OCNL_CB("OCNL CB"),
+        OCNL_TS("OCNL TS"),
+        OCNL_TSGR("OCNL TSGR"),
+        OCNL_TCU("OCNL TCU"),
+        SFC_VIS("SFC VIS", ParamInfo.WITH_OBSCURATION),
+        SFC_WIND("SFC WIND", ParamInfo.WITH_WIND);
 
 
         private String description;

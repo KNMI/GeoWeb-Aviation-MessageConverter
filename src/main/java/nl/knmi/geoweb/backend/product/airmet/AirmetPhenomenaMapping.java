@@ -52,6 +52,6 @@ public class AirmetPhenomenaMapping {
 		this.phenomena.add(new AirmetPhenomenon("Moderate turbulence",  "MOD_TURB", "Airmet_layer_TURB"));
 		this.phenomena.add(new AirmetPhenomenon("Mountain obscuration",  "MT_OBSC", "Airmet_layer_CLD"));
 		this.phenomena.add(new AirmetPhenomenon("Surface visibility",  "SFC_VIS", "Airmet_layer_VIS", AirmetPhenomenonParamInfo.NEEDS_OBSCURATION));
-		this.phenomena.add(new AirmetPhenomenon("Widespread mean surface wind",  "SFC_WIND", "Airmet_layer_WIND", AirmetPhenomenonParamInfo.NEEDS_WIND));
+		this.phenomena.add(new AirmetPhenomenon("Surface wind",  "SFC_WIND", "Airmet_layer_WIND", AirmetPhenomenonParamInfo.NEEDS_WIND));
 	}
 }
