@@ -488,7 +488,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         this.phenomenon = null;
         // If an AIRMET is posted, this has no effect
         this.status= SigmetAirmetStatus.concept;
-        this.type= SigmetAirmetType.test;
+        this.type= SigmetAirmetType.normal;
     }
 
     public Airmet(Airmet otherAirmet) {
@@ -496,8 +496,17 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         this.location_indicator_icao=otherAirmet.getLocation_indicator_icao();
         this.location_indicator_mwo=otherAirmet.getLocation_indicator_mwo();
         this.sequence=-1;
-        this.obscuring = new ArrayList<>();
+        this.obscuring = otherAirmet.getObscuring();
         this.phenomenon = otherAirmet.getPhenomenon();
+        this.change = otherAirmet.getChange();
+        this.geojson = otherAirmet.getGeojson();
+        this.levelinfo = otherAirmet.getLevelinfo();
+        this.movement = otherAirmet.getMovement();
+        this.obs_or_forecast = otherAirmet.getObs_or_forecast();
+        this.movement_type = otherAirmet.getMovement_type();
+        this.visibility = otherAirmet.getVisibility();
+        this.wind = otherAirmet.getWind();
+        this.cloudLevels = otherAirmet.getCloudLevels();
         this.validdate = otherAirmet.getValiddate();
         this.validdate_end = otherAirmet.getValiddate_end();
         this.issuedate = otherAirmet.getIssuedate();
@@ -515,7 +524,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
             this.status = SigmetAirmetStatus.concept;
         }
         if(this.type == null) {
-            this.type = SigmetAirmetType.test;
+            this.type = SigmetAirmetType.normal;
         }
         try {
             om.writeValue(new File(fn), this);
