@@ -234,7 +234,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		this.phenomenon = null;
 		// If a SIGMET is posted, this has no effect
 		this.status=SigmetAirmetStatus.concept;
-		this.type=SigmetAirmetType.test;
+		this.type=SigmetAirmetType.normal;
 	}
 
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
@@ -255,7 +255,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			this.status = SigmetAirmetStatus.concept;
 		}
 		if(this.type == null) {
-			this.type = SigmetAirmetType.test;
+			this.type = SigmetAirmetType.normal;
 		}
 		try {
 			om.writeValue(new File(fn), this);
