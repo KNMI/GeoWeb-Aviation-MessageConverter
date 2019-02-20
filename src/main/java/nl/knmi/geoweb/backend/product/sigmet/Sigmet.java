@@ -108,7 +108,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 			String name;
 			List <Number> position;
 			public String toTAC() {
-				String volcanoName = (this.name != null && this.name.length() > 0) ? " MT " + this.name : "";
+				String volcanoName = (this.name != null && this.name.length() > 0) ? " MT " + this.name.toUpperCase() : "";
 				String location = "";
 				try {
 					location = (position != null && position.size() == 2) ?
@@ -118,10 +118,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 				}catch(Exception e){
 					Debug.printStackTrace(e);
 				}
-				return  ((volcanoName .length() >0 || location.length() > 0) ? "VA ERUPTION" : "") + 
+				return  ((volcanoName.length() > 0 || location.length() > 0) ? "VA ERUPTION" : "") + 
 						volcanoName +  
 						location +
-						((volcanoName .length() >0 || location.length() > 0) ? " " : "");
+						((volcanoName.length() > 0 || location.length() > 0) ? " " : "");
 			}
 		}
 		public String toTAC () {
