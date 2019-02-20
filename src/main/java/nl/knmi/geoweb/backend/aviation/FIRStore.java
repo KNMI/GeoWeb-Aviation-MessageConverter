@@ -64,6 +64,8 @@ public class FIRStore implements Cloneable{
 		Debug.println("delegatedFn:"+delegatedFn);
 		if (!(delegatedFn.exists()&&delegatedFn.isFile())) {
 			Debug.errprintln("No delegated areas FIR file found, copying one from resources dir to "+this.directory);
+			// TODO: since the lists of coordinates for delegated area (EHAA) doesn't align with the FIR boundary,
+			// we introduced an additional coordinate to make them intersect: [3.163, 52.92]
 			String s = Tools.readResource(this.delegatedFile);
 			String FIRText=String.format("%s/%s", this.directory,  this.delegatedFile);
 			Tools.writeFile(FIRText, s);
