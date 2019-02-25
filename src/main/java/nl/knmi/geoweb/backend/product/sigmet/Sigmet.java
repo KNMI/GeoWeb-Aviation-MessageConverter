@@ -221,6 +221,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		this.issuedate = otherSigmet.getIssuedate();
 		this.firFeature = otherSigmet.firFeature;
 		this.type=otherSigmet.type;
+		this.change= otherSigmet.change;
 		this.va_extra_fields = otherSigmet.va_extra_fields;
 		this.tc_extra_fields = otherSigmet.tc_extra_fields;
 	}
@@ -235,6 +236,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		// If a SIGMET is posted, this has no effect
 		this.status=SigmetAirmetStatus.concept;
 		this.type=SigmetAirmetType.normal;
+		this.change= SigmetAirmetChange.NC;
 	}
 
 	public static Sigmet getSigmetFromFile(ObjectMapper om, File f) throws JsonParseException, JsonMappingException, IOException {
@@ -256,6 +258,9 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		}
 		if(this.type == null) {
 			this.type = SigmetAirmetType.normal;
+		}
+		if(this.change == null) {
+			this.change = SigmetAirmetChange.NC;
 		}
 		try {
 			om.writeValue(new File(fn), this);
