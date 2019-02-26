@@ -492,6 +492,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         // If an AIRMET is posted, this has no effect
         this.status= SigmetAirmetStatus.concept;
         this.type= SigmetAirmetType.normal;
+        this.change= SigmetAirmetChange.NC;
     }
 
     public Airmet(Airmet otherAirmet) {
@@ -513,8 +514,8 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         this.validdate = otherAirmet.getValiddate();
         this.validdate_end = otherAirmet.getValiddate_end();
         this.issuedate = otherAirmet.getIssuedate();
-        this.firFeature = otherAirmet.firFeature;
-        this.type=otherAirmet.type;
+        this.firFeature = otherAirmet.getFirFeature();
+        this.type=otherAirmet.getType();
     }
 
     public void serializeAirmet(ObjectMapper om, String fn) {
@@ -528,6 +529,9 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         }
         if(this.type == null) {
             this.type = SigmetAirmetType.normal;
+        }
+        if(this.change == null) {
+            this.change = SigmetAirmetChange.NC;
         }
         try {
             om.writeValue(new File(fn), this);
