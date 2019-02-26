@@ -571,39 +571,39 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
     @Override
     public String export(final File path, final ProductConverter<Airmet> converter, final ObjectMapper om) {
-		List<String> toDeleteIfError=new ArrayList<>(); // List of products to delete in case of error
-		try {
-			OffsetDateTime now = OffsetDateTime.now(ZoneId.of("Z"));
-			String time = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
+        List<String> toDeleteIfError=new ArrayList<>(); // List of products to delete in case of error
+        try {
+            OffsetDateTime now = OffsetDateTime.now(ZoneId.of("Z"));
+            String time = now.format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
             String tacHeaderTime = now.format(DateTimeFormatter.ofPattern("ddHHmm"));
             String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 
-			String bulletinHeader = "WANL31";
-			String tacHeaderLocation = this.getLocation_indicator_mwo();
+            String bulletinHeader = "WANL31";
+            String tacHeaderLocation = this.getLocation_indicator_mwo();
 
-			String tacFileName = bulletinHeader + tacHeaderLocation + "_" + validTime + "_" + time;
+            String tacFileName = bulletinHeader + tacHeaderLocation + "_" + validTime + "_" + time;
             String tacFilePath = path.getPath() + "/" + tacFileName + ".tac";
-            
-			// Create TAC file
-			String tacHeader = "ZCZC\n" + bulletinHeader + " " + tacHeaderLocation + " " + tacHeaderTime + "\n";	
-			String tacCode = this.toTAC(this.getFirFeature())
+
+            // Create TAC file
+            String tacHeader = "ZCZC\n" + bulletinHeader + " " + tacHeaderLocation + " " + tacHeaderTime + "\n";	
+            String tacCode = this.toTAC(this.getFirFeature())
                 .replaceAll("(?m)^[ \\t]*\\r?\\n", "").trim(); // remove empty lines
-			String tacFooter = "=\nNNNN\n";
-			Tools.writeFile(tacFilePath, tacHeader + tacCode +  tacFooter);
-			toDeleteIfError.add(tacFilePath);
+            String tacFooter = "=\nNNNN\n";
+            Tools.writeFile(tacFilePath, tacHeader + tacCode +  tacFooter);
+            toDeleteIfError.add(tacFilePath);
 
             // Create JSON file
-			String jsonFileName = "AIRMET_" + tacHeaderLocation + "_" + validTime + "_" + time;
-			String jsonFilePath = path.getPath() + "/" + jsonFileName + ".json";
-			Tools.writeFile(jsonFilePath, this.toJSON(om));
-			toDeleteIfError.add(jsonFilePath);
-		} catch (IOException | NullPointerException e) {
+            String jsonFileName = "AIRMET_" + tacHeaderLocation + "_" + validTime + "_" + time;
+            String jsonFilePath = path.getPath() + "/" + jsonFileName + ".json";
+            Tools.writeFile(jsonFilePath, this.toJSON(om));
+            toDeleteIfError.add(jsonFilePath);
+        } catch (IOException | NullPointerException e) {
             toDeleteIfError.stream()
                 .forEach(f ->  {
                     Debug.println("REMOVING "+f); Tools.rm(f);
                 });
-			return "ERROR: "+e.getMessage();
-		}
-		return "OK";
-	}
+            return "ERROR: "+e.getMessage();
+        }
+        return "OK";
+    }
 }
