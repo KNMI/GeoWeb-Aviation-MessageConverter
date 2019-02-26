@@ -219,11 +219,10 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 		this.validdate = otherSigmet.getValiddate();
 		this.validdate_end = otherSigmet.getValiddate_end();
 		this.issuedate = otherSigmet.getIssuedate();
-		this.firFeature = otherSigmet.firFeature;
-		this.type=otherSigmet.type;
-		this.change= otherSigmet.change;
-		this.va_extra_fields = otherSigmet.va_extra_fields;
-		this.tc_extra_fields = otherSigmet.tc_extra_fields;
+		this.firFeature = otherSigmet.getFirFeature();
+		this.type=otherSigmet.getType();
+		this.va_extra_fields = otherSigmet.getVa_extra_fields();
+		this.tc_extra_fields = otherSigmet.getTc_extra_fields();
 	}
 
 	public Sigmet(String firname, String location, String issuing_mwo, String uuid) {

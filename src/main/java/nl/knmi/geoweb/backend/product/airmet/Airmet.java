@@ -511,9 +511,8 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         this.validdate = otherAirmet.getValiddate();
         this.validdate_end = otherAirmet.getValiddate_end();
         this.issuedate = otherAirmet.getIssuedate();
-        this.firFeature = otherAirmet.firFeature;
-        this.type=otherAirmet.type;
-        this.change= otherAirmet.change;
+        this.firFeature = otherAirmet.getFirFeature();
+        this.type=otherAirmet.getType();
     }
 
     public void serializeAirmet(ObjectMapper om, String fn) {
