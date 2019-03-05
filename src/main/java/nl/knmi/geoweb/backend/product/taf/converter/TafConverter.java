@@ -1,15 +1,11 @@
 package nl.knmi.geoweb.backend.product.taf.converter;
 
-import fi.fmi.avi.model.immutable.AerodromeImpl;
-import fi.fmi.avi.model.immutable.GeoPositionImpl;
-import fi.fmi.avi.model.taf.immutable.TAFImpl;
-import fi.fmi.avi.model.taf.immutable.TAFReferenceImpl;
-import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTAFConverter;
-import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTafInConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.w3c.dom.Document;
 
 import fi.fmi.avi.converter.AviMessageConverter;
 import fi.fmi.avi.converter.AviMessageSpecificConverter;
@@ -17,13 +13,18 @@ import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionIssue;
 import fi.fmi.avi.converter.ConversionResult;
 import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
+import fi.fmi.avi.model.immutable.AerodromeImpl;
+import fi.fmi.avi.model.immutable.GeoPositionImpl;
 import fi.fmi.avi.model.taf.TAF;
+import fi.fmi.avi.model.taf.immutable.TAFImpl;
+import fi.fmi.avi.model.taf.immutable.TAFReferenceImpl;
 import nl.knmi.geoweb.backend.aviation.AirportInfo;
 import nl.knmi.geoweb.backend.aviation.AirportStore;
 import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.taf.Taf;
+import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTAFConverter;
+import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTafInConverter;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
-import org.w3c.dom.Document;
 
 @Configuration
 @Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, GeoWebTAFConverter.class, GeoWebTafInConverter.class})
@@ -37,9 +38,11 @@ public class TafConverter implements ProductConverter<Taf> {
 
 
     @Autowired
+    @Qualifier("aviTafSpecificMessageConverter")
     private AviMessageSpecificConverter<Taf, TAF> geoWebTafImporter;
 
     @Autowired
+    @Qualifier("aviTafInSpecificMessageConverter")
     private AviMessageSpecificConverter<TAF, Taf> geoWebTafInImporter;
 
     @Bean

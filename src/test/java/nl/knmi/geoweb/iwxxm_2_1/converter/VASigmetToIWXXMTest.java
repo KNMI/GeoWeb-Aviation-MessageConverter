@@ -1,87 +1,58 @@
 package nl.knmi.geoweb.iwxxm_2_1.converter;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
-import org.geojson.GeoJsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.core.io.Resource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import nl.knmi.adaguc.tools.Debug;
-import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.TestConfig;
 import nl.knmi.geoweb.backend.aviation.FIRStore;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.converter.SigmetConverter;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = {SigmetToIWXXMTestConfig.class})
+@SpringBootTest(classes = { TestConfig.class })
 public class VASigmetToIWXXMTest {
 	@Autowired
 	@Qualifier("sigmetObjectMapper")
 	private ObjectMapper sigmetObjectMapper;
-	
+
 	@Autowired
 	private SigmetConverter sigmetConverter;
-	
-	public final String sigmetStoreLocation = "/tmp/junit/geowebbackendstore/";
-	
-	static String[] testSigmets= new String[] {  getStringFromFile(
-			"nl/knmi/geoweb/iwxxm_2_1/converter/vasigmet.json") };
 
-	public static String getStringFromFile(String fn) {
-        	return Tools.readResource(fn);
-    }
+	@Value("classpath:nl/knmi/geoweb/iwxxm_2_1/converter/vasigmet.json")
+	Resource vaSigmetResource1;
 
-	public void setGeoFromString2(Sigmet sm, String json) {
-		Debug.println("setGeoFromString2 "+json);
-		GeoJsonObject geo;	
-		try {
-			geo = sigmetObjectMapper.readValue(json, GeoJsonObject.class);
-			sm.setGeojson(geo);
-			Debug.println("setGeoFromString ["+json+"] set");
-			return;
-		} catch (JsonParseException e) {
-		} catch (JsonMappingException e) {
-		} catch (IOException e) {
-		}
-		Debug.errprintln("setGeoFromString on ["+json+"] failed");
-		sm.setGeojson(null);
-	}
-	
+	@Value("classpath:nl/knmi/geoweb/iwxxm_2_1/converter/SIGMET_EHDB_2018-11-29T1230_20181129111546.json")
+	Resource vaSigmetResource2;
+
 	@Autowired
 	FIRStore firStore;
-	
-	public void TestConversion(String s) {
-		Sigmet sm = null;
-		try {
-			sm=sigmetObjectMapper.readValue(s, Sigmet.class);
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-		}
 
-		String res=sigmetConverter.ToIWXXM_2_1(sm);
-		System.err.println(res);
-		System.err.println("TAC: "+sm.toTAC(firStore.lookup(sm.getFirname(), false)));
-	}
-	
 	@Test
-	public void TestConversions(){
-		for (String sm: testSigmets) {
-			Debug.println("Testing sigmet: "+sm);
-			TestConversion(sm);
-			Debug.println("\n");
-		}
-	}
+	public void TestConversion (){
+		List<Resource> vaResources = Arrays.asList(vaSigmetResource1, vaSigmetResource2);
+		vaResources.forEach(resource -> {
+			Sigmet vaSigmet = null;
+			try {
+				vaSigmet = sigmetObjectMapper.readValue(resource.getInputStream(), Sigmet.class);
+			} catch (Exception e) {
+				e.printStackTrace(System.err);
+			}
 
+			String result = sigmetConverter.ToIWXXM_2_1(vaSigmet);
+			System.err.println(result);
+			System.err.println("TAC: " + vaSigmet.toTAC(firStore.lookup(vaSigmet.getFirname(), false)));
+		});
+		
+	}
 }

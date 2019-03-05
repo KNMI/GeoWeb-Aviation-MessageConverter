@@ -1,6 +1,7 @@
 package nl.knmi.geoweb.backend.product.sigmet.converter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -11,7 +12,6 @@ import fi.fmi.avi.converter.AviMessageSpecificConverter;
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionIssue;
 import fi.fmi.avi.converter.ConversionResult;
-//import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.sigmet.SIGMET;
 import nl.knmi.geoweb.backend.product.ProductConverter;
@@ -28,9 +28,10 @@ public class SigmetConverter implements ProductConverter<Sigmet>{
 	private AviMessageSpecificConverter<SIGMET, Document> sigmetIWXXMDOMSerializer;
 	
 	@Autowired
+	@Qualifier("aviSigmetSpecificMessageConverter")
 	private AviMessageSpecificConverter<Sigmet,SIGMET> geoWebSigmetImporter;
 	
-	@Bean
+	@Bean("aviSigmetMessageConverter")
 	public AviMessageConverter aviMessageConverter() {
 		AviMessageConverter p = new AviMessageConverter();
 		p.setMessageSpecificConverter(GeoWebConverterConfig.GEOWEBSIGMET_TO_SIGMET_POJO, geoWebSigmetImporter);

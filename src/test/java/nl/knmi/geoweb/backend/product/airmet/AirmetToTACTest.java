@@ -1,38 +1,35 @@
 package nl.knmi.geoweb.backend.product.airmet;
 
+import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import static java.util.Arrays.asList;
-
-import org.geojson.GeoJsonObject;
-import org.geojson.Feature;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import nl.knmi.geoweb.backend.product.airmet.Airmet;
-import nl.knmi.geoweb.backend.product.airmet.ObscuringPhenomenonList;
+import org.geojson.Feature;
+import org.geojson.GeoJsonObject;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import nl.knmi.geoweb.TestConfig;
 import nl.knmi.geoweb.backend.product.sigmetairmet.ObsFc;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetChange;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetLevel;
+import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
-import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = {AirmetStoreTestConfig.class})
+@SpringBootTest(classes = { TestConfig.class })
 public class AirmetToTACTest {
 	@Autowired
 	@Qualifier("airmetObjectMapper")
