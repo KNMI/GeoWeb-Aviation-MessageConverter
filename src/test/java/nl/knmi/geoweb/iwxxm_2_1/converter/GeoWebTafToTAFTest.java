@@ -1,29 +1,25 @@
 package nl.knmi.geoweb.iwxxm_2_1.converter;
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
-import nl.knmi.adaguc.tools.Tools;
-import nl.knmi.geoweb.backend.product.taf.Taf;
-import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
-import org.geojson.GeoJsonObject;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
+import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import nl.knmi.adaguc.tools.Tools;
+import nl.knmi.geoweb.TestConfig;
+import nl.knmi.geoweb.backend.product.taf.Taf;
+import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
+
 @RunWith(SpringRunner.class)
-@SpringBootTest
-@ContextConfiguration(classes = {GeoWebTafToIWXXMTestConfig.class})
+@SpringBootTest(classes = { TestConfig.class })
 public class GeoWebTafToTAFTest {
 	@Autowired
 	@Qualifier("tafObjectMapper")

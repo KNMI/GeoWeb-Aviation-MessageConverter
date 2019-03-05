@@ -34,7 +34,7 @@ public class AirmetConverter implements ProductConverter<Airmet>{
 	private AviMessageSpecificConverter<Airmet,AIRMET> geoWebAirmetImporter;
 */
 
-	@Bean
+	@Bean("aviAirmetMessageConverter")
 	public AviMessageConverter aviMessageConverter() {
 		AviMessageConverter p = new AviMessageConverter();
 /*

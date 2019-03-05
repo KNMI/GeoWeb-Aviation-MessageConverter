@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
-import nl.knmi.geoweb.backend.product.airmet.Airmet.AirmetStatus;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 
 @Component

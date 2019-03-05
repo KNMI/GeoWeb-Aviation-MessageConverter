@@ -23,19 +23,19 @@ public class GeoWebConverterConfig {
     public static final ConversionSpecification<TAF, Taf> TAF_TO_GEOWEBTAF_POJO = new ConversionSpecification<>(TAF.class, Taf.class, "GeoWeb TAF",
             null);
 
-    @Bean
+    @Bean("aviTafSpecificMessageConverter")
     AviMessageSpecificConverter<Taf, TAF> geowebTafConverter() {
         GeoWebConverter<TAF> p = new GeoWebTAFConverter();
         return p;
     }
 
-    @Bean
+    @Bean("aviTafInSpecificMessageConverter")
     AviMessageSpecificConverter<TAF, Taf> geowebTafInConverter() {
         GeoWebTafInConverter p = new GeoWebTafInConverter();
         return p;
     }
 
-    @Bean
+    @Bean("aviSigmetSpecificMessageConverter")
     AviMessageSpecificConverter<Sigmet, SIGMET> geowebSIGMETConverter() {
         GeoWebSIGMETConverterIntf<SIGMET> p = new GeoWebSIGMETConverter();
         return p;
