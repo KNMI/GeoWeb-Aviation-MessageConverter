@@ -23,66 +23,66 @@ import nl.knmi.geoweb.backend.aviation.FIRStore;
 @Configuration
 @ComponentScan({"nl.knmi.geoweb.backend.product", "nl.knmi.geoweb.iwxxm_2_1.converter"})
 public class TestConfig {
-	private static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'TT'HH:mm:ss'Y'";
+  private static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'TT'HH:mm:ss'Y'";
 
-	@Value("${productstorelocation}")
-	private String storeLocation;
+  @Value("${productstorelocation}")
+  private String storeLocation;
 
-	private static ObjectMapper objectMapper;
+  private static ObjectMapper objectMapper;
 
-	public TestConfig() {
-		ObjectMapper om = new ObjectMapper();
-		om.registerModule(new Jdk8Module());
-		om.registerModule(new JavaTimeModule());
-		om.setTimeZone(TimeZone.getTimeZone("UTC"));
-		om.setDateFormat(new SimpleDateFormat(DATEFORMAT_ISO8601));
-		om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-		om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-		om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-		objectMapper = om;
-	}
-	
-	@Bean("sigmetObjectMapper")
-	public static ObjectMapper getSigmetObjectMapperBean() {
-		return objectMapper;
-	}
+  public TestConfig() {
+    ObjectMapper om = new ObjectMapper();
+    om.registerModule(new Jdk8Module());
+    om.registerModule(new JavaTimeModule());
+    om.setTimeZone(TimeZone.getTimeZone("UTC"));
+    om.setDateFormat(new SimpleDateFormat(DATEFORMAT_ISO8601));
+    om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+    om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    om.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+    objectMapper = om;
+  }
+  
+  @Bean("sigmetObjectMapper")
+  public static ObjectMapper getSigmetObjectMapperBean() {
+    return objectMapper;
+  }
 
-	@Bean("airmetObjectMapper")
-	public static ObjectMapper getAirmetObjectMapperBean() {
-		return objectMapper;
-	}
+  @Bean("airmetObjectMapper")
+  public static ObjectMapper getAirmetObjectMapperBean() {
+    return objectMapper;
+  }
 
-	@Bean("tafObjectMapper")
-	public static ObjectMapper getTafObjectMapperBean() {
-		return objectMapper;
-	}
+  @Bean("tafObjectMapper")
+  public static ObjectMapper getTafObjectMapperBean() {
+    return objectMapper;
+  }
 
 
-	@Bean("geoWebObjectMapper")
-	public static ObjectMapper getGeoWebObjectMapperBean() {
-		return objectMapper;
-	}
-	
-	@Bean("objectMapper")
-	@Primary
-	public static ObjectMapper getObjectMapperBean() {
-		ObjectMapper om = new ObjectMapper();
-		om.registerModule(new JavaTimeModule());
-		om.setTimeZone(TimeZone.getTimeZone("UTC"));		
-		return om;
-	}
+  @Bean("geoWebObjectMapper")
+  public static ObjectMapper getGeoWebObjectMapperBean() {
+    return objectMapper;
+  }
+  
+  @Bean("objectMapper")
+  @Primary
+  public static ObjectMapper getObjectMapperBean() {
+    ObjectMapper om = new ObjectMapper();
+    om.registerModule(new JavaTimeModule());
+    om.setTimeZone(TimeZone.getTimeZone("UTC"));		
+    return om;
+  }
 
-	@Bean
-	@Primary
-	public AirportStore getAirportStore() throws IOException {
-		AirportStore airportStore = new AirportStore(storeLocation);
-		return airportStore;
-	}
+  @Bean
+  @Primary
+  public AirportStore getAirportStore() throws IOException {
+    AirportStore airportStore = new AirportStore(storeLocation);
+    return airportStore;
+  }
 
-	@Bean
-	public FIRStore getFirStore() {
-		FIRStore firStore = new FIRStore(storeLocation);
-		return firStore;
-	}
+  @Bean
+  public FIRStore getFirStore() {
+    FIRStore firStore = new FIRStore(storeLocation);
+    return firStore;
+  }
 }
