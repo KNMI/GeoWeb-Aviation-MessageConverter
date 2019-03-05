@@ -21,7 +21,7 @@ import nl.knmi.geoweb.backend.aviation.AirportStore;
 import nl.knmi.geoweb.backend.aviation.FIRStore;
 
 @Configuration
-@ComponentScan({"nl.knmi.geoweb.backend.product",	"nl.knmi.geoweb.iwxxm_2_1.converter"})
+@ComponentScan({"nl.knmi.geoweb.backend.product", "nl.knmi.geoweb.iwxxm_2_1.converter"})
 public class TestConfig {
 	private static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'TT'HH:mm:ss'Y'";
 
