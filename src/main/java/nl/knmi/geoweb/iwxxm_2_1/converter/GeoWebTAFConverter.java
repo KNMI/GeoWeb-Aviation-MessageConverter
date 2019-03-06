@@ -12,7 +12,6 @@ import fi.fmi.avi.model.taf.immutable.*;
 
 import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.taf.Taf;
-import nl.knmi.geoweb.backend.product.taf.Taf.Forecast;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFCloudType;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFVisibility;
 import nl.knmi.geoweb.backend.product.taf.Taf.Forecast.TAFWeather;
