@@ -19,7 +19,8 @@ import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
 @Configuration
-@Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter.class})
+@Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class,
+	nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter.class, nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig.class})
 public class SigmetConverter implements ProductConverter<Sigmet>{
 	@Autowired
 	private AviMessageSpecificConverter<SIGMET, String> sigmetIWXXMStringSerializer;
