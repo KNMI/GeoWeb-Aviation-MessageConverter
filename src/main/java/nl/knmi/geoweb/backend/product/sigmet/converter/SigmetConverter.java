@@ -3,6 +3,7 @@ package nl.knmi.geoweb.backend.product.sigmet.converter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.w3c.dom.Document;
@@ -19,6 +20,7 @@ import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
 @Configuration
+@ComponentScan({ "nl.knmi.geoweb.iwxxm_2_1.converter" })
 @Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter.class})
 public class SigmetConverter implements ProductConverter<Sigmet>{
 	@Autowired
