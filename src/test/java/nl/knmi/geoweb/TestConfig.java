@@ -22,7 +22,7 @@ import nl.knmi.geoweb.backend.aviation.FIRStore;
 
 @Configuration
 @Import({nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig.class,
-  nl.knmi.geoweb.backend.product.taf.converter.TafConverter.class,
+  nl.knmi.geoweb.backend.product.taf.converter.TafConverter.class, fi.fmi.avi.converter.json.conf.JSONConverter.class,
   nl.knmi.geoweb.backend.product.airmet.converter.AirmetConverter.class, nl.knmi.geoweb.backend.product.airmet.AirmetStore.class,
   nl.knmi.geoweb.backend.product.sigmet.converter.SigmetConverter.class, nl.knmi.geoweb.backend.product.sigmet.SigmetStore.class
   })

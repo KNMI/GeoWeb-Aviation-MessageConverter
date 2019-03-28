@@ -4,7 +4,9 @@ import static nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon.VA_CLD;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import org.geojson.Feature;
@@ -23,13 +25,18 @@ import fi.fmi.avi.model.immutable.NumericMeasureImpl;
 import fi.fmi.avi.model.immutable.TacOrGeoGeometryImpl;
 import fi.fmi.avi.model.immutable.UnitPropertyGroupImpl;
 import fi.fmi.avi.model.sigmet.AIRMET;
+import fi.fmi.avi.model.sigmet.AirmetCloudLevels;
 import fi.fmi.avi.model.sigmet.SigmetAnalysisType;
 import fi.fmi.avi.model.sigmet.SigmetIntensityChange;
 import fi.fmi.avi.model.sigmet.immutable.AIRMETImpl;
+import fi.fmi.avi.model.sigmet.immutable.AirmetCloudLevelsImpl;
 import fi.fmi.avi.model.sigmet.immutable.AirmetReferenceImpl;
+import fi.fmi.avi.model.sigmet.immutable.AirmetWindImpl;
 import fi.fmi.avi.model.sigmet.immutable.PhenomenonGeometryWithHeightImpl;
 import fi.fmi.avi.model.sigmet.immutable.SigmetReferenceImpl;
+import icao.iwxxm21.AngleWithNilReasonType;
 import nl.knmi.geoweb.backend.product.airmet.Airmet;
+import nl.knmi.geoweb.backend.product.airmet.ObscuringPhenomenonList;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
@@ -67,7 +74,6 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
         airmet.setValidityPeriod(validPeriod.build());
 
         if (input.getObs_or_forecast() != null) {
-            System.err.println("obs_or_fcst found "+input.getObs_or_forecast().isObs());
             if (input.getObs_or_forecast().isObs()) {
                 airmet.setAnalysisType(SigmetAnalysisType.OBSERVATION);
             } else {
@@ -118,58 +124,117 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
                 break;
         }
 
-         Debug.println("levelinfo: " + input.getLevelinfo());
+        Debug.println("levelinfo: " + input.getLevelinfo());
 
         PhenomenonGeometryWithHeightImpl.Builder phenBuilder = new PhenomenonGeometryWithHeightImpl.Builder();
-        if (input.getLevelinfo() != null) {
-            Debug.println("setLevelInfo(" + input.getLevelinfo().getMode() + ")");
-            switch (input.getLevelinfo().getMode()) {
-                case BETW:
-                    NumericMeasure nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
-                            input.getLevelinfo().getLevels()[0].getUnit().toString());
-                    phenBuilder.setLowerLimit(nmLower);
-                    NumericMeasure nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[1].getValue(),
-                            input.getLevelinfo().getLevels()[1].getUnit().toString());
-                    phenBuilder.setUpperLimit(nmUpper);
-                    break;
-                case BETW_SFC:
-                    nmLower = NumericMeasureImpl.of(0.0, "FT"); //Special case for SFC: 0FT
-                    phenBuilder.setLowerLimit(nmLower);
-                    nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[1].getValue(),
-                            input.getLevelinfo().getLevels()[1].getUnit().toString());
-                    phenBuilder.setUpperLimit(nmUpper);
-                    break;
-                case AT:
-                    nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
-                            input.getLevelinfo().getLevels()[0].getUnit().toString());
-                    phenBuilder.setLowerLimit(nmLower);
-                    phenBuilder.setUpperLimit(nmLower);
-                    break;
-                case ABV:
-                    nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
-                            input.getLevelinfo().getLevels()[0].getUnit().toString());
-                    phenBuilder.setLowerLimit(nmLower);
-                    phenBuilder.setUpperLimit(nmLower);
-                    phenBuilder.setUpperLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
-                    break;
-                case TOPS:
-                    nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
-                            input.getLevelinfo().getLevels()[0].getUnit().toString());
-                    phenBuilder.setUpperLimit(nmUpper);
-                    break;
-                case TOPS_ABV:
-                    nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
-                            input.getLevelinfo().getLevels()[0].getUnit().toString());
-                    phenBuilder.setUpperLimit(nmUpper);
-                    phenBuilder.setUpperLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
-                    break;
-                case TOPS_BLW:
-                    nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
-                            input.getLevelinfo().getLevels()[0].getUnit().toString());
-                    phenBuilder.setLowerLimit(nmLower);
-                    phenBuilder.setLowerLimitOperator(AviationCodeListUser.RelationalOperator.BELOW);
-                    break;
-            }
+
+        switch (input.getPhenomenon()) {
+            case BKN_CLD:
+            case OVC_CLD:
+                //Cloudlevels should be set, copy info to ...
+                AirmetCloudLevelsImpl.Builder cloudLevelsBuilder = new AirmetCloudLevelsImpl.Builder();
+                Airmet.AirmetCloudLevelInfo cloudLevels = input.getCloudLevels();
+                if (cloudLevels != null) {
+                    Airmet.LowerCloudLevel lowerCloudLevel = cloudLevels.getLower();
+                    if (lowerCloudLevel == null) {
+                    } //Error
+                    if (lowerCloudLevel.getSurface()) {
+                        System.err.println("cloudBottom isSurface = true");
+                        phenBuilder.setLowerLimit(NumericMeasureImpl.of(0.0, "FT")); //Special case for SFC: 0FT)
+                        cloudLevelsBuilder.setCloudBottom(NumericMeasureImpl.of(0, "FT"));
+                    } else {
+                        System.err.println("cloudBottom isSurface = false");
+                        phenBuilder.setLowerLimit(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
+                        cloudLevelsBuilder.setCloudBottom(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
+                    }
+                    Airmet.UpperCloudLevel upperCloudLevel = cloudLevels.getUpper();
+                    if (upperCloudLevel == null) {
+                    } //Error
+                    phenBuilder.setUpperLimit(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
+                    cloudLevelsBuilder.setCloudTop(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
+                    airmet.setCloudLevels(cloudLevelsBuilder.build());
+                }
+                break;
+            case SFC_VIS:
+                Airmet.AirmetValue vis = input.getVisibility();
+                String unit=vis.getUnit();
+                if (unit.equals("M")) unit="m";
+                NumericMeasure airmetVisibility=NumericMeasureImpl.of(vis.getVal(), unit);
+                airmet.setVisibility(airmetVisibility);
+                List<ObscuringPhenomenonList.ObscuringPhenomenon> obscuring=input.getObscuring();
+                List<AviationCodeListUser.WeatherCausingVisibilityReduction> weatherCausingVisibilityReductionList=new ArrayList<>();
+                for (ObscuringPhenomenonList.ObscuringPhenomenon phen:obscuring){
+                    AviationCodeListUser.WeatherCausingVisibilityReduction weatherCausingVisibilityReduction=
+                        AviationCodeListUser.WeatherCausingVisibilityReduction.fromString(input.getObscuring().get(0).getCode());
+                    weatherCausingVisibilityReductionList.add(weatherCausingVisibilityReduction);
+
+                }
+                airmet.setObscuration(weatherCausingVisibilityReductionList);
+                break;
+            case SFC_WIND:
+                Airmet.AirmetWindInfo windInfo = input.getWind();
+                AirmetWindImpl.Builder airmetWindBuilder = new AirmetWindImpl.Builder();
+                String dirUnit=windInfo.getDirection().getUnit();
+                if ("degrees".equalsIgnoreCase(dirUnit)) dirUnit="deg";
+                airmetWindBuilder.setDirection(NumericMeasureImpl.of(windInfo.getDirection().getVal(), dirUnit));
+                String speedUnit=windInfo.getSpeed().getUnit();
+                if ("KT".equals(speedUnit)) speedUnit="[kn_i]";
+                if ("MPS".equalsIgnoreCase((speedUnit))) speedUnit="m/s";
+                airmetWindBuilder.setSpeed(NumericMeasureImpl.of(windInfo.getSpeed().getVal(), speedUnit));
+                airmet.setWind(airmetWindBuilder.build());
+                break;
+            default:
+                //Levelinfo might/has to be set
+                if (input.getLevelinfo() != null) {
+                    Debug.println("setLevelInfo(" + input.getLevelinfo().getMode() + ")");
+                    switch (input.getLevelinfo().getMode()) {
+                        case BETW:
+                            NumericMeasure nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
+                                    input.getLevelinfo().getLevels()[0].getUnit().toString());
+                            phenBuilder.setLowerLimit(nmLower);
+                            NumericMeasure nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[1].getValue(),
+                                    input.getLevelinfo().getLevels()[1].getUnit().toString());
+                            phenBuilder.setUpperLimit(nmUpper);
+                            break;
+                        case BETW_SFC:
+                            nmLower = NumericMeasureImpl.of(0.0, "FT"); //Special case for SFC: 0FT
+                            phenBuilder.setLowerLimit(nmLower);
+                            nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[1].getValue(),
+                                    input.getLevelinfo().getLevels()[1].getUnit().toString());
+                            phenBuilder.setUpperLimit(nmUpper);
+                            break;
+                        case AT:
+                            nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
+                                    input.getLevelinfo().getLevels()[0].getUnit().toString());
+                            phenBuilder.setLowerLimit(nmLower);
+                            phenBuilder.setUpperLimit(nmLower);
+                            break;
+                        case ABV:
+                            nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
+                                    input.getLevelinfo().getLevels()[0].getUnit().toString());
+                            phenBuilder.setLowerLimit(nmLower);
+                            phenBuilder.setUpperLimit(nmLower);
+                            phenBuilder.setUpperLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
+                            break;
+                        case TOPS:
+                            nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
+                                    input.getLevelinfo().getLevels()[0].getUnit().toString());
+                            phenBuilder.setUpperLimit(nmUpper);
+                            break;
+                        case TOPS_ABV:
+                            nmUpper = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
+                                    input.getLevelinfo().getLevels()[0].getUnit().toString());
+                            phenBuilder.setUpperLimit(nmUpper);
+                            phenBuilder.setUpperLimitOperator(AviationCodeListUser.RelationalOperator.ABOVE);
+                            break;
+                        case TOPS_BLW:
+                            nmLower = NumericMeasureImpl.of((double) input.getLevelinfo().getLevels()[0].getValue(),
+                                    input.getLevelinfo().getLevels()[0].getUnit().toString());
+                            phenBuilder.setLowerLimit(nmLower);
+                            phenBuilder.setLowerLimitOperator(AviationCodeListUser.RelationalOperator.BELOW);
+                            break;
+                    }
+                }
         }
 
         if (input.getStatus().equals(SigmetAirmetStatus.published)) {

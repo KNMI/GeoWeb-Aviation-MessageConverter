@@ -217,8 +217,8 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
             this.upper=new UpperCloudLevel(above, upper, unit);
         }
 
-        public AirmetCloudLevelInfo(boolean lower, boolean above, double upper, String unit) {
-            this.lower = new LowerCloudLevel(lower);
+        public AirmetCloudLevelInfo(boolean isSurface, boolean above, double upper, String unit) {
+            this.lower = new LowerCloudLevel(isSurface);
             this.upper = new UpperCloudLevel(above, upper, unit);
         }
 
@@ -579,6 +579,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
             String validTime = this.getValiddate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm"));
 
             String bulletinHeader = "WANL31";
+            String iwxxmBulletinHeader = "LWNL31";
             String tacHeaderLocation = this.getLocation_indicator_mwo();
 
             String tacFileName = bulletinHeader + tacHeaderLocation + "_" + validTime + "_" + time;
@@ -597,6 +598,20 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
             String jsonFilePath = path.getPath() + "/" + jsonFileName + ".json";
             Tools.writeFile(jsonFilePath, this.toJSON(om));
             toDeleteIfError.add(jsonFilePath);
+
+            String iwxxmName="A_"+iwxxmBulletinHeader+this.getLocation_indicator_mwo()+this.getValiddate().format(DateTimeFormatter.ofPattern("ddHHmm"));
+            if (status.equals(SigmetAirmetStatus.canceled)){
+                iwxxmName+="CNL";
+            }
+            iwxxmName+="_C_"+this.getLocation_indicator_mwo()+"_"+time;
+            String s=converter.ToIWXXM_2_1(this);
+            if ("FAIL".equals(s)) {
+                Debug.println(" ToIWXXM_2_1 failed");
+                toDeleteIfError.stream().forEach(f ->  {Debug.println("REMOVING "+f); Tools.rm(f); });
+                return "ERROR: sigmet.ToIWXXM_2_1() failed";
+            } else {
+                Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
+            }
         } catch (IOException | NullPointerException e) {
             toDeleteIfError.stream()
                 .forEach(f ->  {
