@@ -163,10 +163,6 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
 
         public UpperCloudLevel() {}
 
-        public UpperCloudLevel(boolean isSurface) {
-            this.above=new Boolean(isSurface);
-        }
-
         public UpperCloudLevel(double level, String unit) {
             this(false, level, unit);
         }

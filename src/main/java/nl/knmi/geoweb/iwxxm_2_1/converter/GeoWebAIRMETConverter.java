@@ -1,7 +1,5 @@
 package nl.knmi.geoweb.iwxxm_2_1.converter;
 
-import static nl.knmi.geoweb.backend.product.sigmet.Sigmet.Phenomenon.VA_CLD;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -25,7 +23,6 @@ import fi.fmi.avi.model.immutable.NumericMeasureImpl;
 import fi.fmi.avi.model.immutable.TacOrGeoGeometryImpl;
 import fi.fmi.avi.model.immutable.UnitPropertyGroupImpl;
 import fi.fmi.avi.model.sigmet.AIRMET;
-import fi.fmi.avi.model.sigmet.AirmetCloudLevels;
 import fi.fmi.avi.model.sigmet.SigmetAnalysisType;
 import fi.fmi.avi.model.sigmet.SigmetIntensityChange;
 import fi.fmi.avi.model.sigmet.immutable.AIRMETImpl;
@@ -33,8 +30,6 @@ import fi.fmi.avi.model.sigmet.immutable.AirmetCloudLevelsImpl;
 import fi.fmi.avi.model.sigmet.immutable.AirmetReferenceImpl;
 import fi.fmi.avi.model.sigmet.immutable.AirmetWindImpl;
 import fi.fmi.avi.model.sigmet.immutable.PhenomenonGeometryWithHeightImpl;
-import fi.fmi.avi.model.sigmet.immutable.SigmetReferenceImpl;
-import icao.iwxxm21.AngleWithNilReasonType;
 import nl.knmi.geoweb.backend.product.airmet.Airmet;
 import nl.knmi.geoweb.backend.product.airmet.ObscuringPhenomenonList;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
@@ -63,10 +58,10 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
         if (input.getIssuedate() == null) {
             airmet.setIssueTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.now()));
         } else {
-            airmet.setIssueTime(PartialOrCompleteTimeInstant.of(input.getIssuedate().atZoneSameInstant(ZoneId.of("UTC")))); // TODO:
+            airmet.setIssueTime(PartialOrCompleteTimeInstant.of(input.getIssuedate().atZoneSameInstant(ZoneId.of("UTC"))));
         }
         airmet.setAirmetPhenomenon(AviationCodeListUser.AeronauticalAirmetWeatherPhenomenon.valueOf(input.getPhenomenon().toString()));
-        airmet.setSequenceNumber(Integer.toString(input.getSequence())); //TODO Should be a String??
+        airmet.setSequenceNumber(Integer.toString(input.getSequence())); //This should be a String, so int sequence is stringified
 
         PartialOrCompleteTimePeriod.Builder validPeriod = new PartialOrCompleteTimePeriod.Builder();
         validPeriod.setStartTime(PartialOrCompleteTimeInstant.of(input.getValiddate().atZoneSameInstant(ZoneId.of("UTC"))));
@@ -94,10 +89,8 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
                 airmet.setIntensityChange(SigmetIntensityChange.INTENSIFYING);
                 break;
             default:
-                airmet.setIntensityChange(SigmetIntensityChange.NO_CHANGE); //TODO Is this correct default? or empty/Nil value?
+                airmet.setIntensityChange(SigmetIntensityChange.NO_CHANGE);
         }
-
- //       sa.setAnalysisApproximateLocation(false);
 
         if (input.getMovement_type() == null) {
             input.setMovement_type(Airmet.AirmetMovementType.STATIONARY);
@@ -268,7 +261,7 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
             } else {
                 airmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.NORMAL);
             }
-        } else { //TODO in case of concept or canceled???
+        } else {
             airmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.NORMAL);
         }
 
@@ -284,7 +277,6 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
                 airmet.setPermissibleUsageReason(AviationCodeListUser.PermissibleUsageReason.TEST);
             }
         }
-
 
         retval.setConvertedMessage(airmet.build());
 
