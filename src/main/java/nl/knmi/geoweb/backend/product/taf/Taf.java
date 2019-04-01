@@ -724,10 +724,14 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 
 		public String toTAC() {
 			StringBuilder sb = new StringBuilder();
-			sb.append(changeType.toString());
-			sb.append(" " + TAFtoTACMaps.toDDHH(changeStart));
-			if (changeEnd!=null) { 
-				sb.append("/" + TAFtoTACMaps.toDDHH24(changeEnd));
+			if (changeType.equals("FM")) {
+				sb.append("FM"+TAFtoTACMaps.toDDHHMM(changeStart));
+			}else {
+				sb.append(changeType);
+			    sb.append(" " + TAFtoTACMaps.toDDHH(changeStart));
+				if (changeEnd!=null) {
+					sb.append("/" + TAFtoTACMaps.toDDHH24(changeEnd));
+				}
 			}
 			if (forecast!=null)sb.append(forecast.toTAC());
 			return sb.toString();
