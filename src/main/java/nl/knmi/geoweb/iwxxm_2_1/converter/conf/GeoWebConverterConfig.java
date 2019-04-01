@@ -16,18 +16,20 @@ import nl.knmi.geoweb.backend.product.taf.Taf;
 @Configuration
 public class GeoWebConverterConfig {
 
-    public static final ConversionSpecification<Taf, TAF> GEOWEBTAF_TO_TAF_POJO = new ConversionSpecification<>(Taf.class, TAF.class, "ICAO Annex 3 TAC",
+    public static final ConversionSpecification<Taf, TAF> GEOWEBTAF_TO_TAF_POJO = new ConversionSpecification<>(Taf.class, TAF.class,
+            "ICAO Annex 3 TAC",
             null);
 
-    public static final ConversionSpecification<Sigmet, SIGMET> GEOWEBSIGMET_TO_SIGMET_POJO = new ConversionSpecification<>(Sigmet.class, SIGMET.class, "ICAO Annex 3 SIGMET",
+    public static final ConversionSpecification<Sigmet, SIGMET> GEOWEBSIGMET_TO_SIGMET_POJO = new ConversionSpecification<>(Sigmet.class, SIGMET.class,
+            "ICAO Annex 3 SIGMET",
             null);
 
-    public static final ConversionSpecification<Airmet, AIRMET> GEOWEBAIRMET_TO_AIRMET_POJO = new ConversionSpecification<>(Airmet.class, AIRMET.class, "ICAO "
-            + "Annex 3 AIRMET",
+    public static final ConversionSpecification<Airmet, AIRMET> GEOWEBAIRMET_TO_AIRMET_POJO = new ConversionSpecification<>(Airmet.class, AIRMET.class,
+            "ICAO Annex 3 AIRMET",
             null);
 
-
-    public static final ConversionSpecification<TAF, Taf> TAF_TO_GEOWEBTAF_POJO = new ConversionSpecification<>(TAF.class, Taf.class, "GeoWeb TAF",
+    public static final ConversionSpecification<TAF, Taf> TAF_TO_GEOWEBTAF_POJO = new ConversionSpecification<>(TAF.class, Taf.class,
+            "GeoWeb TAF",
             null);
 
     @Bean("aviTafSpecificMessageConverter")

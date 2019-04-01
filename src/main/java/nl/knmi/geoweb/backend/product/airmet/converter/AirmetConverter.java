@@ -16,11 +16,12 @@ import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.sigmet.AIRMET;
 import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.airmet.Airmet;
+import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebAIRMETConverter;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
 @Configuration
 @Import({ IWXXMConverter.class,
-		nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebAIRMETConverter.class, nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig.class})
+		GeoWebAIRMETConverter.class, GeoWebConverterConfig.class})
 public class AirmetConverter implements ProductConverter<Airmet>{
 	@Autowired
 	private AviMessageSpecificConverter<AIRMET, String> airmetIWXXMStringSerializer;
@@ -42,7 +43,6 @@ public class AirmetConverter implements ProductConverter<Airmet>{
 	}
 
 	public String ToIWXXM_2_1(Airmet geoWebAirmet) {
-
 		ConversionResult<AIRMET> result = geoWebAirmetImporter.convertMessage(geoWebAirmet, ConversionHints.AIRMET);
 		if (ConversionResult.Status.SUCCESS == result.getStatus()) {
 			System.err.println("SUCCESS");
@@ -65,6 +65,5 @@ public class AirmetConverter implements ProductConverter<Airmet>{
 			}
 		}
 		return "FAIL";
-
 	}
 }

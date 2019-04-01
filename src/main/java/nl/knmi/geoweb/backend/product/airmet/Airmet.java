@@ -312,8 +312,8 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         private AirmetStatus (String status) {
             this.status = status;
         }
-        public static AirmetStatus getSigmetStatus(String status){
-            Debug.println("SIGMET status: " + status);
+        public static AirmetStatus getAirmetStatus(String status){
+            Debug.println("AIRMET status: " + status);
 
             for (AirmetStatus sstatus: AirmetStatus.values()) {
                 if (status.equals(sstatus.toString())){
@@ -332,7 +332,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
         private AirmetType (String type) {
             this.type = type;
         }
-        public static AirmetType getSigmetType(String itype){
+        public static AirmetType getAirmetType(String itype){
             for (AirmetType stype: AirmetType.values()) {
                 if (itype.equals(stype.toString())){
                     return stype;
@@ -608,7 +608,7 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
             if ("FAIL".equals(s)) {
                 Debug.println(" ToIWXXM_2_1 failed");
                 toDeleteIfError.stream().forEach(f ->  {Debug.println("REMOVING "+f); Tools.rm(f); });
-                return "ERROR: sigmet.ToIWXXM_2_1() failed";
+                return "ERROR: airmet.ToIWXXM_2_1() failed";
             } else {
                 Tools.writeFile(path.getPath() + "/" + iwxxmName + ".xml", s);
             }

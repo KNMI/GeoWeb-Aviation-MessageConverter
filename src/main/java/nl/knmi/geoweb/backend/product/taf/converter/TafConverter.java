@@ -27,7 +27,7 @@ import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebTafInConverter;
 import nl.knmi.geoweb.iwxxm_2_1.converter.conf.GeoWebConverterConfig;
 
 @Configuration
-@Import({fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter.class, GeoWebTAFConverter.class, GeoWebTafInConverter.class})
+@Import({IWXXMConverter.class, GeoWebTAFConverter.class, GeoWebTafInConverter.class})
 public class TafConverter implements ProductConverter<Taf> {
 
 	@Autowired
