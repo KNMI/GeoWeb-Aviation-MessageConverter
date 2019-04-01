@@ -60,7 +60,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
         if (input.getIssuedate() == null) {
             sigmet.setIssueTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.now()));
         } else {
-            sigmet.setIssueTime(PartialOrCompleteTimeInstant.of(input.getIssuedate().atZoneSameInstant(ZoneId.of("UTC")))); // TODO:
+            sigmet.setIssueTime(PartialOrCompleteTimeInstant.of(input.getIssuedate().atZoneSameInstant(ZoneId.of("UTC"))));
         }
         //Phenomenon
         switch (input.getPhenomenon()) {
@@ -73,7 +73,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
             default:
                 sigmet.setSigmetPhenomenon(AviationCodeListUser.AeronauticalSignificantWeatherPhenomenon.valueOf(input.getPhenomenon().toString()));
         }
-        sigmet.setSequenceNumber(Integer.toString(input.getSequence())); //TODO Should be a String??
+        sigmet.setSequenceNumber(Integer.toString(input.getSequence())); //This should be a String, so int sequence is stringified
 
         PartialOrCompleteTimePeriod.Builder validPeriod = new PartialOrCompleteTimePeriod.Builder();
         validPeriod.setStartTime(PartialOrCompleteTimeInstant.of(input.getValiddate().atZoneSameInstant(ZoneId.of("UTC"))));
@@ -103,10 +103,9 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
                 sigmet.setIntensityChange(SigmetIntensityChange.INTENSIFYING);
                 break;
             default:
-                sigmet.setIntensityChange(SigmetIntensityChange.NO_CHANGE); //TODO Is this correct default? or empty/Nil value?
+                sigmet.setIntensityChange(SigmetIntensityChange.NO_CHANGE);
         }
 
- //       sa.setAnalysisApproximateLocation(false); //TODO
         boolean fpaRequired = true;
 
         if (input.getMovement_type() == null) {
@@ -138,7 +137,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
                 break;
         }
 
-        //TODO Hack in case of no_va_expected: do not generate a forecastPositionAnalysis
+        // Hack in case of no_va_expected: do not generate a forecastPositionAnalysis
         if (input.getPhenomenon()==VA_CLD) {
             if ((input.getVa_extra_fields()!=null)&&input.getVa_extra_fields().isNo_va_expected()) {
                 fpaRequired=false;  //no forecastpositionanalysis in case of NO_VA_EXP
@@ -238,7 +237,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
             } else {
                 sigmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.NORMAL);
             }
-        } else { //TODO in case of concept or canceled???
+        } else {
             sigmet.setStatus(AviationCodeListUser.SigmetAirmetReportStatus.NORMAL);
         }
 
