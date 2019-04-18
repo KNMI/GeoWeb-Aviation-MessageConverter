@@ -17,7 +17,7 @@ import fi.fmi.avi.model.taf.TAF;
 import fi.fmi.avi.model.taf.TAFBaseForecast;
 import fi.fmi.avi.model.taf.TAFChangeForecast;
 import fi.fmi.avi.model.taf.TAFForecast;
-import fi.fmi.avi.model.taf.TAFSurfaceWind;
+import fi.fmi.avi.model.SurfaceWind;
 import nl.knmi.geoweb.backend.product.taf.TAFtoTACMaps;
 import nl.knmi.geoweb.backend.product.taf.Taf;
 
@@ -159,7 +159,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
     private void updateForecastWind(Taf.Forecast fc, TAFForecast tafForecast, ConversionResult<Taf> result) {
         if (tafForecast.getSurfaceWind().isPresent()) {
             Taf.Forecast.TAFWind wind = new Taf.Forecast.TAFWind();
-            TAFSurfaceWind inWind = tafForecast.getSurfaceWind().get();
+            SurfaceWind inWind = tafForecast.getSurfaceWind().get();
             wind.setSpeed(inWind.getMeanWindSpeed().getValue().intValue());
             wind.setUnit(getUomFromUnit(inWind.getMeanWindSpeed().getUom()));
             wind.setDirection(inWind.isVariableDirection() ? "VRB" : inWind.getMeanWindDirection().get().getValue().intValue());

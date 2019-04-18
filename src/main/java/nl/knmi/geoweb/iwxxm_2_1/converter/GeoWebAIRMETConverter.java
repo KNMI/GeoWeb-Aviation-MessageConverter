@@ -134,17 +134,20 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
                     if (lowerCloudLevel.getSurface()) {
                         System.err.println("cloudBottom isSurface = true");
                         phenBuilder.setLowerLimit(NumericMeasureImpl.of(0.0, "FT")); //Special case for SFC: 0FT)
-                        cloudLevelsBuilder.setCloudBottom(NumericMeasureImpl.of(0, "FT"));
+                        cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(0, "FT"));
                     } else {
                         System.err.println("cloudBottom isSurface = false");
                         phenBuilder.setLowerLimit(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
-                        cloudLevelsBuilder.setCloudBottom(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
+                        cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
                     }
                     Airmet.UpperCloudLevel upperCloudLevel = cloudLevels.getUpper();
                     if (upperCloudLevel == null) {
                     } //Error
                     phenBuilder.setUpperLimit(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
                     cloudLevelsBuilder.setCloudTop(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
+                    if ((upperCloudLevel.getAbove()!=null)&&(upperCloudLevel.getAbove())) {
+                        cloudLevelsBuilder.setTopAbove(true);
+                    }
                     airmet.setCloudLevels(cloudLevelsBuilder.build());
                 }
                 break;

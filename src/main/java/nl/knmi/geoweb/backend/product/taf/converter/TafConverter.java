@@ -68,9 +68,9 @@ public class TafConverter implements ProductConverter<Taf> {
             if (airportInfo != null) {
                 AerodromeImpl.Builder ad = AerodromeImpl.Builder.from(convertedTAF.getAerodrome());
 
-                GeoPositionImpl.Builder refPoint = new GeoPositionImpl.Builder()
+                GeoPositionImpl.Builder refPoint = GeoPositionImpl.builder()
                         .setCoordinateReferenceSystemId(airportInfo.getGeoLocation().getEPSG())
-                        .setCoordinates(new Double[]{airportInfo.getGeoLocation().getLon(), airportInfo.getGeoLocation().getLat()})
+                        .addCoordinates(new double[]{airportInfo.getGeoLocation().getLon(), airportInfo.getGeoLocation().getLat()})
                         .setElevationValue(airportInfo.getFieldElevation())
                         .setElevationUom("m");
                 ad.setReferencePoint(refPoint.build());

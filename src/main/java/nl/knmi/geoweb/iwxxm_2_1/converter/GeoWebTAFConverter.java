@@ -128,7 +128,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
 
     private List<ConversionIssue> updateForecastSurfaceWind(final TAFBaseForecastImpl.Builder fct, final Taf input, ConversionHints hints) {
         List<ConversionIssue> retval = new ArrayList<>();
-        TAFSurfaceWindImpl.Builder wind = new TAFSurfaceWindImpl.Builder();
+        SurfaceWindImpl.Builder wind = SurfaceWindImpl.builder();
 
         Object dir = input.getForecast().getWind().getDirection().toString();
         if ((dir instanceof String) && (dir.equals("VRB"))) {
@@ -363,7 +363,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
 
     private List<ConversionIssue> updateChangeForecastSurfaceWind(final TAFChangeForecastImpl.Builder fct, final Taf.ChangeForecast input, ConversionHints hints) {
         List<ConversionIssue> retval = new ArrayList<>();
-        TAFSurfaceWindImpl.Builder wind = new TAFSurfaceWindImpl.Builder();
+        SurfaceWindImpl.Builder wind = SurfaceWindImpl.builder();
 
         TAFWind src = input.getForecast().getWind();
         if (src != null) {
