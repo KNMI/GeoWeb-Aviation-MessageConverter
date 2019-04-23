@@ -55,6 +55,9 @@ public class AirportStore {
 			String s = Tools.readResource(this.airportFile);
 			Debug.errprintln("Resource read "+s.length()+" bytes");
 			String airportText=String.format("%s/%s", this.directory,  this.airportFile);
+			Debug.errprintln(new File("/tmp/test").exists()?"OK":"MISSING");
+			Debug.errprintln(new File("/tmp/test/admin").exists()?"OK":"MISSING");
+			Debug.errprintln(new File("/tmp/test/admin/config").exists()?"OK":"MISSING");
 			Tools.writeFile(airportText, s);
 			Debug.errprintln("Resource written "+s.length()+" bytes");
 		}
