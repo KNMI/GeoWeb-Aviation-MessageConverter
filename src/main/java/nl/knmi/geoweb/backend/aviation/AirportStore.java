@@ -53,8 +53,10 @@ public class AirportStore {
 		}else {
 			Debug.errprintln("No airportfile found, copying one from resources dir to "+this.directory);
 			String s = Tools.readResource(this.airportFile);
+			Debug.errprintln("Resource read "+s.length()+" bytes");
 			String airportText=String.format("%s/%s", this.directory,  this.airportFile);
 			Tools.writeFile(airportText, s);
+			Debug.errprintln("Resource written "+s.length()+" bytes");
 		}
 		
 		try {
