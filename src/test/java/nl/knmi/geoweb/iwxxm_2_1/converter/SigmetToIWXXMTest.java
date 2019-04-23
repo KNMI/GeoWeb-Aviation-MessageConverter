@@ -186,7 +186,12 @@ public class SigmetToIWXXMTest {
 			"nl/knmi/geoweb/iwxxm_2_1/converter/failingsigmet.json") };
 
 	public static String getStringFromFile(String fn) {
-		return Tools.readResource(fn);
+		try {
+			return Tools.readResource(fn);
+		} catch (IOException e) {
+			Debug.errprintln("Can't read resource "+fn);
+		}
+		return "";
     }
 
 	public void setGeoFromString2(Sigmet sm, String json) {

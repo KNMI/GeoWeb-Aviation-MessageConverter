@@ -41,7 +41,12 @@ public class AirmetToIWXXMTest {
 	};
 
 	public static String getStringFromFile(String fn) {
-		return Tools.readResource(fn);
+		try {
+			return Tools.readResource(fn);
+		} catch (IOException e) {
+			Debug.errprintln("Can't read resource "+fn);
+		}
+		return "";
     }
 
 	public void setGeoFromString2(Airmet am, String json) {

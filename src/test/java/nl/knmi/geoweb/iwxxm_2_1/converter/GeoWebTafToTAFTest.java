@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.TestConfig;
 import nl.knmi.geoweb.backend.product.taf.Taf;
@@ -29,7 +30,12 @@ public class GeoWebTafToTAFTest {
 	private TafConverter tafConverter;
 
     public Taf setTafFromResource(String fn) {
-    	String json= Tools.readResource(fn);
+    	String json="";
+    	try {
+			json = Tools.readResource(fn);
+		} catch (IOException e) {
+			Debug.errprintln("Can't read resource "+fn);
+		}
     	return setTafFromString(json);
 	}
 
