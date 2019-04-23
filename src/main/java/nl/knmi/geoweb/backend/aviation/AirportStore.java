@@ -33,8 +33,10 @@ public class AirportStore {
 		String dir = productstorelocation +"/admin/config";
 		File f = new File(dir);
 		if(f.exists() == false){
+			Debug.println("Creating airport store at ["+f.getAbsolutePath()+"]");
 			Tools.mksubdirs(f.getAbsolutePath());
-			Debug.println("Creating taf schema store at ["+f.getAbsolutePath()+"]");
+			Debug.errprintln(new File("/tmp/test/admin").exists()?"C: OK":"C: MISSING");
+			Debug.errprintln(new File("/tmp/test/config").exists()?"C: OK":"C: MISSING");
 		}
 		if(f.isDirectory() == false){
 			Debug.errprintln("Taf directory location is not a directory");
