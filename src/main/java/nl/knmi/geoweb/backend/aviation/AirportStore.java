@@ -79,6 +79,7 @@ public class AirportStore {
 			try {
 				initStore();
 			} catch (IOException e) {
+				Debug.errprintln("ERROR: on AirportStore.lookup("+ICAO+")"+ " "+e);
 				return null;
 			}
 		}
