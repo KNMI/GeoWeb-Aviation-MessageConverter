@@ -59,7 +59,6 @@ public class TafConverter implements ProductConverter<Taf> {
     AirportStore airportStore;
 
     public String ToIWXXM_2_1(Taf geoWebTaf) {
-
         ConversionResult<TAF> result = geoWebTafImporter.convertMessage(geoWebTaf, ConversionHints.TAF);
         if (ConversionResult.Status.SUCCESS == result.getStatus()) {
             TAFImpl.Builder convertedTAF = TAFImpl.Builder.from(result.getConvertedMessage().get());
