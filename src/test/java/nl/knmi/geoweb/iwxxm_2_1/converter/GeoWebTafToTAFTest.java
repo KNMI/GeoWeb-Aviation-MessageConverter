@@ -1,5 +1,6 @@
 package nl.knmi.geoweb.iwxxm_2_1.converter;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -55,6 +56,9 @@ public class GeoWebTafToTAFTest {
 
 	@Test
 	public void TafToTAFTest() {
+      Debug.errprintln("before test "+(new File("/tmp/test").exists()?"OK":"MISSING"));
+      Debug.errprintln("before test "+(new File("/tmp/test/admin").exists()?"OK":"MISSING"));
+      Debug.errprintln("before test "+(new File("/tmp/test/admin/config").exists()?"OK":"MISSING"));
       Taf taf=setTafFromResource("Taf_valid.json");
       System.err.println(taf.toTAC());
       String s = tafConverter.ToIWXXM_2_1(taf);

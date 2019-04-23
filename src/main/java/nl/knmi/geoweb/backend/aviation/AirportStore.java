@@ -36,11 +36,11 @@ public class AirportStore {
 			Debug.println("Creating airport store at ["+f.getAbsolutePath()+"]");
 			Tools.mksubdirs(f.getAbsolutePath());
 			Debug.errprintln(new File("/tmp/test/admin").exists()?"C: OK":"C: MISSING");
-			Debug.errprintln(new File("/tmp/test/config").exists()?"C: OK":"C: MISSING");
+			Debug.errprintln(new File("/tmp/test/admin/config").exists()?"C: OK":"C: MISSING");
 		}
 		if(f.isDirectory() == false){
-			Debug.errprintln("Taf directory location is not a directory");
-			throw new NotDirectoryException("Taf directory location is not a directory");
+			Debug.errprintln("Airport store location is not a directory");
+			throw new NotDirectoryException("Airport store location is not a directory");
 		}
 		this.directory=dir;
 		this.airportFile="BREM_20160310.json";
