@@ -28,7 +28,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
         Taf taf = new Taf();
         Taf.Metadata metadata = new Taf.Metadata();
         metadata.setUuid(UUID.randomUUID().toString());
-        metadata.setIssueTime(OffsetDateTime.ofInstant(input.getIssueTime().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
+        metadata.setIssueTime(OffsetDateTime.ofInstant(input.getIssueTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
         metadata.setValidityStart(
                 OffsetDateTime.ofInstant(input.getValidityTime().get().getStartTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
         metadata.setValidityEnd(OffsetDateTime.ofInstant(input.getValidityTime().get().getEndTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
