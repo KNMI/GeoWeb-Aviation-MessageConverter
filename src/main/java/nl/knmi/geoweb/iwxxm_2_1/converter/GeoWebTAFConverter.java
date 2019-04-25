@@ -82,8 +82,8 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
             //	taf.setReferredReport(new TAFReference());
 
             PartialOrCompleteTimePeriod.Builder referredValidityTimeBuilder = new PartialOrCompleteTimePeriod.Builder()
-                    .setStartTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getValidityStart())))
-                    .setEndTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getValidityStart())));
+                    .setStartTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getPreviousMetadata().getValidityStart())))
+                    .setEndTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getPreviousMetadata().getValidityEnd())));
             AerodromeImpl.Builder referredAerodromeBuilder = new AerodromeImpl.Builder()
                     .setDesignator(input.getMetadata().getLocation());
             tafReferenceBuilder = tafReferenceBuilder.setAerodrome(referredAerodromeBuilder.build())
