@@ -33,10 +33,8 @@ public class AirportStore {
 		String dir = productstorelocation +"/admin/config";
 		File f = new File(dir);
 		if(f.exists() == false){
-			Debug.println("Creating airport store at ["+f.getAbsolutePath()+"]");
+			Debug.errprintln("Creating airport store at ["+f.getAbsolutePath()+"]");
 			Tools.mksubdirs(f.getAbsolutePath());
-			Debug.errprintln(new File("/tmp/test/admin").exists()?"C: OK":"C: MISSING");
-			Debug.errprintln(new File("/tmp/test/admin/config").exists()?"C: OK":"C: MISSING");
 		}
 		if(f.isDirectory() == false){
 			Debug.errprintln("Airport store location is not a directory");
@@ -49,19 +47,14 @@ public class AirportStore {
 	public void initStore() throws IOException {
 		this.airportInfos=new HashMap<String,AirportInfo>();
 		File fn=new File(this.directory+"/"+this.airportFile);
-		Debug.println("fn:"+fn);
+		Debug.errprintln("fn:"+fn);
 		if (fn.exists()&&fn.isFile()) {
 
 		}else {
 			Debug.errprintln("No airportfile found, copying one from resources dir to "+this.directory);
 			String s = Tools.readResource(this.airportFile);
-			Debug.errprintln("Resource read "+s.length()+" bytes");
 			String airportText=String.format("%s/%s", this.directory,  this.airportFile);
-			Debug.errprintln(new File("/tmp/test").exists()?"OK":"MISSING");
-			Debug.errprintln(new File("/tmp/test/admin").exists()?"OK":"MISSING");
-			Debug.errprintln(new File("/tmp/test/admin/config").exists()?"OK":"MISSING");
 			Tools.writeFile(airportText, s);
-			Debug.errprintln("Resource written "+s.length()+" bytes");
 		}
 		
 		try {
