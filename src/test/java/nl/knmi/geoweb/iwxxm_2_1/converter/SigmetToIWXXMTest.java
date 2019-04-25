@@ -220,7 +220,7 @@ public class SigmetToIWXXMTest {
 
 		String res=sigmetConverter.ToIWXXM_2_1(sm);
 		System.err.println(res);
-		System.err.println("TAC: "+sm.toTAC(firStore.lookup(sm.getFirname(), false)));
+		System.err.println("TAC: "+sm.toTAC(firStore.lookup(sm.getFirname(), true)));
 	}
 	
 	@Test

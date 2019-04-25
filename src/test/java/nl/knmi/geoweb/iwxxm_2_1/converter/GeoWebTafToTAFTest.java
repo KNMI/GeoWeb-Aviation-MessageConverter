@@ -50,18 +50,15 @@ public class GeoWebTafToTAFTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.err.println("set TAF from string ["+json+"] failed");
+		Debug.errprintln("set TAF from string ["+json+"] failed");
 	    return null;
 	}
 
 	@Test
 	public void TafToTAFTest() {
-      Debug.errprintln("before test "+(new File("/tmp/test").exists()?"OK":"MISSING"));
-      Debug.errprintln("before test "+(new File("/tmp/test/admin").exists()?"OK":"MISSING"));
-      Debug.errprintln("before test "+(new File("/tmp/test/admin/config").exists()?"OK":"MISSING"));
       Taf taf=setTafFromResource("Taf_valid.json");
-      System.err.println(taf.toTAC());
+      Debug.errprintln(taf.toTAC());
       String s = tafConverter.ToIWXXM_2_1(taf);
-      System.err.println("S:"+s);
+      Debug.errprintln("S:"+s);
 	}
 }
