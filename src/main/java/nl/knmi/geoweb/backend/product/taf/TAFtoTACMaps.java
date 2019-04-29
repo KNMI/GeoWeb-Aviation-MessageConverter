@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import nl.knmi.adaguc.tools.Debug;
+
 public class TAFtoTACMaps {
 	private static final Map<String, String> qualifierMap;
 	private static final Map<String, String> descriptorMap;
@@ -149,7 +151,7 @@ public class TAFtoTACMaps {
             if (phenomenon!=null){
                 w.getPhenomena().add(phenomenon);
             } else {
-                System.err.println("Unknown phenomenon "+ph);
+                Debug.errprintln("Unknown phenomenon "+ph);
             }
         }
         return w;

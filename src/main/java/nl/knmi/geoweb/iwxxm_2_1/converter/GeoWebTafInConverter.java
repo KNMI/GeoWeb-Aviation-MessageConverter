@@ -18,6 +18,7 @@ import fi.fmi.avi.model.taf.TAFBaseForecast;
 import fi.fmi.avi.model.taf.TAFChangeForecast;
 import fi.fmi.avi.model.taf.TAFForecast;
 import fi.fmi.avi.model.SurfaceWind;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.taf.TAFtoTACMaps;
 import nl.knmi.geoweb.backend.product.taf.Taf;
 
@@ -102,7 +103,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
                         }
 
                         if (changeForecast.isCeilingAndVisibilityOk()) {
-                            System.err.println("SETTING CHANGEFORECAST CAVOK");
+                            Debug.errprintln("SETTING CHANGEFORECAST CAVOK");
                             chFc.setCaVOK(true);
                         }
 

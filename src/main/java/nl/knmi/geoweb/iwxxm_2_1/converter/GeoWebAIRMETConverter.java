@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.geojson.Feature;
-import org.locationtech.jts.util.Debug;
 
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionResult;
@@ -30,6 +29,7 @@ import fi.fmi.avi.model.sigmet.immutable.AirmetCloudLevelsImpl;
 import fi.fmi.avi.model.sigmet.immutable.AirmetReferenceImpl;
 import fi.fmi.avi.model.sigmet.immutable.AirmetWindImpl;
 import fi.fmi.avi.model.sigmet.immutable.PhenomenonGeometryWithHeightImpl;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.airmet.Airmet;
 import nl.knmi.geoweb.backend.product.airmet.ObscuringPhenomenonList;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
@@ -75,7 +75,7 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
                 airmet.setAnalysisType(SigmetAnalysisType.FORECAST);
             }
         } else {
-            System.err.println("obs_or_fcst NOT found");
+            Debug.errprintln("obs_or_fcst NOT found");
         }
 
         switch (input.getChange()) {
@@ -132,11 +132,11 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
                     if (lowerCloudLevel == null) {
                     } //Error
                     if (lowerCloudLevel.getSurface()) {
-                        System.err.println("cloudBottom isSurface = true");
+                        Debug.errprintln("cloudBottom isSurface = true");
                         phenBuilder.setLowerLimit(NumericMeasureImpl.of(0.0, "FT")); //Special case for SFC: 0FT)
                         cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(0, "FT"));
                     } else {
-                        System.err.println("cloudBottom isSurface = false");
+                        Debug.errprintln("cloudBottom isSurface = false");
                         phenBuilder.setLowerLimit(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
                         cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
                     }

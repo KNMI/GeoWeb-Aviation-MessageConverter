@@ -53,7 +53,7 @@ public class AirmetConverter implements ProductConverter<Airmet>{
 			} else {
 				Debug.errprintln("ERR: "+iwxxmResult.getStatus());
 				for (ConversionIssue iss:iwxxmResult.getConversionIssues()) {
-					System.err.println("iss: "+iss.getMessage());
+					Debug.errprintln("iss: "+iss.getMessage());
 				}
 			}
 		}else {

@@ -18,6 +18,7 @@ import fi.fmi.avi.model.immutable.GeoPositionImpl;
 import fi.fmi.avi.model.taf.TAF;
 import fi.fmi.avi.model.taf.immutable.TAFImpl;
 import fi.fmi.avi.model.taf.immutable.TAFReferenceImpl;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.aviation.AirportInfo;
 import nl.knmi.geoweb.backend.aviation.AirportStore;
 import nl.knmi.geoweb.backend.product.ProductConverter;
@@ -94,25 +95,25 @@ public class TafConverter implements ProductConverter<Taf> {
                     convertedTAF.setReferredReport(tafReference.build());
                 }
             } else {
-                System.err.println("airportinfo for " + airportName + " not found");
+                Debug.errprintln("airportinfo for " + airportName + " not found");
             }
             ConversionResult<String> iwxxmResult = tafIWXXMStringSerializer.convertMessage(convertedTAF.build(), ConversionHints.TAF);
             if ((ConversionResult.Status.SUCCESS == iwxxmResult.getStatus())||(ConversionResult.Status.WITH_WARNINGS == iwxxmResult.getStatus())) {
                 for (ConversionIssue iss : iwxxmResult.getConversionIssues()) {
-                    System.err.println("iss: " + iss.getMessage());
+                    Debug.errprintln("iss: " + iss.getMessage());
                 }
                 return iwxxmResult.getConvertedMessage().get();
             } else {
-                System.err.println("ERR: " + iwxxmResult.getStatus());
+                Debug.errprintln("ERR: " + iwxxmResult.getStatus());
                 for (ConversionIssue iss : iwxxmResult.getConversionIssues()) {
-                    System.err.println("iss: " + iss.getMessage());
+                    Debug.errprintln("iss: " + iss.getMessage());
                 }
             } //TODO
         } else {
-            System.err.println("Taf2IWXXM failed");
-            System.err.println("ERR: " + result.getStatus());
+            Debug.errprintln("Taf2IWXXM failed");
+            Debug.errprintln("ERR: " + result.getStatus());
             for (ConversionIssue iss : result.getConversionIssues()) {
-                System.err.println("iss: " + iss.getMessage());
+                Debug.errprintln("iss: " + iss.getMessage());
             }
         }
         return "FAIL";

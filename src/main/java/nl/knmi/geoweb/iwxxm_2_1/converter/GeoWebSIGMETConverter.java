@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.geojson.Feature;
-import org.locationtech.jts.util.Debug;
 
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionResult;
@@ -32,6 +31,7 @@ import fi.fmi.avi.model.sigmet.immutable.PhenomenonGeometryWithHeightImpl;
 import fi.fmi.avi.model.sigmet.immutable.SIGMETImpl;
 import fi.fmi.avi.model.sigmet.immutable.SigmetReferenceImpl;
 import fi.fmi.avi.model.sigmet.immutable.VAInfoImpl;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
@@ -82,14 +82,14 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 
 //        SigmetAnalysisImpl.Builder sa = new SigmetAnalysisImpl.Builder();
         if (input.getObs_or_forecast() != null) {
-            System.err.println("obs_or_fcst found "+input.getObs_or_forecast().isObs());
+            Debug.errprintln("obs_or_fcst found "+input.getObs_or_forecast().isObs());
             if (input.getObs_or_forecast().isObs()) {
                 sigmet.setAnalysisType(SigmetAnalysisType.OBSERVATION);
             } else {
                 sigmet.setAnalysisType(SigmetAnalysisType.FORECAST);
             }
         } else {
-            System.err.println("obs_or_fcst NOT found");
+            Debug.errprintln("obs_or_fcst NOT found");
         }
 
         switch (input.getChange()) {
