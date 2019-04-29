@@ -781,7 +781,7 @@ public class Taf implements GeoWebProduct, IExportable<Taf> {
 
 		/* Add issuetime */
 		if (this.metadata.issueTime != null) {
-			sb.append(" " + TAFtoTACMaps.toDDHHMM(this.metadata.issueTime));
+			sb.append(" " + TAFtoTACMaps.toDDHHMM_Z(this.metadata.issueTime));
 		} else{
 			sb.append(" " + "<not yet issued>");
 		}

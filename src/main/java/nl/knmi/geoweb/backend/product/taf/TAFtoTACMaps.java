@@ -63,9 +63,15 @@ public class TAFtoTACMaps {
 		return phenomenaMap.get(phenomenon.trim());
 	}
 
-	public static String toDDHHMM(OffsetDateTime t) {
+	public static String toDDHHMM_Z(OffsetDateTime t) {
 		if(t==null)return null;
 		DateTimeFormatter fmt= DateTimeFormatter.ofPattern("ddHHmm'Z'");
+		return t.format(fmt);
+	}
+
+	public static String toDDHHMM(OffsetDateTime t) {
+		if(t==null)return null;
+		DateTimeFormatter fmt= DateTimeFormatter.ofPattern("ddHHmm");
 		return t.format(fmt);
 	}
 
