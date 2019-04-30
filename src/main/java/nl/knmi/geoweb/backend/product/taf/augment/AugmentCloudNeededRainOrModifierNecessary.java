@@ -115,24 +115,6 @@ public class AugmentCloudNeededRainOrModifierNecessary {
 									|| cloud.get("mod").asText().equals("TCU"))));
 				}
 			}
-			if (forecastClouds != null && forecastClouds.isArray()) {
-				ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-				boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true)
-						.anyMatch(cloud -> cloud.has("mod")
-								&& (cloud.get("mod").asText().equals("CB") || cloud.get("mod").asText().equals("TCU")));
-				if (modifierPresent) {
-					forecast.put("cloudsModifierHasWeatherPresent", rainOrThunderstormPresent);
-				}
-			}
-
-		} else {
-			if (forecastClouds != null && forecastClouds.isArray()) {
-				ArrayNode cloudsArray = (ArrayNode) forecastClouds;
-				boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true)
-						.anyMatch(cloud -> cloud.has("mod")
-								&& (cloud.get("mod").asText().equals("CB") || cloud.get("mod").asText().equals("TCU")));
-				forecast.put("cloudsModifierHasWeatherPresent", !modifierPresent);
-			}
 		}
 	}
 }

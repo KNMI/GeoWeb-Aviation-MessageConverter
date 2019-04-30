@@ -19,14 +19,17 @@ public class AugmentMaxVerticalVisibility {
 		{
 			JsonNode forecastWeather = input.get("forecast").get("weather");
 			JsonNode forecastVerticalVisibility = input.get("forecast").get("vertical_visibility");
+			JsonNode forecastClouds = input.get("forecast").get("clouds");
 			if (forecastWeather != null && !forecastWeather.isNull() && !forecastWeather.isMissingNode()
-					&& forecastVerticalVisibility != null && !forecastVerticalVisibility.isNull() && !forecastVerticalVisibility.isMissingNode()) {
+					&& forecastVerticalVisibility != null && !forecastVerticalVisibility.isNull() && !forecastVerticalVisibility.isMissingNode()
+					&& forecastClouds != null && !forecastClouds.isNull() && !forecastClouds.isMissingNode()) {
 				int visibility = forecastVerticalVisibility.asInt();
 				for (Iterator<JsonNode> weatherNode = forecastWeather.elements(); weatherNode.hasNext();) {
 					JsonNode nextNode = weatherNode.next();
 					if (nextNode == null || nextNode == NullNode.getInstance()) continue;
 					JsonNode weatherGroup = (ObjectNode) nextNode;
 					checkVerticalVisibilityWithinLimit(weatherGroup, (ObjectNode) input.get("forecast"), visibility);
+					checkVerticalVisibilityWithCBorTCU(forecastClouds, (ObjectNode) input.get("forecast"));
 				}
 			}
 		}
@@ -46,16 +49,17 @@ public class AugmentMaxVerticalVisibility {
 
 			JsonNode changeWeather = changeForecast.get("weather");
 			JsonNode changeVisibility = changeForecast.get("visibility");
+			JsonNode forecastClouds = changeForecast.get("clouds");
 			if (changeWeather != null && !changeWeather.isNull() && !changeWeather.isMissingNode()
-					&& changeVisibility != null && !changeVisibility.isNull() && !changeVisibility.isMissingNode()) {
+					&& changeVisibility != null && !changeVisibility.isNull() && !changeVisibility.isMissingNode()
+					&& forecastClouds != null && !forecastClouds.isNull() && !forecastClouds.isMissingNode()) {
 				int visibility = changeVisibility.asInt();
 				for (Iterator<JsonNode> weatherNode = changeWeather.elements(); weatherNode.hasNext();) {
 					JsonNode weatherGroup = (ObjectNode) weatherNode.next();
 					checkVerticalVisibilityWithinLimit (weatherGroup, changeForecast, visibility);
+					checkVerticalVisibilityWithCBorTCU(forecastClouds, changeForecast);
 				}
 			}
-
-
 		}
 	}
 	private static void checkVerticalVisibilityWithinLimit (JsonNode weatherGroup, ObjectNode forecast, int visibility ){
@@ -70,6 +74,18 @@ public class AugmentMaxVerticalVisibility {
 			forecast.put("verticalVisibilityAndFogWithinLimit", visibility <= 5);
 		} else if (isPrecip) {
 			forecast.put("verticalVisibilityAndPrecipitationWithinLimit", visibility <= 10);
+		}
+	}
+
+	private static void checkVerticalVisibilityWithCBorTCU (JsonNode forecastClouds, ObjectNode forecast)
+	{
+		if (forecastClouds != null && forecastClouds.isArray())
+		{
+			ArrayNode cloudsArray = (ArrayNode) forecastClouds;
+			boolean modifierPresent = StreamSupport.stream(cloudsArray.spliterator(), true)
+					.allMatch(cloud -> cloud.has("mod")
+							&& (cloud.get("mod").asText().equals("CB") || cloud.get("mod").asText().equals("TCU")));
+			forecast.put("verticalVisibilityOnlyWithCloudsCBorTCU", modifierPresent);
 		}
 	}
 

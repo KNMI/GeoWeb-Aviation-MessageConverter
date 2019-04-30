@@ -346,6 +346,15 @@
                     ],
                     "type": "boolean"
                 },
+                "verticalVisibilityOnlyWithCloudsCBorTCU": {
+                    "$geoweb::messages": {
+                        "enum": "In the presence of VV only CB or TCU clouds are allowed"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
                 "wind": {
                     "properties": {
                         "gustFastEnough": {
