@@ -1,5 +1,6 @@
 package nl.knmi.geoweb.iwxxm_2_1.converter;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.TestConfig;
 import nl.knmi.geoweb.backend.product.taf.Taf;
@@ -29,7 +31,12 @@ public class GeoWebTafToTAFTest {
 	private TafConverter tafConverter;
 
     public Taf setTafFromResource(String fn) {
-    	String json= Tools.readResource(fn);
+    	String json="";
+    	try {
+			json = Tools.readResource(fn);
+		} catch (IOException e) {
+			Debug.errprintln("Can't read resource "+fn);
+		}
     	return setTafFromString(json);
 	}
 
@@ -43,15 +50,15 @@ public class GeoWebTafToTAFTest {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.err.println("set TAF from string ["+json+"] failed");
+		Debug.errprintln("set TAF from string ["+json+"] failed");
 	    return null;
 	}
 
 	@Test
 	public void TafToTAFTest() {
       Taf taf=setTafFromResource("Taf_valid.json");
-      System.err.println(taf.toTAC());
+      Debug.errprintln(taf.toTAC());
       String s = tafConverter.ToIWXXM_2_1(taf);
-      System.err.println("S:"+s);
+      Debug.errprintln("S:"+s);
 	}
 }

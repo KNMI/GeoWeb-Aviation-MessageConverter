@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.geojson.Feature;
-import org.locationtech.jts.util.Debug;
 
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionResult;
@@ -29,9 +28,10 @@ import fi.fmi.avi.model.sigmet.SigmetAnalysisType;
 import fi.fmi.avi.model.sigmet.SigmetIntensityChange;
 import fi.fmi.avi.model.sigmet.immutable.PhenomenonGeometryImpl;
 import fi.fmi.avi.model.sigmet.immutable.PhenomenonGeometryWithHeightImpl;
-import fi.fmi.avi.model.sigmet.immutable.WSSIGMETImpl;
+import fi.fmi.avi.model.sigmet.immutable.SIGMETImpl;
 import fi.fmi.avi.model.sigmet.immutable.SigmetReferenceImpl;
-import fi.fmi.avi.model.sigmet.immutable.VASIGMETImpl;
+import fi.fmi.avi.model.sigmet.immutable.VAInfoImpl;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet.SigmetMovementType;
 import nl.knmi.geoweb.backend.product.sigmet.geo.GeoUtils;
@@ -45,7 +45,7 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
     public ConversionResult<SIGMET> convertMessage(Sigmet input, ConversionHints hints) {
         Debug.println("convertMessage: " + this.getClass().getName());
         ConversionResult<SIGMET> retval = new ConversionResult<>();
-        WSSIGMETImpl.Builder sigmet = new WSSIGMETImpl.Builder();
+        SIGMETImpl.Builder sigmet = new SIGMETImpl.Builder();
 
         sigmet.setIssuingAirTrafficServicesUnit(getFicInfo(input.getFirname(), input.getLocation_indicator_icao()));
         UnitPropertyGroupImpl.Builder mwo = new UnitPropertyGroupImpl.Builder();
@@ -82,14 +82,14 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
 
 //        SigmetAnalysisImpl.Builder sa = new SigmetAnalysisImpl.Builder();
         if (input.getObs_or_forecast() != null) {
-            System.err.println("obs_or_fcst found "+input.getObs_or_forecast().isObs());
+            Debug.errprintln("obs_or_fcst found "+input.getObs_or_forecast().isObs());
             if (input.getObs_or_forecast().isObs()) {
                 sigmet.setAnalysisType(SigmetAnalysisType.OBSERVATION);
             } else {
                 sigmet.setAnalysisType(SigmetAnalysisType.FORECAST);
             }
         } else {
-            System.err.println("obs_or_fcst NOT found");
+            Debug.errprintln("obs_or_fcst NOT found");
         }
 
         switch (input.getChange()) {
@@ -255,7 +255,6 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
         }
 
         if (input.getPhenomenon().equals(VA_CLD)) {
-            VASIGMETImpl.Builder vaSigmet = VASIGMETImpl.Builder.from(sigmet.build());
             if (input.getVa_extra_fields() != null) {
                 VolcanoDescriptionImpl.Builder volcanoBuilder = new VolcanoDescriptionImpl.Builder();
                 if (input.getVa_extra_fields().getVolcano() != null) {
@@ -263,26 +262,26 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
                         volcanoBuilder.setVolcanoName("MT " + input.getVa_extra_fields().getVolcano().getName());
                     }
                     if (input.getVa_extra_fields().getVolcano().getPosition() != null) {
-                        GeoPositionImpl.Builder geoPositionBuilder = new GeoPositionImpl.Builder().setCoordinateReferenceSystemId(
+                        GeoPositionImpl.Builder geoPositionBuilder = GeoPositionImpl.builder().setCoordinateReferenceSystemId(
                                 AviationCodeListUser.CODELIST_VALUE_EPSG_4326);
-                        Double[] pos = new Double[2];
+                        double[] pos = new double[2];
                         pos[0] = input.getVa_extra_fields().getVolcano().getPosition().get(0).doubleValue();
                         pos[1] = input.getVa_extra_fields().getVolcano().getPosition().get(1).doubleValue();
-                        geoPositionBuilder.setCoordinates(pos);
+                        geoPositionBuilder.addCoordinates(pos);
 
                         volcanoBuilder.setVolcanoPosition(geoPositionBuilder.build());
                     }
                 }
-                vaSigmet.setVolcano(volcanoBuilder.build());
+                VAInfoImpl.Builder vaInfoBuilder = new VAInfoImpl.Builder();
+                vaInfoBuilder.setVolcano(volcanoBuilder.build());
                 if ((input.getVa_extra_fields().getMove_to() != null) && (input.getVa_extra_fields().getMove_to().get(0) != null)) {
-                    vaSigmet.setVolcanicAshMovedToFIR(getFirInfo(input.getVa_extra_fields().getMove_to().get(0)+" FIR",
-                            input.getVa_extra_fields().getMove_to().get(0)));
+                    vaInfoBuilder.setVolcanicAshMovedToFIR(
+                            getFirInfo(input.getVa_extra_fields().getMove_to().get(0) + " FIR", input.getVa_extra_fields().getMove_to().get(0)));
                 }
+                sigmet.setVAInfo(vaInfoBuilder.build());
             }
-            retval.setConvertedMessage(vaSigmet.build());
-        } else {
-            retval.setConvertedMessage(sigmet.build());
         }
+        retval.setConvertedMessage(sigmet.build());
 
         return retval;
     }

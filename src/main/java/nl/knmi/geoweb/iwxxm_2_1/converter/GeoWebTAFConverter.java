@@ -82,8 +82,8 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
             //	taf.setReferredReport(new TAFReference());
 
             PartialOrCompleteTimePeriod.Builder referredValidityTimeBuilder = new PartialOrCompleteTimePeriod.Builder()
-                    .setStartTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getValidityStart())))
-                    .setEndTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getValidityStart())));
+                    .setStartTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getPreviousMetadata().getValidityStart())))
+                    .setEndTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getMetadata().getPreviousMetadata().getValidityEnd())));
             AerodromeImpl.Builder referredAerodromeBuilder = new AerodromeImpl.Builder()
                     .setDesignator(input.getMetadata().getLocation());
             tafReferenceBuilder = tafReferenceBuilder.setAerodrome(referredAerodromeBuilder.build())
@@ -92,7 +92,6 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
                     .setAerodrome(referredAerodromeBuilder.build());
 
             tafBuilder.setReferredReport(tafReferenceBuilder.build());
-            //	taf.getReferredReport().setStatus(input.getMetadata().getPreviousMetadata().getStatus()); //TODO: really unnecessary??
         }
 
         if (input.getMetadata().getType() != TAFReportType.canceled) {
@@ -129,7 +128,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
 
     private List<ConversionIssue> updateForecastSurfaceWind(final TAFBaseForecastImpl.Builder fct, final Taf input, ConversionHints hints) {
         List<ConversionIssue> retval = new ArrayList<>();
-        TAFSurfaceWindImpl.Builder wind = new TAFSurfaceWindImpl.Builder();
+        SurfaceWindImpl.Builder wind = SurfaceWindImpl.builder();
 
         Object dir = input.getForecast().getWind().getDirection().toString();
         if ((dir instanceof String) && (dir.equals("VRB"))) {
@@ -243,8 +242,6 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
             fct.setCloud(cloud.build());
         } else {
             fct.setCloud(Optional.empty());
-            //fct.setCloud(cloud.build());
-            //cloud.setLayers(Optional.empty()); //TODO add empty layers???
         }
         return retval;
     }
@@ -294,9 +291,9 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
                         break;
                     case "FM":
                         changeFct.setChangeIndicator(AviationCodeListUser.TAFChangeIndicator.FROM);
-                        //changeFct.setPartialValidityStartTime(ch.getChangeStart().toString()); //TODO still needed??
                         updateChangeForecastContents(changeFct, ch, hints);
-                        //changeFct.setValidityEndTime(fct.getValidityEndTime());//TODO correct to put the endTime of baseForecast here?
+                        //The end time of the baseforecast is used as the end time of the FROM changeforecast (as IBLSOFT does for example)
+                        changeFct.getPeriodOfChangeBuilder().setEndTime(fctBuilder.getValidityTime().get().getEndTime().get());
                         break;
                     case "PROB30":
                         changeFct.setChangeIndicator(AviationCodeListUser.TAFChangeIndicator.PROBABILITY_30);
@@ -337,7 +334,6 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
     private List<ConversionIssue> updateChangeForecastContents(final TAFChangeForecastImpl.Builder fct, final Taf.ChangeForecast input, final ConversionHints hints) {
         List<ConversionIssue> retval = new ArrayList<>();
 
-
         if (fct.getChangeIndicator() != AviationCodeListUser.TAFChangeIndicator.FROM) {
             PartialOrCompleteTimePeriod.Builder periodOfChangeBuilder = new PartialOrCompleteTimePeriod.Builder();
             periodOfChangeBuilder.setStartTime(PartialOrCompleteTimeInstant.of(ZonedDateTime.from(input.getChangeStart())));
@@ -365,7 +361,7 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
 
     private List<ConversionIssue> updateChangeForecastSurfaceWind(final TAFChangeForecastImpl.Builder fct, final Taf.ChangeForecast input, ConversionHints hints) {
         List<ConversionIssue> retval = new ArrayList<>();
-        TAFSurfaceWindImpl.Builder wind = new TAFSurfaceWindImpl.Builder();
+        SurfaceWindImpl.Builder wind = SurfaceWindImpl.builder();
 
         TAFWind src = input.getForecast().getWind();
         if (src != null) {
@@ -511,11 +507,8 @@ public class GeoWebTAFConverter extends AbstractGeoWebConverter<TAF> {
         } else {
             if (debug) Debug.println("updateChangeClouds() found null clouds");
         }
-        if (!layers.isEmpty()) {
-            cloud.setLayers(layers);
-        } else {
-            cloud.setLayers(layers); //TODO
-        }
+
+        cloud.setLayers(layers);
         fct.setCloud(cloud.build());
         return retval;
     }

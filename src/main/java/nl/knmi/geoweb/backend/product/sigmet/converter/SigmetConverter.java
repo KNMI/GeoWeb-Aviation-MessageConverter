@@ -14,6 +14,7 @@ import fi.fmi.avi.converter.ConversionIssue;
 import fi.fmi.avi.converter.ConversionResult;
 import fi.fmi.avi.converter.iwxxm.conf.IWXXMConverter;
 import fi.fmi.avi.model.sigmet.SIGMET;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.ProductConverter;
 import nl.knmi.geoweb.backend.product.sigmet.Sigmet;
 import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebSIGMETConverter;
@@ -47,23 +48,23 @@ public class SigmetConverter implements ProductConverter<Sigmet>{
 
 		ConversionResult<SIGMET> result = geoWebSigmetImporter.convertMessage(geoWebSigmet, ConversionHints.SIGMET);
 		if (ConversionResult.Status.SUCCESS == result.getStatus()) {
-			System.err.println("SUCCESS");
+			Debug.errprintln("SUCCESS");
 			SIGMET pojo = result.getConvertedMessage().get();
-			System.err.println("POJO:"+pojo);
+			Debug.errprintln("POJO:"+pojo);
 			ConversionResult<String>iwxxmResult=sigmetIWXXMStringSerializer.convertMessage(pojo, ConversionHints.SIGMET);
 			if (ConversionResult.Status.SUCCESS == iwxxmResult.getStatus()) {
 				return iwxxmResult.getConvertedMessage().get();
 			} else {
-				System.err.println("ERR: "+iwxxmResult.getStatus());
+				Debug.errprintln("ERR: "+iwxxmResult.getStatus());
 				for (ConversionIssue iss:iwxxmResult.getConversionIssues()) {
-					System.err.println("iss: "+iss.getMessage());
+					Debug.errprintln("iss: "+iss.getMessage());
 				}
 			}
 		}else {
-			System.err.println("Sigmet2IWXXM failed");
-			System.err.println("ERR: "+result.getStatus());
+			Debug.errprintln("Sigmet2IWXXM failed");
+			Debug.errprintln("ERR: "+result.getStatus());
 			for (ConversionIssue iss:result.getConversionIssues()) {
-				System.err.println("iss: "+iss.getMessage());
+				Debug.errprintln("iss: "+iss.getMessage());
 			}
 		}
 
