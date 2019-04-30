@@ -130,23 +130,27 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
                 if (cloudLevels != null) {
                     Airmet.LowerCloudLevel lowerCloudLevel = cloudLevels.getLower();
                     if (lowerCloudLevel == null) {
-                    } //Error
-                    if (lowerCloudLevel.getSurface()) {
-                        Debug.errprintln("cloudBottom isSurface = true");
-                        phenBuilder.setLowerLimit(NumericMeasureImpl.of(0.0, "FT")); //Special case for SFC: 0FT)
-                        cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(0, "FT"));
+                        Debug.errprintln("lowerCloudLevel is null");
                     } else {
-                        Debug.errprintln("cloudBottom isSurface = false");
-                        phenBuilder.setLowerLimit(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
-                        cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
+                        if (lowerCloudLevel.getSurface()) {
+                            Debug.errprintln("cloudBottom isSurface = true");
+                            phenBuilder.setLowerLimit(NumericMeasureImpl.of(0.0, "FT")); //Special case for SFC: 0FT)
+                            cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(0, "FT"));
+                        } else {
+                            Debug.errprintln("cloudBottom isSurface = false");
+                            phenBuilder.setLowerLimit(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
+                            cloudLevelsBuilder.setCloudBase(NumericMeasureImpl.of(lowerCloudLevel.getVal(), lowerCloudLevel.getUnit()));
+                        }
                     }
                     Airmet.UpperCloudLevel upperCloudLevel = cloudLevels.getUpper();
                     if (upperCloudLevel == null) {
-                    } //Error
-                    phenBuilder.setUpperLimit(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
-                    cloudLevelsBuilder.setCloudTop(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
-                    if ((upperCloudLevel.getAbove()!=null)&&(upperCloudLevel.getAbove())) {
-                        cloudLevelsBuilder.setTopAbove(true);
+                        Debug.errprintln("upperCloudLevel is null");
+                    } else {
+                        phenBuilder.setUpperLimit(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
+                        cloudLevelsBuilder.setCloudTop(NumericMeasureImpl.of(upperCloudLevel.getVal(), upperCloudLevel.getUnit()));
+                        if ((upperCloudLevel.getAbove() != null) && (upperCloudLevel.getAbove())) {
+                            cloudLevelsBuilder.setTopAbove(true);
+                        }
                     }
                     airmet.setCloudLevels(cloudLevelsBuilder.build());
                 }
