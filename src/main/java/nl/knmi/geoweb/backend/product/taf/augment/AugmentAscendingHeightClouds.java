@@ -29,12 +29,18 @@ public class AugmentAscendingHeightClouds {
 				ObjectNode cloudNode = (ObjectNode) nextNode;				
 
 				JsonNode cloudHeight = cloudNode.findValue("height");
+				JsonNode cloudMod = cloudNode.findValue("mod");
 				if (cloudHeight == null || cloudHeight.asText().equals("null"))
 					continue;
-				int height = Integer.parseInt(cloudHeight.asText());
+				int height = Integer.parseInt(cloudHeight.asText());				
 				if (height <= prevHeight) {
-					cloudNode.put("cloudsHeightAscending", false);
-				}else{
+					if (cloudMod != null && cloudMod.asText().equals("CB") && height == prevHeight){
+						cloudNode.put("cloudsHeightAscending", true);	
+					}else {
+						cloudNode.put("cloudsHeightAscending", false);
+					}
+				}
+				else {
 					cloudNode.put("cloudsHeightAscending", true);
 				}
 				prevHeight = height;
