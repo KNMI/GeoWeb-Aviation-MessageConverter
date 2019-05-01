@@ -10,6 +10,10 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import nl.knmi.geoweb.backend.product.taf.TafValidator;
 
+// FIXME: [entire project] the check .isMissing() applies only to .path() calls. 
+// In the code is used also for the .get(), .findParents(), ect calls.
+// It should be removed when it is not necessary.
+
 public class AugmentMaxVerticalVisibility {
 
 

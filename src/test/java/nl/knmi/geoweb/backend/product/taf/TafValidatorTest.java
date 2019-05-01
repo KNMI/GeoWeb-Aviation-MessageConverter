@@ -22,6 +22,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.TestConfig;
 
+// FIXME: [entire file] TafSchemaStore and TafValidator are re-instantiated for each test. This is not desirable (performance, breaks dependency injection by Spring).
+// It needs to be refactored in a way that there will be only a single instance used multiple times.
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestConfig.class })
 public class TafValidatorTest {

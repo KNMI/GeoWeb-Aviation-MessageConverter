@@ -283,15 +283,6 @@
                     ],
                     "type": "boolean"
                 },
-                "cloudsModifierHasWeatherPresent": {
-                    "$geoweb::messages": {
-                        "enum": "In the presence of CB or TCU a weather group with SH or TS is required"
-                    },
-                    "enum": [
-                        true
-                    ],
-                    "type": "boolean"
-                },
                 "cloudsNeededAndPresent": {
                     "$geoweb::messages": {
                         "enum": "Clouds are necessary for rain"
