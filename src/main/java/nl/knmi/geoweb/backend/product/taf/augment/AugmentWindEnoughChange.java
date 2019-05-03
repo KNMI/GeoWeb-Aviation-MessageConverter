@@ -11,6 +11,8 @@ import nl.knmi.geoweb.backend.product.taf.TafValidator;
 public class AugmentWindEnoughChange {
 	
 	public static void augment (JsonNode input) {
+		int forecastGust = 0;
+
 		JsonNode forecastNode = input.get("forecast");
 		if (forecastNode == null || forecastNode.isNull() || forecastNode.isMissingNode())
 			return;
@@ -22,18 +24,21 @@ public class AugmentWindEnoughChange {
 		if (forecastWind == null || !forecastWind.has("direction") || !forecastWind.has("speed"))
 			return;
 
-
 		String unit = forecastWind.get("unit").asText();
 
 		int forecastWindDirection = forecastWind.get("direction").asInt();
 		int forecastWindSpeed = forecastWind.get("speed").asInt();
-		boolean wasGusty = false;
+
+		if (forecastWind.has("gusts")){
+			forecastGust = forecastWind.get("gusts").asInt();
+		}
 
 		JsonNode changeGroups = input.get("changegroups");
 		if (changeGroups == null || changeGroups.isNull() || changeGroups.isMissingNode())
 			return;
 		for (Iterator<JsonNode> change = changeGroups.elements(); change.hasNext();) {
-			boolean becomesGusty = false;
+			int changeGust = 0;
+
 			JsonNode nextNode = change.next(); 
 			if (nextNode == null || nextNode == NullNode.getInstance()) continue;
 			ObjectNode changegroup = (ObjectNode) nextNode;
@@ -50,10 +55,15 @@ public class AugmentWindEnoughChange {
 				ObjectNode wind = (ObjectNode) changeForecast.get("wind");
 				if (!wind.has("direction") || !wind.has("speed"))
 					continue;
-				becomesGusty = wind.has("gusts") && wind.get("gusts").asInt() > 0;
+
 				int changeWindDirection = wind.get("direction").asInt();
 				int changeWindSpeed = wind.get("speed").asInt();
 				String changeUnit = wind.get("unit").asText();
+
+				if (wind.has("gusts")){
+					changeGust = wind.get("gusts").asInt();
+				}
+
 				if (!unit.equals(changeUnit)) {
 					// one is in knots and the other in meters per second.
 					// compute it such that both are in knots
@@ -61,15 +71,24 @@ public class AugmentWindEnoughChange {
 					if (unit.equalsIgnoreCase("KT")) {
 						changeUnit = "KT";
 						changeWindSpeed = (int) Math.round((changeWindSpeed * MPS_TO_KNOTS_FACTOR));
+						if (wind.has("gusts")){
+							changeGust = (int) Math.round((changeGust * MPS_TO_KNOTS_FACTOR));
+						}
 					} else {
 						unit = "KT";
-						changeWindSpeed = (int) Math.round((forecastWindSpeed * MPS_TO_KNOTS_FACTOR));
+						forecastWindSpeed = (int) Math.round((forecastWindSpeed * MPS_TO_KNOTS_FACTOR));
+						if (wind.has("gusts")){
+							forecastGust = (int) Math.round((forecastGust * MPS_TO_KNOTS_FACTOR));
+						}
 					}
 				}
 				int speedDifference = Math.abs(changeWindSpeed - forecastWindSpeed);
 
 				long directionDifference = Math.min(TafValidator.subtract(changeWindDirection, forecastWindDirection, 360),
 						TafValidator.subtract(forecastWindDirection, changeWindDirection, 360));
+				
+				int gustDifference = Math.abs(changeGust - forecastGust);
+
 				wind.put("directionDiff", directionDifference);
 				wind.put("speedDiff", speedDifference);
 				
@@ -77,10 +96,9 @@ public class AugmentWindEnoughChange {
 				if (!changeGroupChangeAsText.equals("FM")) {
 					/* Wind speed difference should be more than 5 knots or 2 meters per second.*/	
 					int limitSpeedDifference = unit.equals("KT") ? 5 : 2;
-					/* If previous was gusty and new one is not gusty, all is allowed */
-					if (!(wasGusty && !becomesGusty)) { 
+					if (gustDifference != 0) { 
 						wind.put("windEnoughDifference",
-								directionDifference >= 30 || speedDifference >= limitSpeedDifference || becomesGusty);
+								directionDifference >= 30 || speedDifference >= limitSpeedDifference);
 					}
 				}
 				
@@ -88,7 +106,7 @@ public class AugmentWindEnoughChange {
 				if (!changeGroupChangeAsText.startsWith("PROB") && !changeGroupChangeAsText.equalsIgnoreCase("TEMPO")) {
 					forecastWindDirection = changeWindDirection;
 					forecastWindSpeed = changeWindSpeed;
-					wasGusty = becomesGusty;
+					forecastGust = changeGust;
 				}
 			}
 		}
