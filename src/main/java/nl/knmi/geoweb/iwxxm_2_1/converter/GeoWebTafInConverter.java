@@ -17,7 +17,8 @@ import fi.fmi.avi.model.taf.TAF;
 import fi.fmi.avi.model.taf.TAFBaseForecast;
 import fi.fmi.avi.model.taf.TAFChangeForecast;
 import fi.fmi.avi.model.taf.TAFForecast;
-import fi.fmi.avi.model.taf.TAFSurfaceWind;
+import fi.fmi.avi.model.SurfaceWind;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.backend.product.taf.TAFtoTACMaps;
 import nl.knmi.geoweb.backend.product.taf.Taf;
 
@@ -28,7 +29,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
         Taf taf = new Taf();
         Taf.Metadata metadata = new Taf.Metadata();
         metadata.setUuid(UUID.randomUUID().toString());
-        metadata.setIssueTime(OffsetDateTime.ofInstant(input.getIssueTime().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
+        metadata.setIssueTime(OffsetDateTime.ofInstant(input.getIssueTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
         metadata.setValidityStart(
                 OffsetDateTime.ofInstant(input.getValidityTime().get().getStartTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
         metadata.setValidityEnd(OffsetDateTime.ofInstant(input.getValidityTime().get().getEndTime().get().getCompleteTime().get().toInstant(), ZoneId.of("Z")));
@@ -102,7 +103,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
                         }
 
                         if (changeForecast.isCeilingAndVisibilityOk()) {
-                            System.err.println("SETTING CHANGEFORECAST CAVOK");
+                            Debug.errprintln("SETTING CHANGEFORECAST CAVOK");
                             chFc.setCaVOK(true);
                         }
 
@@ -159,7 +160,7 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
     private void updateForecastWind(Taf.Forecast fc, TAFForecast tafForecast, ConversionResult<Taf> result) {
         if (tafForecast.getSurfaceWind().isPresent()) {
             Taf.Forecast.TAFWind wind = new Taf.Forecast.TAFWind();
-            TAFSurfaceWind inWind = tafForecast.getSurfaceWind().get();
+            SurfaceWind inWind = tafForecast.getSurfaceWind().get();
             wind.setSpeed(inWind.getMeanWindSpeed().getValue().intValue());
             wind.setUnit(getUomFromUnit(inWind.getMeanWindSpeed().getUom()));
             wind.setDirection(inWind.isVariableDirection() ? "VRB" : inWind.getMeanWindDirection().get().getValue().intValue());

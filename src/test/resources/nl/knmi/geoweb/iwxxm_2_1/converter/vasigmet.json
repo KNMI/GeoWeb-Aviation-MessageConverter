@@ -84,6 +84,7 @@
   "va_extra_fields" : {
     "no_va_expected" : false,
     "volcano":{
+      "name": "GRIMSVOTN",
       "position": [52.0,5.2]
     }
   }

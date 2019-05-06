@@ -523,8 +523,6 @@ public class TafValidator {
 
 	public TafValidationResult validate(String tafStr)
 			throws ProcessingException, JSONException, IOException, ParseException {
-		//		Debug.println("Validate\n" + tafStr);
-		//		System.out.println(discoverSchemata(this.tafSchemaStore.getDirectory()));
 
 		String schemaFile = tafSchemaStore.getLatestTafSchema();
 		JsonNode jsonNode = ValidationUtils.getJsonNode(tafStr);

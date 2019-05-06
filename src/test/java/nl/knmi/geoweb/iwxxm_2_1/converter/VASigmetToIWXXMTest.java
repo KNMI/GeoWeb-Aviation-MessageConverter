@@ -51,7 +51,7 @@ public class VASigmetToIWXXMTest {
 
 			String result = sigmetConverter.ToIWXXM_2_1(vaSigmet);
 			System.err.println(result);
-			System.err.println("TAC: " + vaSigmet.toTAC(firStore.lookup(vaSigmet.getFirname(), false)));
+			System.err.println("TAC: " + vaSigmet.toTAC(firStore.lookup(vaSigmet.getFirname(), true)));
 		});
 		
 	}

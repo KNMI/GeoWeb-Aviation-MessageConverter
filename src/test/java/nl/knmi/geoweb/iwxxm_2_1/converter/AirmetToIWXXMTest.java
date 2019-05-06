@@ -41,16 +41,19 @@ public class AirmetToIWXXMTest {
 	};
 
 	public static String getStringFromFile(String fn) {
-		return Tools.readResource(fn);
+		try {
+			return Tools.readResource(fn);
+		} catch (IOException e) {
+			Debug.errprintln("Can't read resource "+fn);
+		}
+		return "";
     }
 
 	public void setGeoFromString2(Airmet am, String json) {
-		Debug.println("setGeoFromString2 "+json);
-		GeoJsonObject geo;	
+		GeoJsonObject geo;
 		try {
 			geo = airmetObjectMapper.readValue(json, GeoJsonObject.class);
 			am.setGeojson(geo);
-			Debug.println("setGeoFromString ["+json+"] set");
 			return;
 		} catch (JsonParseException e) {
 		} catch (JsonMappingException e) {
@@ -69,16 +72,14 @@ public class AirmetToIWXXMTest {
 		}
 
 		String res=airmetConverter.ToIWXXM_2_1(am);
-		System.err.println(res);
-		System.err.println("TAC: "+am.toTAC(firStore.lookup(am.getFirname(), false)));
+		Debug.errprintln(res);
+		Debug.errprintln("TAC: "+am.toTAC(firStore.lookup(am.getFirname(), true)));
 	}
 	
 	@Test
 	public void TestConversions(){
 		for (String am: testAirmets) {
-			Debug.println("Testing airmet: "+am);
 			TestConversion(am);
-			Debug.println("\n");
 		}
 	}
 

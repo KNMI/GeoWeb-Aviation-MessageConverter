@@ -182,7 +182,7 @@ public class AirmetStoreTest {
 	AirmetStore testAirmetStore;
 	
 	public AirmetStore createNewStore() throws IOException {
-		Tools.rmdir(airmetStoreLocation);
+		Tools.rmdir(airmetStoreLocation+"/airmets");
 		Tools.mksubdirs(airmetStoreLocation);
 		testAirmetStore.setLocation(airmetStoreLocation);
 		Airmet[] airmets=testAirmetStore.getAirmets(false, SigmetAirmetStatus.concept);

@@ -160,7 +160,7 @@ public class Sigmet implements GeoWebProduct, IExportable<Sigmet>{
 
 		public static Phenomenon getRandomPhenomenon() {
 			int i=(int)(Math.random()*Phenomenon.values().length);
-			System.err.println("rand "+i+ " "+Phenomenon.values().length);
+			Debug.errprintln("rand "+i+ " "+Phenomenon.values().length);
 			return Phenomenon.valueOf(Phenomenon.values()[i].toString());
 		}
 
