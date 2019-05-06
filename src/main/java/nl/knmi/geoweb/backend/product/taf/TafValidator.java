@@ -43,8 +43,6 @@ import com.github.fge.jsonschema.main.JsonSchemaFactory;
 
 import lombok.Getter;
 import lombok.Setter;
-import nl.knmi.adaguc.tools.Debug;
-import nl.knmi.geoweb.backend.product.taf.augment.AugmentAmountCoverageClouds;
 import nl.knmi.geoweb.backend.product.taf.augment.AugmentAscendingHeightClouds;
 import nl.knmi.geoweb.backend.product.taf.augment.AugmentChangegroupDuration;
 import nl.knmi.geoweb.backend.product.taf.augment.AugmentChangegroupsIncreasingInTime;

@@ -172,8 +172,6 @@ public class GeoWebTafInConverter extends AbstractGeoWebTafInConverter<TAF> {
 
     private void updateForecastCloud(Taf.Forecast fc, TAFForecast tafForecast, ConversionResult<Taf> result) {
         if (tafForecast.getCloud().isPresent()) {
-            List<Taf.Forecast.TAFCloudType> cloudTypes = new ArrayList<>();
-
             CloudForecast cf = tafForecast.getCloud().get();
             if (cf.isNoSignificantCloud()) {
                 Taf.Forecast.TAFCloudType ct = new Taf.Forecast.TAFCloudType();

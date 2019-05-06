@@ -4,7 +4,6 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TAFtoTACMaps {
@@ -113,8 +112,6 @@ public class TAFtoTACMaps {
 	public static Taf.Forecast.TAFWeather fromTacString(String tac) {
 
 	    Taf.Forecast.TAFWeather w=new Taf.Forecast.TAFWeather();
-	    List<String>phen=new ArrayList<>();
-
 		String localTac=tac;
 		if (tac.startsWith("-")) {
 		    w.setQualifier(findQualifier("-"));

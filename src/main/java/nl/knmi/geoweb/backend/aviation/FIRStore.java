@@ -16,7 +16,6 @@ import java.util.Map;
 import org.geojson.Feature;
 import org.geojson.FeatureCollection;
 import org.geojson.GeoJsonObject;
-import org.geojson.GeoJsonObjectVisitor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -133,7 +132,6 @@ public class FIRStore implements Cloneable {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public static Feature cloneThroughSerialize(Feature t) {
 		try {
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();

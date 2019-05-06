@@ -46,7 +46,6 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
         AIRMETImpl.Builder airmet = new AIRMETImpl.Builder();
 
         airmet.setIssuingAirTrafficServicesUnit(getFicInfo(input.getFirname(), input.getLocation_indicator_icao()));
-        UnitPropertyGroupImpl.Builder mwo = new UnitPropertyGroupImpl.Builder();
         airmet.setMeteorologicalWatchOffice(getMWOInfo(input.getLocation_indicator_mwo(), input.getLocation_indicator_mwo()));
 
         AirspaceImpl.Builder airspaceBuilder=new AirspaceImpl.Builder()
@@ -283,22 +282,6 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
         return retval;
     }
 
-    private String getFirType(String firName) {
-        String firType=null;
-        if (firName.endsWith("FIR")) {
-            firType = "FIR";
-        } else if (firName.endsWith("UIR")) {
-            firType = "UIR";
-        } else if (firName.endsWith("CTA")) {
-            firType = "CTA";
-        } else if (firName.endsWith("FIR/UIR")) {
-            firType = "OTHER:FIR_UIR";
-        } else {
-            return "OTHER:UNKNOWN";
-        }
-        return firType;
-    }
-
     String getFirName(String firFullName){
         return firFullName.trim().replaceFirst("(\\w+)\\s((FIR|UIR|CTA|UIR/FIR)$)", "$1");
     }
@@ -307,13 +290,6 @@ public class GeoWebAIRMETConverter extends AbstractGeoWebAirmetConverter<AIRMET>
         String firName=firFullName.trim().replaceFirst("(\\w+)\\s((FIR|UIR|CTA|UIR/FIR)$)", "$1");
         UnitPropertyGroupImpl.Builder unit = new UnitPropertyGroupImpl.Builder();
         unit.setPropertyGroup(firName, icao, "FIC");
-        return unit.build();
-    }
-
-    private UnitPropertyGroup getFirInfo(String firFullName, String icao) {
-        String firName=getFirName(firFullName);
-        UnitPropertyGroupImpl.Builder unit = new UnitPropertyGroupImpl.Builder();
-        unit.setPropertyGroup(firName, icao, getFirType(firFullName));
         return unit.build();
     }
 
