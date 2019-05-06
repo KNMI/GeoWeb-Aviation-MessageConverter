@@ -96,10 +96,9 @@ public class AugmentWindEnoughChange {
 				if (!changeGroupChangeAsText.equals("FM")) {
 					/* Wind speed difference should be more than 5 knots or 2 meters per second.*/	
 					int limitSpeedDifference = unit.equals("KT") ? 5 : 2;
-					if (gustDifference != 0) { 
-						wind.put("windEnoughDifference",
-								directionDifference >= 30 || speedDifference >= limitSpeedDifference);
-					}
+					int limitGustDifference = unit.equals("KT") ? 5 : 2;
+					wind.put("windEnoughDifference",
+							directionDifference >= 30 || speedDifference >= limitSpeedDifference || gustDifference >= limitGustDifference);
 				}
 				
 				/* Copy previous wind if change type is not PROB* or TEMPO */

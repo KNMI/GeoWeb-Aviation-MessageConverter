@@ -84,13 +84,25 @@ public class TafValidatorTest {
 	}
 
 	/*
-	 * Tests Changegroups: veranderingsgroep met gust (tov geen gusts) ten onrechte
-	 * afgekeurd.
+	 * Tests Changegroups: changegroup with gust and previous group without gust
 	 */
 	@Test
 	public void testValidate_test_taf_changeGroup_with_gust_should_validateOK() throws Exception {
 
 		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T12:00:00Z\",\"changeEnd\":\"2018-06-18T15:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"wind\":{\"direction\":200,\"speed\":22,\"gusts\":36,\"unit\":\"KT\"}}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		assertThat(report.isSucceeded(), is(true));
+	}
+
+	/*
+	 * Tests Changegroups: changegroup without gust and previous group with gust
+	 */
+	@Test
+	public void testValidate_test_taf_changeGroup_without_gust_should_validateOK() throws Exception {
+
+		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":200,\"speed\":20,\"gusts\":36,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T12:00:00Z\",\"changeEnd\":\"2018-06-18T15:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"wind\":{\"direction\":200,\"speed\":22,\"unit\":\"KT\"}}}]}";
 		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
@@ -111,6 +123,64 @@ public class TafValidatorTest {
 	@Test
 	public void testValidate_test_taf_validation_should_not_crash_2() throws Exception {
 		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T16:00:00Z\",\"changeEnd\":\"2018-06-18T20:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"wind\":{\"direction\":200,\"speed\":22,\"gusts\":37,\"unit\":\"KT\"}}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		assertThat(report.isSucceeded(), is(true));
+	}
+
+	/*
+	 * Tests Changegroups: changegroup and previous group with gust and less then 5 knots of gust difference.
+	 */
+	@Test
+	public void testValidate_test_taf_groups_with_gust_difference_less_then_5_should_validateOK() throws Exception {
+
+		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":200,\"speed\":20,\"gusts\":30,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T12:00:00Z\",\"changeEnd\":\"2018-06-18T15:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"wind\":{\"direction\":200,\"speed\":20,\"gusts\":33,\"unit\":\"KT\"}}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		System.out.println(report.getErrors());
+		assertThat(report.getErrors().toString(), is("{\"/changegroups/0/forecast/wind/windEnoughDifference\":"
+				+ "[\"Change in wind must be at least 30 degrees or 5 knots\"]}"));
+		assertThat(report.isSucceeded(), is(false));
+	}
+
+	/*
+	 * Tests Changegroups: changegroup and previous group with gust and more then 5 knots of gust difference.
+	 */
+	@Test
+	public void testValidate_test_taf_groups_with_gust_difference_more_then_5_should_validateOK() throws Exception {
+
+		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":200,\"speed\":20,\"gusts\":30,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T12:00:00Z\",\"changeEnd\":\"2018-06-18T15:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"wind\":{\"direction\":200,\"speed\":20,\"gusts\":37,\"unit\":\"KT\"}}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		assertThat(report.isSucceeded(), is(true));
+	}
+
+	/*
+	 * Tests Changegroups: changegroup and previous group with gust and less then 5 knots of speed difference.
+	 */
+	@Test
+	public void testValidate_test_taf_groups_with_speed_difference_less_then_5_should_validateOK() throws Exception {
+
+		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":200,\"speed\":20,\"gusts\":35,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T12:00:00Z\",\"changeEnd\":\"2018-06-18T15:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"wind\":{\"direction\":200,\"speed\":22,\"gusts\":35,\"unit\":\"KT\"}}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		System.out.println(report.getErrors());
+		assertThat(report.getErrors().toString(), is("{\"/changegroups/0/forecast/wind/windEnoughDifference\":"
+				+ "[\"Change in wind must be at least 30 degrees or 5 knots\"]}"));
+		assertThat(report.isSucceeded(), is(false));
+	}
+
+	/*
+	 * Tests Changegroups: changegroup and previous group with gust and more then 5 knots of speed difference.
+	 */
+	@Test
+	public void testValidate_test_taf_groups_with_speed_difference_more_then_5_should_validateOK() throws Exception {
+
+		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":200,\"speed\":20,\"gusts\":35,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T12:00:00Z\",\"changeEnd\":\"2018-06-18T15:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"wind\":{\"direction\":200,\"speed\":25,\"gusts\":35,\"unit\":\"KT\"}}}]}";
 		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
