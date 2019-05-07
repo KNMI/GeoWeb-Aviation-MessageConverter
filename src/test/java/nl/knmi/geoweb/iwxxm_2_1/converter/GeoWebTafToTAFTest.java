@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,41 +24,42 @@ import nl.knmi.geoweb.backend.product.taf.converter.TafConverter;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestConfig.class })
 public class GeoWebTafToTAFTest {
-	@Autowired
-	@Qualifier("tafObjectMapper")
-	private ObjectMapper tafObjectMapper;
+    @Autowired
+    @Qualifier("tafObjectMapper")
+    private ObjectMapper tafObjectMapper;
 
-	@Autowired
-	private TafConverter tafConverter;
+    @Autowired
+    private TafConverter tafConverter;
 
     public Taf setTafFromResource(String fn) {
-    	String json="";
-    	try {
-			json = Tools.readResource(fn);
-		} catch (IOException e) {
-			Debug.errprintln("Can't read resource "+fn);
-		}
-    	return setTafFromString(json);
-	}
+        String json = "";
+        try {
+            json = Tools.readResource(fn);
+        } catch (IOException e) {
+            Debug.errprintln("Can't read resource " + fn);
+        }
+        return setTafFromString(json);
+    }
 
-	public Taf setTafFromString( String json) {
-		Taf taf=null;
-		try {
-			taf = tafObjectMapper.readValue(json, Taf.class);
-			return taf;
-		} catch (JsonParseException |JsonMappingException e) {
+    public Taf setTafFromString(String json) {
+        Taf taf = null;
+        try {
+            taf = tafObjectMapper.readValue(json, Taf.class);
+            return taf;
+        } catch (JsonParseException | JsonMappingException e) {
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Debug.errprintln("set TAF from string ["+json+"] failed");
-	    return null;
-	}
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Debug.errprintln("set TAF from string [" + json + "] failed");
+        return null;
+    }
 
-	@Test
-	public void TafToTAFTest() {
+    @Test
+    public void TafToTAFTest() throws JsonProcessingException {
       Taf taf=setTafFromResource("Taf_valid.json");
       Debug.errprintln(taf.toTAC());
+      Debug.errprintln(tafObjectMapper.writeValueAsString(taf));
       String s = tafConverter.ToIWXXM_2_1(taf);
       Debug.errprintln("S:"+s);
 	}
