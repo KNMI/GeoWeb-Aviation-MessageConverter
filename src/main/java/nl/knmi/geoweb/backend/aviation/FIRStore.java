@@ -129,7 +129,6 @@ public class FIRStore implements Cloneable {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static Feature cloneThroughSerialize(final Feature t) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();

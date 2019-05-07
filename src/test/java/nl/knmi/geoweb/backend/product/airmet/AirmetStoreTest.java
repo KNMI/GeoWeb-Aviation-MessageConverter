@@ -156,7 +156,6 @@ public class AirmetStoreTest {
 		GeoJsonObject geo;	
 		try {
 			geo = airmetObjectMapper.readValue(json, GeoJsonObject.class);
-///			am.setGeojson(geo);
 			Debug.println("setGeoFromString ["+json+"] set");
 			return;
 		} catch (JsonParseException e) {
