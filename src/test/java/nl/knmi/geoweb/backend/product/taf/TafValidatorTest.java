@@ -68,7 +68,7 @@ public class TafValidatorTest {
 		TafValidationResult report = tafValidator.validate(tafString);
 		System.out.println(report.getErrors());
 		assertThat(report.getErrors().toString(), is("{\"/changegroups/0/forecast/wind/windEnoughDifference\":"
-				+ "[\"Change in wind must be at least 30 degrees or 5 knots\"]}"));
+				+ "[\"Change in wind must be at least 30 degrees in direction or 5 knots (2 MPS) in speed or gust\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 	}
 
@@ -141,7 +141,7 @@ public class TafValidatorTest {
 		TafValidationResult report = tafValidator.validate(tafString);
 		System.out.println(report.getErrors());
 		assertThat(report.getErrors().toString(), is("{\"/changegroups/0/forecast/wind/windEnoughDifference\":"
-				+ "[\"Change in wind must be at least 30 degrees or 5 knots\"]}"));
+				+ "[\"Change in wind must be at least 30 degrees in direction or 5 knots (2 MPS) in speed or gust\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 	}
 
@@ -170,7 +170,7 @@ public class TafValidatorTest {
 		TafValidationResult report = tafValidator.validate(tafString);
 		System.out.println(report.getErrors());
 		assertThat(report.getErrors().toString(), is("{\"/changegroups/0/forecast/wind/windEnoughDifference\":"
-				+ "[\"Change in wind must be at least 30 degrees or 5 knots\"]}"));
+				+ "[\"Change in wind must be at least 30 degrees in direction or 5 knots (2 MPS) in speed or gust\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 	}
 
