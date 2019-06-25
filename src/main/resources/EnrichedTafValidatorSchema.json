@@ -283,15 +283,6 @@
                     ],
                     "type": "boolean"
                 },
-                "cloudsModifierHasWeatherPresent": {
-                    "$geoweb::messages": {
-                        "enum": "In the presence of CB or TCU a weather group with SH or TS is required"
-                    },
-                    "enum": [
-                        true
-                    ],
-                    "type": "boolean"
-                },
                 "cloudsNeededAndPresent": {
                     "$geoweb::messages": {
                         "enum": "Clouds are necessary for rain"
@@ -340,6 +331,15 @@
                 "verticalVisibilityAndPrecipitationWithinLimit": {
                     "$geoweb::messages": {
                         "enum": "Precipitation requires a vertical visibility of 1000 ft or less"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
+                "verticalVisibilityOnlyWithCloudsCBorTCU": {
+                    "$geoweb::messages": {
+                        "enum": "In the presence of VV only CB or TCU clouds are allowed"
                     },
                     "enum": [
                         true

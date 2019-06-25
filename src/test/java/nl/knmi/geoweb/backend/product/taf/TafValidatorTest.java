@@ -22,6 +22,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import nl.knmi.adaguc.tools.Tools;
 import nl.knmi.geoweb.TestConfig;
 
+// FIXME: [entire file] TafSchemaStore and TafValidator are re-instantiated for each test. This is not desirable (performance, breaks dependency injection by Spring).
+// It needs to be refactored in a way that there will be only a single instance used multiple times.
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestConfig.class })
 public class TafValidatorTest {
@@ -67,7 +70,6 @@ public class TafValidatorTest {
 		assertThat(report.getErrors().toString(), is("{\"/changegroups/0/forecast/wind/windEnoughDifference\":"
 				+ "[\"Change in wind must be at least 30 degrees or 5 knots\"]}"));
 		assertThat(report.isSucceeded(), is(false));
-
 	}
 
 	/* Tests speedOperator and gustsOperator */
@@ -79,7 +81,6 @@ public class TafValidatorTest {
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
 		assertThat(report.isSucceeded(), is(true));
-
 	}
 
 	/*
@@ -94,7 +95,6 @@ public class TafValidatorTest {
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
 		assertThat(report.isSucceeded(), is(true));
-
 	}
 
 	/* Tests validation should simply not crash on this one: One */
@@ -105,7 +105,6 @@ public class TafValidatorTest {
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
 		assertThat(report.isSucceeded(), is(false));
-
 	}
 
 	/* Tests validation should simply not crash on this one: Two */
@@ -116,7 +115,6 @@ public class TafValidatorTest {
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
 		assertThat(report.isSucceeded(), is(true));
-
 	}
 
 	/* Clouds NOT ascending in height should give valid pointer */
@@ -130,7 +128,16 @@ public class TafValidatorTest {
 		assertThat(report.getErrors().toString(),
 				is("{\"/forecast/clouds/1/cloudsHeightAscending\":[\"Cloud groups must be ascending in height\"]}"));
 		assertThat(report.isSucceeded(), is(false));
+	}
 
+	/* Clouds with the same height if CB should give valid pointer */
+	@Test
+	public void testValidate_test_taf_clouds_with_same_height_if_CB_should_give_valid_pointer() throws Exception {
+		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":15},{\"amount\":\"OVC\",\"height\":15,\"mod\":\"CB\"}],\"visibility\":{\"unit\":\"M\",\"value\":6000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-18T16:00:00Z\",\"changeType\":\"PROB30\",\"forecast\":{\"visibility\":{\"unit\":\"M\",\"value\":7000},\"wind\":{\"direction\":200,\"speed\":25,\"unit\":\"KT\"}}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		assertThat(report.isSucceeded(), is(true));
 	}
 
 	/* Clouds ascending in height should validate */
@@ -158,7 +165,6 @@ public class TafValidatorTest {
 		tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"}],\"visibility\":{\"unit\":\"M\",\"value\":2000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"freezing\",\"phenomena\":[\"fog\"]},{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[]}";
 		report = tafValidator.validate(tafString);
 		assertThat(report.isSucceeded(), is(false));
-
 	}
 
 	/* Test metadata properties */
@@ -199,7 +205,6 @@ public class TafValidatorTest {
 		assertThat(report.getErrors().toString(), is(
 				"{\"/forecast/visibilityAndFogWithoutDescriptorWithinLimit\":[\"Fog requires a visibility of less than 1000 meters\"]}"));
 		assertThat(report.isSucceeded(), is(false));
-
 	}
 
 	/* Tests if heavy fog (+FG) gives proper feedback message */
@@ -213,6 +218,15 @@ public class TafValidatorTest {
 		assertThat(report.getErrors().toString(),
 				is("{\"/forecast/weather/0/qualifier\":[\"FG, BR, DU, HZ, SA, FU, VA, SQ, PO and TS can only be moderate\"]}"));
 		assertThat(report.isSucceeded(), is(false));
+	}
 
+	/* Tests with CB or TCU without weather group should validate */
+	@Test
+	public void testValidate_test_taf_changeGroup_without_weather_group_and_with_CB_or_TCU_should_validateOK() throws Exception {
+		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":120,\"speed\":40,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-18T16:00:00Z\",\"changeType\":\"BECMG\",\"forecast\":{\"clouds\":[{\"amount\":\"BKN\",\"height\":4},{\"amount\":\"FEW\",\"height\":35,\"mod\":\"CB\"}]}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		assertThat(report.isSucceeded(), is(true));
 	}
 }
