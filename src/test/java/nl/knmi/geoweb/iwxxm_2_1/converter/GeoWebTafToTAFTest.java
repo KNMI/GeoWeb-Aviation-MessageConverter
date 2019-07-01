@@ -59,7 +59,6 @@ public class GeoWebTafToTAFTest {
     public void TafToTAFTest() throws JsonProcessingException {
       Taf taf=setTafFromResource("Taf_valid.json");
       Debug.errprintln(taf.toTAC());
-      Debug.errprintln(tafObjectMapper.writeValueAsString(taf));
       String s = tafConverter.ToIWXXM_2_1(taf);
       Debug.errprintln("S:"+s);
 	}
