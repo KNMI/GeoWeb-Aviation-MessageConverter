@@ -105,12 +105,6 @@ public class TafConverter implements ProductConverter<Taf> {
             } else {
                 Debug.errprintln("airportinfo for " + airportName + " not found");
             }
-            try {
-                Debug.errprintln("Taf: " + tafObjectMapper.writeValueAsString(convertedTAF.build()));
-            } catch (JsonProcessingException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
             ConversionResult<String> iwxxmResult = tafIWXXMStringSerializer.convertMessage(convertedTAF.build(), ConversionHints.TAF);
             if ((ConversionResult.Status.SUCCESS == iwxxmResult.getStatus())||(ConversionResult.Status.WITH_WARNINGS == iwxxmResult.getStatus())) {
                 for (ConversionIssue iss : iwxxmResult.getConversionIssues()) {
