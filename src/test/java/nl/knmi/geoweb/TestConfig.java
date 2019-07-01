@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsonorg.JsonOrgModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +37,7 @@ import nl.knmi.geoweb.backend.aviation.FIRStore;
 public class TestConfig {
   private static final String DATEFORMAT_ISO8601 = "yyyy-MM-dd'TT'HH:mm:ss'Y'";
 
-  @Value("${productstorelocation}")
+  @Value("${geoweb.products.storeLocation}")
   private String storeLocation;
 
   private static ObjectMapper objectMapper;
@@ -45,6 +46,7 @@ public class TestConfig {
     ObjectMapper om = new ObjectMapper();
     om.registerModule(new Jdk8Module());
     om.registerModule(new JavaTimeModule());
+    om.registerModule(new JsonOrgModule());
     om.setDateFormat(new SimpleDateFormat(DATEFORMAT_ISO8601));
     om.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
     SimpleModule simpleModule = new SimpleModule();

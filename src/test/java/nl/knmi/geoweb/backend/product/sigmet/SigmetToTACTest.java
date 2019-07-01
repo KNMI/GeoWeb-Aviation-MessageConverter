@@ -37,7 +37,7 @@ public class SigmetToTACTest {
 	@Qualifier("sigmetObjectMapper")
 	private ObjectMapper sigmetObjectMapper;
 	
-	@Value("${productstorelocation}")
+	@Value("${geoweb.products.storeLocation}")
 	private String sigmetStoreLocation;
 
 	@Autowired

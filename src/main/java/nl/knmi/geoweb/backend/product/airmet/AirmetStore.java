@@ -33,7 +33,7 @@ public class AirmetStore {
 
 	public ObjectMapper getOM(){ return airmetObjectMapper;}
 
-	public AirmetStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
+	public AirmetStore(@Value(value = "${geoweb.products.storeLocation}") String productstorelocation) throws IOException {
 		this.setLocation(productstorelocation);
 	}
 

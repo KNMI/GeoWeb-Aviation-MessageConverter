@@ -39,7 +39,7 @@ public class FIRStore implements Cloneable {
     private Map<String, Feature> simplifiedFIRInfos;
     private Map<String, List<Feature>> delegatedAirspaces;
 
-    public FIRStore(@Value(value = "${productstorelocation}") final String productstorelocation) {
+    public FIRStore(@Value(value = "${geoweb.products.storeLocation}") final String productstorelocation) {
         this.directory = productstorelocation + "/admin/config";
         try {
             Tools.mksubdirs(productstorelocation + "/admin/config");

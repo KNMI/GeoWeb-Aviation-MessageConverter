@@ -31,7 +31,7 @@ public class AirportStore {
     private String directory;
     private Map<String, AirportInfo> airportInfos;
 
-    public AirportStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
+    public AirportStore(@Value(value = "${geoweb.products.storeLocation}") String productstorelocation) throws IOException {
         String dir = productstorelocation + "/admin/config";
         File f = new File(dir);
         if (f.exists() == false) {

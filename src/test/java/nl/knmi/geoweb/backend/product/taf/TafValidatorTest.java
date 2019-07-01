@@ -29,7 +29,7 @@ import nl.knmi.geoweb.TestConfig;
 @SpringBootTest(classes = { TestConfig.class })
 public class TafValidatorTest {
 
-	@Value(value = "${productstorelocation}")
+	@Value(value = "${geoweb.products.storeLocation}")
 	String productstorelocation;
 
 	@Autowired

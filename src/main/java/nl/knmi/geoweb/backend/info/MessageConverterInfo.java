@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class MessageConverterInfo {
-	@Value("${info.version}")
+	@Value("${geoweb.messageConverterVersion}")
 	private String messageConverterVersion;
 	
 	public String getMessageConverterVersion() {
