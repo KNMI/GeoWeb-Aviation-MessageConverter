@@ -36,7 +36,7 @@ public class SigmetStore {
 
 	public ObjectMapper getOM(){ return sigmetObjectMapper;}
 
-	public SigmetStore(@Value(value = "${productstorelocation}") String productstorelocation) throws IOException {
+	public SigmetStore(@Value(value = "${geoweb.products.storeLocation}") String productstorelocation) throws IOException {
 		this.setLocation(productstorelocation);
 	}
 

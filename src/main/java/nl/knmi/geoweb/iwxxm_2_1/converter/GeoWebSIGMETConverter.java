@@ -48,7 +48,6 @@ public class GeoWebSIGMETConverter extends AbstractGeoWebSigmetConverter<SIGMET>
         SIGMETImpl.Builder sigmet = new SIGMETImpl.Builder();
 
         sigmet.setIssuingAirTrafficServicesUnit(getFicInfo(input.getFirname(), input.getLocation_indicator_icao()));
-        UnitPropertyGroupImpl.Builder mwo = new UnitPropertyGroupImpl.Builder();
         sigmet.setMeteorologicalWatchOffice(getMWOInfo(input.getLocation_indicator_mwo(), input.getLocation_indicator_mwo()));
 
         AirspaceImpl.Builder airspaceBuilder=new AirspaceImpl.Builder()
