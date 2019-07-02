@@ -149,9 +149,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-json-org</artifactId>
-        </dependency>
+            		<groupId>com.fasterxml.jackson.datatype</groupId>
+            		<artifactId>jackson-datatype-json-org</artifactId>
+        	</dependency>
 
 		<dependency>
 			<groupId>de.grundid.opendatalab</groupId>
