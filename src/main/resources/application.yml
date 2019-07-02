@@ -10,3 +10,4 @@ geoweb:
   products:
     storeLocation: /tmp
     exportLocation: ${geoweb.products.storeLocation}/export
+    
