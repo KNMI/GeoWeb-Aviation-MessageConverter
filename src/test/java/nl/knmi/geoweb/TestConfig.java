@@ -87,13 +87,13 @@ public class TestConfig {
   public static ObjectMapper getGeoWebObjectMapperBean() {
     return objectMapper;
   }
-  
+
   @Bean("objectMapper")
   @Primary
   public static ObjectMapper getObjectMapperBean() {
     ObjectMapper om = new ObjectMapper();
     om.registerModule(new JavaTimeModule());
-    om.setTimeZone(TimeZone.getTimeZone("UTC"));		
+    om.setTimeZone(TimeZone.getTimeZone("UTC"));
     return om;
   }
 

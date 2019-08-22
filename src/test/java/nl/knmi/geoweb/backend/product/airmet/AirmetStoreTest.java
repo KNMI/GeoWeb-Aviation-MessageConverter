@@ -3,6 +3,7 @@ package nl.knmi.geoweb.backend.product.airmet;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
@@ -19,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.geojson.GeoJsonObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -133,8 +135,9 @@ public class AirmetStoreTest {
 
 		Airmet[] airmets=store.getAirmets(false, SigmetAirmetStatus.concept);
 		assertThat(airmets.length, is(3));
-		System.err.println(airmets[0].getCloudLevels().getLower().surface+" "+airmets[0].getCloudLevels().getLower().getVal());
-//		assertEquals(airmets[0], am);
+//		System.err.println(airmets[0].getCloudLevels()); //.getLower().surface+" "+airmets[0].getCloudLevels().getLower().getVal());
+//		System.err.println(airmetObjectMapper.writeValueAsString(am));
+		assertEquals(airmetObjectMapper.writeValueAsString(am), airmetObjectMapper.writeValueAsString(airmets[0]));
 	}
 
 	@Test
