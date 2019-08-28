@@ -30,9 +30,11 @@ public class TafSchemaStore {
 	@Getter
 	private String directory = null;
 	
+/*
 	@Autowired
 	private TafValidator tafValidator;
-	
+*/
+
 	public TafSchemaStore(@Value(value = "${geoweb.products.storeLocation}") String productstorelocation) throws IOException {
 	
 		String dir = productstorelocation + "/tafs/schemas";
