@@ -346,6 +346,15 @@
                     ],
                     "type": "boolean"
                 },
+                "forecastNeededWithFM": {
+                    "$geoweb::messages": {
+                        "enum": "FM changegroups needs entire forecast and cannot contain NSW"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
                 "wind": {
                     "properties": {
                         "gustFastEnough": {
