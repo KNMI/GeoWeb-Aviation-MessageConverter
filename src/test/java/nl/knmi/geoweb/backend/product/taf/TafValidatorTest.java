@@ -299,4 +299,16 @@ public class TafValidatorTest {
 		TafValidationResult report = tafValidator.validate(tafString);
 		assertThat(report.isSucceeded(), is(true));
 	}
+
+	/* Tests: FM changegroup with NSW should give proper feedback message */
+	@Test
+	public void testValidate_test_taf_FM_changeGroup_with_NSW_proper_feedback() throws Exception {
+		String tafString = "{\"forecast\":{\"caVOK\":true,\"wind\":{\"direction\":120,\"speed\":40,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-19T18:00:00Z\",\"changeType\":\"FM\",\"forecast\":{\"weather\":\"NSW\"}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		assertThat(report.getErrors().toString(),
+				is("{\"/forecast/forecastNeededWithFM\":[\"FM changegroups needs entire forecast and cannot contain NSW\"]}"));
+		assertThat(report.isSucceeded(), is(false));
+	}
 }

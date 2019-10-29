@@ -57,7 +57,7 @@
                         "minimum":"Clouds cannot be lower than 0 ft",
                         "multipleOf": "When cloud height is between 0 and 5000 ft, it must be a multiple of 100 ft"
                     },
-                    "maximum":50,
+                    "maximum":49,
                     "minimum":0,
                     "multipleOf": 1,
                     "type":"integer"
