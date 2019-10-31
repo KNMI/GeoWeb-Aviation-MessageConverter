@@ -346,6 +346,15 @@
                     ],
                     "type": "boolean"
                 },
+                "forecastGivenWithFM": {
+                    "$geoweb::messages": {
+                        "enum": "FM changegroups needs entire forecast and cannot contain NSW"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
+                },
                 "wind": {
                     "properties": {
                         "gustFastEnough": {
@@ -359,7 +368,7 @@
                         },
                         "windEnoughDifference": {
                             "$geoweb::messages": {
-                                "enum": "Change in wind must be at least 30 degrees or 5 knots"
+                                "enum": "Change in wind must be at least 30 degrees in direction or 5 knots (2 MPS) in speed or gust"
                             },
                             "enum": [
                                 true

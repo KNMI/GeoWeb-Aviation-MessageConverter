@@ -20,7 +20,7 @@
               },
               {
                   "maximum": 360,
-                  "minimum": 0,
+                  "minimum": 1,
                   "multipleOf": 10,
                   "type": "integer"
               }
