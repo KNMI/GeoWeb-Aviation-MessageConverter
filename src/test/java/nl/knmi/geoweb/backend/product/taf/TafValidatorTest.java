@@ -308,7 +308,7 @@ public class TafValidatorTest {
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
 		assertThat(report.getErrors().toString(),
-				is("{\"/forecast/forecastNeededWithFM\":[\"FM changegroups needs entire forecast and cannot contain NSW\"]}"));
+				is("{\"/forecast/forecastGivenWithFM\":[\"FM changegroups needs entire forecast and cannot contain NSW\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 	}
 }
