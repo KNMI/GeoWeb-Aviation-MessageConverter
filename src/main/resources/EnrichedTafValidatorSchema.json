@@ -28,7 +28,7 @@
                         },
                         "changegroupsAscending": {
                             "$geoweb::messages": {
-                                "enum": "Changegroups with PROB or BECMG must be equal to or ascending in starting time, FM must be ascending in time"
+                                "enum": "Changegroups with PROB/TEMPO or BECMG must be equal to or ascending in starting time, FM must be ascending in time"
                             },
                             "enum": [
                                 true
@@ -111,7 +111,7 @@
                     "properties": {
                         "changeDurationInHours": {
                             "$geoweb::messages": {
-                                "maximum": "BECMG changegroups should be shorter than 2 hours, but strictly shorter than 4 hours",
+                                "maximum": "BECMG changegroups should normally not exceed two hours and in any case shall not exceed four hours",
                                 "minimum": "Changegroups must be at least one hour"
                             },
                             "maximum": 4,
@@ -144,7 +144,7 @@
                         },
                         "changegroupsAscending": {
                             "$geoweb::messages": {
-                                "enum": "Changegroups with PROB or BECMG must be equal to or ascending in starting time, FM must be ascending in time"
+                                "enum": "Changegroups with PROB/TEMPO or BECMG must be equal to or ascending in starting time, FM must be ascending in time"
                             },
                             "enum": [
                                 true
