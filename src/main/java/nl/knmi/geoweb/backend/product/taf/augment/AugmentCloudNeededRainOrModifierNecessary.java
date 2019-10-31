@@ -59,6 +59,15 @@ public class AugmentCloudNeededRainOrModifierNecessary {
 					forecastClouds = changeClouds;
 				}
 			}
+			else {
+				ObjectNode changeForecast = (ObjectNode) changeForecastNode;
+				JsonNode changeWeather = changeForecast.get("weather");
+				if (changeWeather.asText().equals("NSW")){
+					forecast.put("forecastGivenWithFM", false);
+				} else{
+					forecast.put("forecastGivenWithFM", true);
+				}
+			}
 		}
 	}
 

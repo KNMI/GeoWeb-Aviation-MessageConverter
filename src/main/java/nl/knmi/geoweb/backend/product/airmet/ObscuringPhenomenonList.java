@@ -54,7 +54,7 @@ public class ObscuringPhenomenonList {
             allPhenomena.add(new ObscuringPhenomenon("Sand", "SA"));
             allPhenomena.add(new ObscuringPhenomenon("Snow grains", "SG"));
             allPhenomena.add(new ObscuringPhenomenon("Snow", "SN"));
-            allPhenomena.add(new ObscuringPhenomenon("Squall line", "SQ"));
+            allPhenomena.add(new ObscuringPhenomenon("Squalls", "SQ"));
             allPhenomena.add(new ObscuringPhenomenon("Sand storm", "SS"));
             allPhenomena.add(new ObscuringPhenomenon("Volcanic Ash", "VA"));
         }
