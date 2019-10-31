@@ -30,9 +30,11 @@ public class TafSchemaStore {
 	@Getter
 	private String directory = null;
 	
+/*
 	@Autowired
 	private TafValidator tafValidator;
-	
+*/
+
 	public TafSchemaStore(@Value(value = "${geoweb.products.storeLocation}") String productstorelocation) throws IOException {
 	
 		String dir = productstorelocation + "/tafs/schemas";
@@ -62,20 +64,27 @@ public class TafSchemaStore {
 		return s;
 	}
 
-	public void storeTafSchema(String schema, ObjectMapper mapper) throws JsonProcessingException, IOException, ProcessingException {
-		JsonNode asJson = mapper.readTree(schema);
-		if (tafValidator.validateSchema(asJson)) {
-			long unixTime = System.currentTimeMillis() / 1000L;
-			String fn=String.format("%s/taf_schema_%s.json", this.directory, unixTime);
-			Tools.writeFile(fn, asJson.toString());
-		} else {
-			throw new ProcessingException("Schema is not valid");
-		}
-	}
 
 	private Long getTimestamp(String fname) {
 		return Long.parseLong(fname.replaceAll("\\D+", ""));
 	}
+
+/*      //Does not work work anymore with autowiring
+
+        @Autowired
+        private TafValidator tafValidator;
+
+        public void _storeTafSchema(String schema, ObjectMapper mapper) throws JsonProcessingException, IOException, ProcessingException {
+                JsonNode asJson = mapper.readTree(schema);
+                if (tafValidator.validateSchema(asJson)) {
+                        long unixTime = System.currentTimeMillis() / 1000L;
+                        String fn=String.format("%s/taf_schema_%s.json", this.directory, unixTime);
+                        Tools.writeFile(fn, asJson.toString());
+                } else {
+                        throw new ProcessingException("Schema is not valid");
+                }
+        }
+*/
 
 
 	public String[] getTafSchemas() throws JsonParseException, JsonMappingException, IOException {

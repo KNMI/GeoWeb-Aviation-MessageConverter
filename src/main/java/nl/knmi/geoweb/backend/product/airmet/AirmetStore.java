@@ -103,9 +103,9 @@ public class AirmetStore {
 		Comparator<Airmet> comp = new Comparator<Airmet>() {
 			public int compare(Airmet lhs, Airmet rhs) {
 				if (rhs.getIssuedate() != null && lhs.getIssuedate() != null)
-					return rhs.getIssuedate().compareTo(lhs.getIssuedate());
+					return lhs.getIssuedate().compareTo(rhs.getIssuedate());
 				else 
-					return rhs.getValiddate().compareTo(lhs.getValiddate());
+					return lhs.getValiddate().compareTo(rhs.getValiddate());
 			}
 		};
 		//Scan directory for airmets
