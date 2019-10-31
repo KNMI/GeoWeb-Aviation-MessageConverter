@@ -1,0 +1,13 @@
+endpoints:
+  info:
+    enabled: "true"
+  health:
+    enabled: "true"
+
+# GeoWeb configuration
+geoweb:
+  messageConverterVersion: "@project.version@"
+  products:
+    storeLocation: /tmp
+    exportLocation: ${geoweb.products.storeLocation}/export
+    

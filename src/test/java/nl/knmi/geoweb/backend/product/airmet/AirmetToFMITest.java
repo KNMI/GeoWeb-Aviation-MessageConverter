@@ -1,13 +1,15 @@
 package nl.knmi.geoweb.backend.product.airmet;
 
 import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.geojson.Feature;
 import org.geojson.GeoJsonObject;
@@ -20,14 +22,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import fi.fmi.avi.converter.AviMessageSpecificConverter;
 import fi.fmi.avi.converter.ConversionHints;
 import fi.fmi.avi.converter.ConversionResult;
 import fi.fmi.avi.model.sigmet.AIRMET;
+import nl.knmi.adaguc.tools.Debug;
 import nl.knmi.geoweb.TestConfig;
 import nl.knmi.geoweb.backend.product.sigmetairmet.ObsFc;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetChange;
@@ -36,7 +35,6 @@ import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetMovement;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetStatus;
 import nl.knmi.geoweb.backend.product.sigmetairmet.SigmetAirmetType;
 import nl.knmi.geoweb.iwxxm_2_1.converter.GeoWebAIRMETConverter;
-import nl.knmi.adaguc.tools.Debug;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = { TestConfig.class })
