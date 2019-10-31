@@ -238,6 +238,15 @@
                         true
                     ],
                     "type": "boolean"
+                },
+                "onlyOneCloudsCBorTCUPresent": {
+                    "$geoweb::messages": {
+                        "enum": "Only one CB or TCU cloud is possible per group"
+                    },
+                    "enum": [
+                        true
+                    ],
+                    "type": "boolean"
                 }
             }
         }]},
