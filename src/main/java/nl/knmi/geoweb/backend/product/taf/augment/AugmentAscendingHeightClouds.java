@@ -17,6 +17,9 @@ public class AugmentAscendingHeightClouds {
 			if (forecast == null || forecast.isNull() || forecast.isMissingNode())
 				continue;
 			int prevHeight = -1;
+			boolean cloudModCB = false;
+			boolean cloudModTCU = false;
+			
 			JsonNode cloudsNode=forecast.findValue("clouds");
 			if (cloudsNode.getClass().equals(String.class) || cloudsNode.getClass().equals(TextNode.class)) {
 				continue;
@@ -32,7 +35,15 @@ public class AugmentAscendingHeightClouds {
 				JsonNode cloudMod = cloudNode.findValue("mod");
 				if (cloudHeight == null || cloudHeight.asText().equals("null"))
 					continue;
-				int height = Integer.parseInt(cloudHeight.asText());				
+				int height = Integer.parseInt(cloudHeight.asText());	
+				
+				if (cloudMod != null && cloudModCB && cloudMod.asText().equals("CB") || cloudModTCU && cloudMod.asText().equals("TCU")) {
+					cloudNode.put("onlyOneCloudsCBorTCUPresent", false);
+				}
+				else {
+					cloudNode.put("onlyOneCloudsCBorTCUPresent", true);
+				}
+				
 				if (height <= prevHeight) {
 					if (cloudMod != null && cloudMod.asText().equals("CB") && height == prevHeight){
 						cloudNode.put("cloudsHeightAscending", true);	
@@ -43,7 +54,15 @@ public class AugmentAscendingHeightClouds {
 				else {
 					cloudNode.put("cloudsHeightAscending", true);
 				}
+				
+				if (cloudMod != null && !cloudModCB && cloudMod.asText().equals("CB")) {
+					cloudModCB = true;
+				}
+				if (cloudMod != null && !cloudModTCU && cloudMod.asText().equals("TCU")) {
+					cloudModTCU = true;
+				}
 				prevHeight = height;
+				
 			}
 		}
 	}

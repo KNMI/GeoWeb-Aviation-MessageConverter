@@ -190,7 +190,7 @@ public class TafValidatorTest {
 	/* Clouds NOT ascending in height should give valid pointer */
 	@Test
 	public void testValidate_test_taf_clouds_not_ascending_in_height_should_give_valid_pointer() throws Exception {
-		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"},{\"amount\":\"OVC\",\"height\":15,\"mod\":\"CB\"}],\"visibility\":{\"unit\":\"M\",\"value\":6000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-18T16:00:00Z\",\"changeType\":\"PROB30\",\"forecast\":{\"visibility\":{\"unit\":\"M\",\"value\":7000},\"wind\":{\"direction\":200,\"speed\":25,\"unit\":\"KT\"}}}]}";
+		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"},{\"amount\":\"OVC\",\"height\":15}],\"visibility\":{\"unit\":\"M\",\"value\":6000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-18T16:00:00Z\",\"changeType\":\"PROB30\",\"forecast\":{\"visibility\":{\"unit\":\"M\",\"value\":7000},\"wind\":{\"direction\":200,\"speed\":25,\"unit\":\"KT\"}}}]}";
 		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
@@ -210,10 +210,20 @@ public class TafValidatorTest {
 		assertThat(report.isSucceeded(), is(true));
 	}
 
+	/* Multiple CB in Clouds group should npt validate */
+	@Test
+	public void testValidate_test_taf_clouds_multiple_CB_should_not_validate() throws Exception {
+		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"},{\"amount\":\"OVC\",\"height\":25,\"mod\":\"CB\"}],\"visibility\":{\"unit\":\"M\",\"value\":6000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-18T16:00:00Z\",\"changeType\":\"PROB30\",\"forecast\":{\"visibility\":{\"unit\":\"M\",\"value\":7000},\"wind\":{\"direction\":200,\"speed\":25,\"unit\":\"KT\"}}}]}";
+		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
+		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
+		TafValidationResult report = tafValidator.validate(tafString);
+		assertThat(report.isSucceeded(), is(false));
+	}
+
 	/* Clouds ascending in height should validate */
 	@Test
 	public void testValidate_test_taf_clouds_ascending_in_height_should_validate() throws Exception {
-		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"},{\"amount\":\"OVC\",\"height\":25,\"mod\":\"CB\"}],\"visibility\":{\"unit\":\"M\",\"value\":6000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-18T16:00:00Z\",\"changeType\":\"PROB30\",\"forecast\":{\"visibility\":{\"unit\":\"M\",\"value\":7000},\"wind\":{\"direction\":200,\"speed\":25,\"unit\":\"KT\"}}}]}";
+		String tafString = "{\"forecast\":{\"clouds\":[{\"amount\":\"OVC\",\"height\":20,\"mod\":\"CB\"},{\"amount\":\"OVC\",\"height\":25}],\"visibility\":{\"unit\":\"M\",\"value\":6000},\"weather\":[{\"qualifier\":\"moderate\",\"descriptor\":\"showers\",\"phenomena\":[\"rain\"]}],\"wind\":{\"direction\":200,\"speed\":20,\"unit\":\"KT\"}},\"metadata\":{\"location\":\"EHAM\",\"validityStart\":\"2018-06-18T12:00:00Z\",\"validityEnd\":\"2018-06-19T18:00:00Z\"},\"changegroups\":[{\"changeStart\":\"2018-06-18T14:00:00Z\",\"changeEnd\":\"2018-06-18T16:00:00Z\",\"changeType\":\"PROB30\",\"forecast\":{\"visibility\":{\"unit\":\"M\",\"value\":7000},\"wind\":{\"direction\":200,\"speed\":25,\"unit\":\"KT\"}}}]}";
 		TafSchemaStore tafSchemaStore = new TafSchemaStore(productstorelocation);
 		TafValidator tafValidator = new TafValidator(tafSchemaStore, tafObjectMapper);
 		TafValidationResult report = tafValidator.validate(tafString);
