@@ -296,7 +296,7 @@ public class TafValidatorTest {
 		TafValidationResult report = tafValidator.validate(tafString);
 		System.out.println(report.getErrors().toString());
 		assertThat(report.getErrors().toString(),
-				is("{\"/forecast/weather/0/qualifier\":[\"FG, BR, DU, HZ, SA, FU, VA, SQ, PO and TS can only be used together with a precipitation type\"]}"));
+				is("{\"/forecast/weather/0/qualifier\":[\"Qualifier of intensity (-,+,VC) can only be used in combination with a precipitation type\"]}"));
 		assertThat(report.isSucceeded(), is(false));
 	}
 

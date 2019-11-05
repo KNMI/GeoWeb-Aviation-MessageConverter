@@ -141,7 +141,7 @@
                         },
                         "qualifier": {
                             "$geoweb::messages": {
-                                "enum": "Qualifier of intensity (-,+,VC) can only be used in combination with a precipitation type."
+                                "enum": "Qualifier of intensity (-,+,VC) can only be used in combination with a precipitation type"
                             },
                             "enum": [
                                 "moderate"
