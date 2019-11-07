@@ -141,7 +141,7 @@
                         },
                         "qualifier": {
                             "$geoweb::messages": {
-                                "enum": "FG, BR, DU, HZ, SA, FU, VA, SQ, PO and TS can only be used together with a precipitation type"
+                                "enum": "Qualifier of intensity (-,+,VC) can only be used in combination with a precipitation type"
                             },
                             "enum": [
                                 "moderate"

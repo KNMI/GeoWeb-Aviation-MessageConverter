@@ -359,10 +359,13 @@ public class Airmet implements GeoWebProduct, IExportable<Airmet> {
                 && !((Feature) effectiveStartGeometry).getProperty("selectionType").equals("fir")
                 && !((Feature) effectiveStartGeometry).getProperty("selectionType").equals("point")) {
             GeoJsonObject intersected = SigmetAirmetUtils.extractSingleStartGeometry(this.geojson);
-            int sz = ((Polygon) ((Feature) intersected).getGeometry()).getCoordinates().get(0).size();
-            if (sz <= 7) {
-                effectiveStartGeometry = intersected; // Use intersection result
-            }
+            try {
+				int sz=((Polygon)((Feature)intersected).getGeometry()).getCoordinates().get(0).size();
+				if (sz<=7)  {
+					effectiveStartGeometry = intersected; // Use intersection result
+				}
+			}
+			catch(Exception e) {}
         }
         StringBuilder sb = new StringBuilder();
         String validdateFormatted = String.format("%02d", this.validdate.getDayOfMonth())
